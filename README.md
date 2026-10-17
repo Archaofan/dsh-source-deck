@@ -2,14 +2,16 @@
 
 SourceDeck — 资料筛选台。DeepSeek Harness Desktop 插件（Host 半 + Client 半单包）。
 
-Stage one is complete and verified in the sandbox Desktop: the third-party
-`./client` half enters the boot graph, the `sourcedeck` right-Sidebar tab and
-its guide entry render, and the placeholder body mounts (evidence in
-`docs/implementation/2026-10-17-implementation-plan.md`). Stage two (V3a) is
-implemented and verified: the `source_deck` domain, `deck_submit_sources`
-tool, `sourceDeck` Remote, ignorable session records, the deck panel, the
-conversation card, and the composer entry. Evidence is in
-`docs/SETUP-VERIFICATION.md` (夜-4) and the sandbox screenshots.
+Stages one through five are implemented and verified in the sandbox Desktop:
+the third-party `./client` half enters the boot graph; the `sourcedeck` tab,
+its guide entry, the deck panel, the conversation card, and the composer entry
+render; the `source_deck` six-table domain, `deck_submit_sources` tool, and
+`sourceDeck` Remote serve both manual and model-driven submissions; ignorable
+session records replay into the card; a source-scope policy (GitHub / web /
+LLM-freeform) flags candidates from Agent metadata; and restart recovery,
+session isolation, data clearing, uninstall/reinstall, and peer rejection were
+exercised. Evidence is in `docs/SETUP-VERIFICATION.md` (夜-4 and 夜-5) and the
+sandbox screenshots. The plugin is not installed into the production Desktop.
 
 ## Build
 

@@ -77,21 +77,28 @@
 - 交付验证：手动添加→卡片→筛选→提交全链路；域文件可查（sets/candidates/selections/sources/session_active）；`session.prompt` queue 的 user/message 出现在会话投影；`deck_submit_sources` 出现在 request/header 工具目录；16 个单元测试全绿。证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-4 段；截图 `sandbox/dsh-desktop/logs/shots/stage2-panel/`、`stage2-card/`、`stage2-final/`。
 - 实现取舍：树外包无法运行 workspace 版 Typert 生成器，Remote 采用单 `request(op, bodyJson)` 方法 + 手写贡献；Host 端 `@Remote` 装饰器不被本项目 tsdown 降级，改为显式写入协议同款 `version:1` 原型 marker。后续若要具名 wire 方法，可再引入生成器而不改 UI。
 
-## 阶段 3：来源范围配置（V7）
+## 阶段 3：来源范围配置（V7）— 已完成（2026-10-17，产品 0.1.12）
 
-- `scope-policy.ts`：三种策略类型 schema + flags 计算；`getScopePolicy/setScopePolicy`；`scope_policies` 表；`sources.meta`；`candidates.policyFlags`。
-- 设置页策略编辑器（GitHub 参数表单 / web 域名清单 / LLM 自主指导语）；资料台策略摘要条；卡片/面板策略标记（不阻断保留）。
-- 交付物：改策略→新候选带标记的对比截图。
+- `scope-policy.ts`：github / web / llm-freeform 三类策略的校验、`computeFlags`（stars-below、stale、language/license/topic、fork、archived、domain-blocked/not-allowed）与中文摘要。
+- 域：新增 `scope_policies` 表（键 `default`）；`sources.meta`（Agent 提供）；`candidates.policyFlags`；`getPolicy/setPolicy`；`clearData` 覆盖六表。
+- UI：`settings.section`「资料台」编辑器（GitHub 参数、web 域名、LLM 指导语、清除数据）；资料台策略摘要条；卡片/面板标记徽章；保存只影响后续候选。
+- 验收：29 个单元测试全绿；沙箱设置页把 minStars 改为 800，Agent 提交 `Bun`（无标记）与 `Old Go Repo`（`stars-below`+`stale`）；域记录与 UI 徽章一致。证据见 SETUP-VERIFICATION 夜-5 段。
 
-## 阶段 4：模型链路（V3b）
+## 阶段 4：模型链路（V3b）— 已完成（2026-10-17）
 
-- 沙箱 DeepSeek API 已就绪（见 SETUP-VERIFICATION 下午记录）。验证 Agent 调用 `deck_submit_sources`→卡片→筛选→提交→下一轮引用保留资料。
-- 交付物：会话投影截图 + 下一轮请求历史含摘要的证据（日志/CDP）。
+- 沙箱 DeepSeek API 已就绪。实测 Agent 调用 `deck_submit_sources`（会话日志 seq19 tool-call），产生 set-snapshot（含策略与 flags）。
+- 筛选提交后：`user/message`（seq39）含保留 Bun 与排除理由、当前策略；下一轮助手（seq41）明确「The user has kept Bun」并基于该资料继续。
+- 交付物：日志证据 + `logs/shots/stage3-4-model/` 截图。
 
-## 阶段 5：边界行为（V4/V5/V6/V2）
+## 阶段 5：边界行为（V4/V5/V6/V2）— 已完成（2026-10-17）
 
-- 重启恢复、多会话隔离、停用/卸载/清除数据、peer 负向兼容。
-- 交付物：各项行为记录表。
+- V4 重启恢复：卡片与面板从域/日志恢复，决策与策略一致（`logs/shots/stage5-recovery/`）。
+- V5 多会话隔离：两个会话各自看到自己的集合（1 条 vs 2 条），无串数据（`stage5-sessions/`）。
+- V6 清除/卸载重装：设置页清除后六表 0 文件；卸载后入口/guide/body 均消失，重装恢复（`stage5-clear/`）。
+- V2 peer 负向：peer `0.2.0-rc.2` 的 0.1.12-peer-old 被 CLI 明确拒绝并自动回滚，profile 保持 0.1.12。
+- 工具：新增沙箱脚本 `Remove-Plugin.ps1`（不在项目 Git 内）。
+
+所有阶段结果与未验证项见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-5 段。生产 Desktop 已由用户升级到 `0.2.1-rc.2`，与本产品 peer 匹配；安装到生产等待用户批准。
 
 ## 阶段间纪律
 

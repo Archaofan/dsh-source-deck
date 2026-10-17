@@ -20,6 +20,8 @@ export interface PromptInput {
   readonly total: number
   readonly kept: readonly PromptKept[]
   readonly excluded: readonly PromptExcluded[]
+  /** One-line description of the active source-scope policy, when one exists. */
+  readonly policy?: string
 }
 
 /**
@@ -44,5 +46,6 @@ export function buildPrompt(input: PromptInput): string {
     })
   }
   lines.push('请基于保留资料继续。')
+  if (input.policy !== undefined && input.policy !== '') lines.push(`当前来源策略：${input.policy}`)
   return lines.join('\n')
 }

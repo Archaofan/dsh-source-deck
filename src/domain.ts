@@ -67,6 +67,7 @@ function validateSource(value: unknown): void {
   requiredEnum(value.origin, 'source.origin', ['agent', 'user'])
   requiredString(value.dedupeKey, 'source.dedupeKey')
   requiredString(value.createdAt, 'source.createdAt')
+  if (value.meta !== undefined && !isObject(value.meta)) throw new Error('source.meta must be an object')
 }
 
 function validateCandidate(value: unknown): void {
@@ -75,6 +76,18 @@ function validateCandidate(value: unknown): void {
   requiredString(value.sourceId, 'candidate.sourceId')
   requiredEnum(value.verdict, 'candidate.verdict', ['pending', 'kept', 'excluded'])
   requiredString(value.createdAt, 'candidate.createdAt')
+  if (value.policyFlags !== undefined
+    && (!Array.isArray(value.policyFlags) || value.policyFlags.some(flag => typeof flag !== 'string'))) {
+    throw new Error('candidate.policyFlags must be an array of strings')
+  }
+}
+
+function validatePolicy(value: unknown): void {
+  if (!isObject(value)) throw new Error('scope policy record must be an object')
+  requiredEnum(value.kind, 'policy.kind', ['github', 'web', 'llm-freeform'])
+  if (!isObject(value.params)) throw new Error('policy.params must be an object')
+  requiredString(value.createdAt, 'policy.createdAt')
+  requiredString(value.updatedAt, 'policy.updatedAt')
 }
 
 function validateSelection(value: unknown): void {
@@ -102,6 +115,7 @@ const DOMAIN_SPEC = {
     sources: { valueSchema: recordSchema(validateSource) },
     candidates: { valueSchema: recordSchema(validateCandidate) },
     selections: { valueSchema: recordSchema(validateSelection) },
+    scope_policies: { valueSchema: recordSchema(validatePolicy) },
     session_active: { valueSchema: recordSchema(validateSessionActive) },
   },
 } as const

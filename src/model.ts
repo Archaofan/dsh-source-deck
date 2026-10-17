@@ -1,7 +1,8 @@
 /**
- * SourceDeck data model: the five domain tables and their record fields.
+ * SourceDeck data model: the six domain tables and their record fields.
  * Records are plain JSON; the Host validates them before storage.
  */
+import type { SourceMeta } from './scope-policy.ts'
 
 /** Candidate decision. */
 export type Verdict = 'pending' | 'kept' | 'excluded'
@@ -19,15 +20,7 @@ export interface SourceRecord {
   readonly origin: Origin
   readonly dedupeKey: string
   readonly createdAt: string
-  readonly meta?: {
-    readonly stars?: number
-    readonly pushedAt?: string
-    readonly language?: string
-    readonly license?: string
-    readonly forks?: number
-    readonly archived?: boolean
-    readonly topics?: readonly string[]
-  }
+  readonly meta?: SourceMeta
 }
 
 /** One candidate set. */
@@ -46,6 +39,7 @@ export interface CandidateRecord {
   reason?: string
   decidedAt?: string
   readonly createdAt: string
+  readonly policyFlags?: readonly string[]
 }
 
 /** One submitted selection. */
@@ -65,7 +59,7 @@ export interface SessionActiveRecord {
 }
 
 /** Tables owned by the `source_deck` domain. */
-export const TABLES = ['sets', 'sources', 'candidates', 'selections', 'session_active'] as const
+export const TABLES = ['sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active'] as const
 
 /** The storage surface the operations need; the domain handle and tests both provide it. */
 export interface DeckStore {

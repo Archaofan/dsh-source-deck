@@ -28,6 +28,27 @@
   border-bottom: 1px solid var(--dsw-border-subtle, rgba(127, 127, 127, 0.2));
 }
 
+.policy {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--dsw-text-secondary, currentColor);
+}
+
+.flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.flag {
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--dsw-warning, #e8590c);
+  color: var(--dsw-warning, #e8590c);
+  font-size: 10px;
+  line-height: 18px;
+}
+
 .form {
   display: flex;
   flex-direction: column;

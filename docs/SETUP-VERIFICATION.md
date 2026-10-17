@@ -130,11 +130,49 @@
 | 截图 | `logs/shots/stage2-panel/`（添加、已提交）、`logs/shots/stage2-card/`（卡片、卡片打开资料台）、`logs/shots/stage2-final/`（最终卡片与面板）；均不进 Git |
 | 未受影响 | 日用 DSH 19387 未启动/重启；产品 peer 仍 `0.2.1-rc.2`；未做模型链路专项验收（属阶段 4 / V3b） |
 
+## 2026-10-17 夜-5：阶段 3/4/5 实现与验收（来源范围、模型链路、边界行为）
+
+背景：用户要求继续阶段 3-5 直到验收；生产 Desktop 已由用户经 Codex 升级到 `0.2.1-rc.2`（与沙箱一致，见 `operations/production-upgrade-20261017/README.md`）。产品 `0.1.12`。未把插件安装到生产。
+
+### 阶段 3（V7 来源范围配置）
+
+| 项目 | 证据与结果 |
+|---|---|
+| 策略引擎 | `scope-policy.ts`：github/web/llm-freeform 三类；校验；`computeFlags`；`policySummary`。单元测试 8 例通过 |
+| 操作/域 | `scope_policies` 表（键 `default`）；`getPolicy/setPolicy`；候选入库时算 `policyFlags`；`clearData` 覆盖六表。policy-ops 测试 5 例通过 |
+| 全量测试 | `node --test tests/*.test.ts`：`tests 29 / pass 29 / fail 0` |
+| 设置页 | 设置 → 资料台；编辑器加载默认 `minStars=500/6 个月/排除 fork/archived`；改为 800 保存后显示「已保存：GitHub · stars≥800 · 近6个月更新 · 排除 fork · 排除 archived」 |
+| 策略落盘 | `home/storages/source_deck/scope_policies/default.json`：`{kind:'github',params:{minStars:800,updatedWithinMonths:6,excludeForks:true,excludeArchived:true},createdAt,updatedAt}` |
+| 策略生效 | Agent 提交 `Bun`（78k stars, 2026-10）无标记；`Old Go Repo`（120 stars, 2024-01）域记录 `policyFlags:["stars-below","stale"]`；面板/卡片显示「星数不足」「久未更新」，仍可保留 |
+| 改策略边界 | 单测 `a changed policy applies only to later candidates`：改策略前候选 flags 不重算，改后新候选按新策略标记 |
+| 截图 | `logs/shots/stage3-policy/`（设置页、保存）、`stage3-4-model/`（卡片/面板标记） |
+
+### 阶段 4（V3b 模型链路）
+
+| 项目 | 证据与结果 |
+|---|---|
+| Agent 调工具 | 新会话提示后，助手序 19 包含 `tool-call deck_submit_sources` 及两个候选参数；工具返回后助手回复「已提交」 |
+| 记录 | 会话日志 seq21/22 `set-snapshot`（含 policySummary 与 flags）、seq34 `selection-submitted`（kept:1 excluded:1） |
+| 提交回传 | seq39 `user/message`：「用户已筛选资料集（共 2 条候选）：保留 1 条：1）《Bun》https://github.com/oven-sh/bun 排除 1 条：1）《Old Go Repo》…当前来源策略：GitHub · stars≥800…」 |
+| 下一轮理解 | seq41 助手（turn 2）推理明确写「The user has kept Bun」，并基于 Bun 继续；随后向用户发问，已跳过 |
+| UI | 面板显示策略条与两个标记；保留 Bun、排除 Old Go Repo，提交成功；卡片 DOM 文本「候选资料集 · 2 / 保留 1 · 排除 1 · 待处理 0 / 来源策略… / Bun 保留 / Old Go Repo 排除 星数不足 久未更新 / 在资料台打开」 |
+| 截图 | `logs/shots/stage3-4-model/`（agent-card、agent-panel-flags、agent-submitted、chat-card） |
+
+### 阶段 5（边界行为）
+
+| 用例 | 证据与结果 |
+|---|---|
+| V4 重启恢复 | 停止后重启：卡片恢复为 `set-32881acd…`「候选资料集 · 2 / 保留 1 / 排除 1 / 策略 800 / 标记」；面板恢复同样内容。截图 `logs/shots/stage5-recovery/` |
+| V5 多会话隔离 | 切换到「DSH插件机制资料继续」会话：面板仅 1 条（DSH 插件机制概述，保留）；切回「提交两个候选到 deck_submit_sources」：面板 2 条（Bun/Old Go Repo）。互不串数据。截图 `stage5-sessions/` |
+| V6 清除数据 | 设置页点「清除资料台数据」（确认）→ 显示「已清除资料台数据。」；`storages/source_deck` 六张表文件数均为 0；会话日志保留。截图 `stage5-clear/` |
+| V6 卸载/重装 | `Remove-Plugin.ps1` 卸载后：profile dependencies 为 null；启动后 composer 入口数 0、guide 无「资料筛选台」、无 deck body；重装 0.1.12 后入口数 1、deck body 恢复（empty） |
+| V2 peer 负向 | 构造 peer `@deepseek-ai/dsh@0.2.0-rc.2` 的 `0.1.12-peer-old.tgz` 安装：CLI 拒绝「dsh-source-deck@0.1.12-peer-old is incompatible with dsh 0.2.1-rc.2: requirements {@deepseek-ai/dsh:0.2.0-rc.2}」并自动回滚 `package.json`/lockfile/node_modules；profile 保持 0.1.12 |
+| 工具 | `Remove-Plugin.ps1`（沙箱脚本，加入 scripts 目录；不入项目 Git） |
+
 ## 尚未验证
 
-- **生产 Desktop 升级到 0.2.1-rc.2**：未进行，也不在本次范围内；在升级前 0.1.x 不会在日用环境加载。
-- **带模型的完整筛选链路（V3b）**：未做专项验收；本轮提交后 `session.prompt` 会唤醒 Agent，属设计内的“提交即唤醒”，但未验证 Agent 后续正确引用保留资料。
-- **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 5 附加验证。
+- **安装到生产 Desktop**：生产已升级到 `0.2.1-rc.2`，与产品 peer 匹配；但没有擅自安装，等待用户明确批准。安装走 App「设置 → 插件」或市场接口。
+- **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）。
 - 停车后的正常菜单退出仍未验证（本轮为按记录 PID 的受控停止）。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。
 

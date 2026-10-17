@@ -16,8 +16,9 @@ import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
 import {
-  addSource, clearData, commitSelection, decide, getActiveSet, getSet,
+  addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, setPolicy,
 } from './ops.ts'
+import { policySummary, type SourceMeta } from './scope-policy.ts'
 
 /** One operation body shape; operations validate the fields they use. */
 type OperationBody = Record<string, unknown>
@@ -42,6 +43,62 @@ function optionalString(body: OperationBody, name: string): string | undefined {
   if (value === undefined) return undefined
   if (typeof value !== 'string') throw new Error(`${name} must be a string`)
   return value
+}
+
+/** Decode optional Agent-supplied source metadata; unknown fields are ignored. */
+function metaOf(body: OperationBody): SourceMeta | undefined {
+  const raw = body.meta
+  if (raw === undefined) return undefined
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+    throw new Error('meta must be a JSON object')
+  }
+  const meta = raw as Record<string, unknown>
+  const number = (name: string): number | undefined => {
+    const value = meta[name]
+    if (value === undefined) return undefined
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+      throw new Error(`meta.${name} must be a non-negative number`)
+    }
+    return value
+  }
+  const text = (name: string): string | undefined => {
+    const value = meta[name]
+    if (value === undefined) return undefined
+    if (typeof value !== 'string') throw new Error(`meta.${name} must be a string`)
+    return value
+  }
+  const flag = (name: string): boolean | undefined => {
+    const value = meta[name]
+    if (value === undefined) return undefined
+    if (typeof value !== 'boolean') throw new Error(`meta.${name} must be a boolean`)
+    return value
+  }
+  const list = (name: string): string[] | undefined => {
+    const value = meta[name]
+    if (value === undefined) return undefined
+    if (!Array.isArray(value) || value.some(item => typeof item !== 'string')) {
+      throw new Error(`meta.${name} must be an array of strings`)
+    }
+    return value as string[]
+  }
+  const stars = number('stars')
+  const pushedAt = text('pushedAt')
+  const language = text('language')
+  const license = text('license')
+  const forks = number('forks')
+  const archived = flag('archived')
+  const fork = flag('fork')
+  const topics = list('topics')
+  return {
+    ...(stars === undefined ? {} : { stars }),
+    ...(pushedAt === undefined ? {} : { pushedAt }),
+    ...(language === undefined ? {} : { language }),
+    ...(license === undefined ? {} : { license }),
+    ...(forks === undefined ? {} : { forks }),
+    ...(archived === undefined ? {} : { archived }),
+    ...(fork === undefined ? {} : { fork }),
+    ...(topics === undefined ? {} : { topics }),
+  }
 }
 
 /** SourceDeck Host Remote service. */
@@ -92,10 +149,20 @@ export class SourceDeckRemote extends TypertRemoteService {
           ...(optionalString(args, 'url') === undefined ? {} : { url: optionalString(args, 'url') }),
           ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
           ...(optionalString(args, 'snippet') === undefined ? {} : { snippet: optionalString(args, 'snippet') }),
+          ...(metaOf(args) === undefined ? {} : { meta: metaOf(args) }),
         })
         emitDeckRecord(this.ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot',
-          snapshotOf(result.setId, await getSet(store, result.setId)))
+          snapshotOf(result.setId, await getSet(store, result.setId), policySummary(await getPolicy(store))))
         return JSON.stringify(result)
+      }
+      case 'getScopePolicy': {
+        const policy = await getPolicy(await this.getStore())
+        return JSON.stringify({ policy, summary: policySummary(policy) })
+      }
+      case 'setScopePolicy': {
+        const store = await this.getStore()
+        const stored = await setPolicy(store, args.policy ?? { kind: args.kind, params: args.params })
+        return JSON.stringify({ policy: stored, summary: policySummary(stored) })
       }
       case 'getActiveSet': {
         const view = await getActiveSet(await this.getStore(), stringField(args, 'sessionId'))
@@ -124,7 +191,7 @@ export class SourceDeckRemote extends TypertRemoteService {
           ...(candidate.reason === undefined ? {} : { reason: candidate.reason }),
         })
         emitDeckRecord(this.ctx, view.set.sessionId, 'plugin:dsh-source-deck/set-snapshot',
-          snapshotOf(candidate.setId, view))
+          snapshotOf(candidate.setId, view, policySummary(await getPolicy(store))))
         return JSON.stringify({ ok: true })
       }
       case 'commitSelection': {

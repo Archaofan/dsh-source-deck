@@ -18,12 +18,14 @@ export const DECK_CARD_KIND = 'source-deck-set'
 /** Renderer payload derived from the latest snapshot. */
 export interface DeckCardData {
   readonly setId: string
+  readonly policySummary?: string
   readonly candidates: readonly {
     readonly candidateId: string
     readonly title: string
     readonly url?: string
     readonly verdict: 'pending' | 'kept' | 'excluded'
     readonly reason?: string
+    readonly policyFlags?: readonly string[]
   }[]
   readonly kept: number
   readonly excluded: number
@@ -45,9 +47,11 @@ function dataOf(event: ConversationMatch['event']): DeckCardData {
     ...(candidate.url === undefined ? {} : { url: candidate.url }),
     verdict: candidate.verdict,
     ...(candidate.reason === undefined ? {} : { reason: candidate.reason }),
+    ...(candidate.policyFlags === undefined ? {} : { policyFlags: candidate.policyFlags }),
   }))
   return {
     setId: snapshot.setId,
+    ...(snapshot.policySummary === undefined ? {} : { policySummary: snapshot.policySummary }),
     candidates,
     kept: candidates.filter(candidate => candidate.verdict === 'kept').length,
     excluded: candidates.filter(candidate => candidate.verdict === 'excluded').length,

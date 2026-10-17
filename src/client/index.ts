@@ -8,15 +8,18 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type { CommitResult, SetView, AddSourceResult } from '../ops.ts'
 import type { Verdict } from '../model.ts'
+import type { ScopePolicy } from '../scope-policy.ts'
 import { DeckBody } from './DeckBody.tsx'
 import { DeckCard } from './DeckCard.tsx'
 import { DeckEntryButton } from './DeckEntryButton.tsx'
 import { DeckTitle } from './DeckTitle.tsx'
+import { ScopePolicySection } from './ScopePolicySection.tsx'
 import { deckCardDefinition, DECK_CARD_KIND } from './card-definition.ts'
 import { DECK_ID, DECK_KIND, deckDefinition } from './definition.ts'
-import type { DeckFace } from './deck-face.ts'
+import type { DeckFace, PolicyView } from './deck-face.ts'
 import { en, zh } from './locales.ts'
 import { TYPERT_REMOTE } from '../remote-info.ts'
 
@@ -94,6 +97,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       })
       return result.ok
     },
+    loadPolicy: async () => await call('getScopePolicy', {}) as PolicyView,
+    savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
+    clearData: async () => { await call('clearData', {}) },
   }
 
   ctx.effect(() => ctx.sidebarRightTabs.register(deckDefinition(t)), 'dsh-source-deck: deck type')
@@ -107,6 +113,17 @@ export async function apply(ctx: ClientContext): Promise<void> {
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register(
     { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck }) },
     DeckEntryButton as never,
+  ))
+  ctx.slots.inject('settings.section', () => ctx.slots.register(
+    {
+      name: 'settings.section',
+      id: 'source-deck',
+      order: 60,
+      label: () => t('settings.nav'),
+      locale: NS,
+      inject: () => ({ deck }),
+    },
+    ScopePolicySection as never,
   ))
   ctx.effect(() => ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register(
     { name: 'sidebar.right.pane.tab', key: DECK_ID, locale: NS, inject: () => ({ deck }) },

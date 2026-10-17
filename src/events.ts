@@ -21,6 +21,7 @@ declare module '@deepseek-ai/dsh-session/types' {
       readonly sessionId: string
       readonly origin: Origin
       readonly status: 'open' | 'submitted'
+      readonly policySummary?: string
       readonly candidates: readonly {
         readonly candidateId: string
         readonly sourceId: string
@@ -28,6 +29,7 @@ declare module '@deepseek-ai/dsh-session/types' {
         readonly url?: string
         readonly verdict: Verdict
         readonly reason?: string
+        readonly policyFlags?: readonly string[]
       }[]
     }
     /** One decision change, for consumers that only need the delta. */
@@ -71,6 +73,7 @@ export interface DeckSnapshot {
   readonly sessionId: string
   readonly origin: Origin
   readonly status: 'open' | 'submitted'
+  readonly policySummary?: string
   readonly candidates: readonly {
     readonly candidateId: string
     readonly sourceId: string
@@ -78,6 +81,7 @@ export interface DeckSnapshot {
     readonly url?: string
     readonly verdict: Verdict
     readonly reason?: string
+    readonly policyFlags?: readonly string[]
   }[]
 }
 
@@ -85,14 +89,16 @@ export interface DeckSnapshot {
  * Build a snapshot payload from one set view.
  * @param setId - set identity.
  * @param view - current set and candidates.
+ * @param policy - one-line active policy summary.
  * @returns the record payload.
  */
-export function snapshotOf(setId: string, view: SetView): DeckSnapshot {
+export function snapshotOf(setId: string, view: SetView, policy?: string): DeckSnapshot {
   return {
     setId,
     sessionId: view.set.sessionId,
     origin: view.set.origin,
     status: view.set.status,
+    ...(policy === undefined ? {} : { policySummary: policy }),
     candidates: view.candidates.map(entry => ({
       candidateId: entry.candidateId,
       sourceId: entry.candidate.sourceId,
@@ -100,6 +106,7 @@ export function snapshotOf(setId: string, view: SetView): DeckSnapshot {
       ...(entry.source.url === undefined ? {} : { url: entry.source.url }),
       verdict: entry.candidate.verdict,
       ...(entry.candidate.reason === undefined ? {} : { reason: entry.candidate.reason }),
+      ...(entry.candidate.policyFlags === undefined ? {} : { policyFlags: entry.candidate.policyFlags }),
     })),
   }
 }

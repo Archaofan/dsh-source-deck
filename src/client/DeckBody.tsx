@@ -7,8 +7,8 @@ import { useEffect, useState, type ReactNode } from 'react'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type { CandidateView, SetView } from '../ops.ts'
-import type { DeckFace } from './deck-face.ts'
-import type {} from './locales.ts'
+import type { DeckFace, PolicyView } from './deck-face.ts'
+import type { DeckKey } from './locales.ts'
 import css from './DeckBody.module.css'
 
 /** The body's composed props: runtime shares, copy, and the injected face. */
@@ -33,6 +33,7 @@ function groupsOf(candidates: readonly CandidateView[]) {
  */
 export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
   const [view, setView] = useState<SetView | null>(null)
+  const [policy, setPolicy] = useState<PolicyView | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -43,7 +44,9 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
   const refresh = async (): Promise<void> => {
     try {
       setError(null)
-      setView(await deck.load(sessionId))
+      const [nextView, nextPolicy] = await Promise.all([deck.load(sessionId), deck.loadPolicy()])
+      setView(nextView)
+      setPolicy(nextPolicy)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : String(caught))
     }
@@ -123,6 +126,8 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
         pending: String(groups.pending.length),
       })}</div>
 
+      {policy === null ? null : <div className={css.policy}>{t('policy.bar', { summary: policy.summary })}</div>}
+
       {view === null ? (
         <div>
           <p className={css.line}>{t('empty.title')}</p>
@@ -154,6 +159,13 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
                   </div>
                   {entry.source.note === undefined ? null : <div className={css.meta}>{entry.source.note}</div>}
                   {entry.candidate.reason === undefined ? null : <div className={css.meta}>{entry.candidate.reason}</div>}
+                  {entry.candidate.policyFlags === undefined || entry.candidate.policyFlags.length === 0 ? null : (
+                    <div className={css.flags}>
+                      {entry.candidate.policyFlags.map(flag => (
+                        <span key={flag} className={css.flag}>{t(`flag.${flag}` as DeckKey)}</span>
+                      ))}
+                    </div>
+                  )}
                   <div className={css.actions}>
                     {entry.candidate.verdict === 'kept'
                       ? <button className={css.button} disabled={busy} onClick={() => void decide(entry.candidateId, 'pending')}>{t('action.undo')}</button>

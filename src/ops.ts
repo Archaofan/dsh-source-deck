@@ -5,10 +5,23 @@
 import { dedupeKey } from './dedupe.ts'
 import { buildPrompt } from './prompt.ts'
 import {
+  computeFlags, DEFAULT_POLICY, normalizePolicy, policySummary,
+  type ScopePolicy,
+} from './scope-policy.ts'
+import {
   newId,
   type CandidateRecord, type DeckStore, type Origin, type SelectionRecord,
   type SessionActiveRecord, type SetRecord, type SourceRecord, type Verdict,
 } from './model.ts'
+
+/** One policy record as stored. */
+export interface StoredPolicy extends ScopePolicy {
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+/** The policy key every session reads until per-session overrides exist. */
+const POLICY_KEY = 'default'
 
 /** Input for adding one manual or agent-provided source. */
 export interface AddSourceInput {
@@ -28,6 +41,7 @@ export interface AddSourceResult {
   readonly sourceId: string
   readonly candidateId: string
   readonly duplicate: boolean
+  readonly policyFlags: readonly string[]
 }
 
 /** One candidate with its source, as rendered by the deck. */
@@ -78,6 +92,33 @@ function activeSetId(store: DeckStore, sessionId: string): string | undefined {
 }
 
 /**
+ * Read the active source-scope policy, falling back to the first-run default.
+ * @param store - deck store.
+ * @returns the stored policy or the default.
+ */
+export async function getPolicy(store: DeckStore): Promise<StoredPolicy> {
+  const value = store.get('scope_policies', POLICY_KEY)
+  if (isRecord(value)) return value as unknown as StoredPolicy
+  const created = now()
+  return { ...DEFAULT_POLICY, createdAt: created, updatedAt: created }
+}
+
+/**
+ * Validate and persist the active policy.
+ * @param store - deck store.
+ * @param input - policy payload from settings.
+ * @returns the stored policy.
+ */
+export async function setPolicy(store: DeckStore, input: unknown): Promise<StoredPolicy> {
+  const normalized = normalizePolicy(input)
+  const existing = store.get('scope_policies', POLICY_KEY)
+  const createdAt = isRecord(existing) && typeof existing.createdAt === 'string' ? existing.createdAt : now()
+  const stored: StoredPolicy = { ...normalized, createdAt, updatedAt: now() }
+  await store.put('scope_policies', POLICY_KEY, stored)
+  return stored
+}
+
+/**
  * Ensure the session has an open set.
  * @param store - deck store.
  * @param sessionId - owning session.
@@ -103,6 +144,8 @@ export async function ensureActiveSet(store: DeckStore, sessionId: string, origi
  */
 export async function addSource(store: DeckStore, input: AddSourceInput): Promise<AddSourceResult> {
   const key = dedupeKey({ url: input.url, title: input.title })
+  const policy = await getPolicy(store)
+  const policyFlags = computeFlags(policy, input.meta ?? {}, input.url)
   const setId = await ensureActiveSet(store, input.sessionId, input.origin)
   const existingSource = findEntry<SourceRecord>(store, 'sources', source => source.dedupeKey === key)
   let sourceId: string
@@ -126,12 +169,24 @@ export async function addSource(store: DeckStore, input: AddSourceInput): Promis
   const existingCandidate = findEntry<CandidateRecord>(store, 'candidates', candidate =>
     candidate.setId === setId && candidate.sourceId === sourceId)
   if (existingCandidate !== undefined) {
-    return { setId, sourceId, candidateId: existingCandidate[0], duplicate: true }
+    return {
+      setId,
+      sourceId,
+      candidateId: existingCandidate[0],
+      duplicate: true,
+      policyFlags: existingCandidate[1].policyFlags ?? [],
+    }
   }
   const candidateId = newId('cand')
-  const candidate: CandidateRecord = { setId, sourceId, verdict: 'pending', createdAt: now() }
+  const candidate: CandidateRecord = {
+    setId,
+    sourceId,
+    verdict: 'pending',
+    createdAt: now(),
+    ...(policyFlags.length === 0 ? {} : { policyFlags }),
+  }
   await store.put('candidates', candidateId, candidate)
-  return { setId, sourceId, candidateId, duplicate: false }
+  return { setId, sourceId, candidateId, duplicate: false, policyFlags }
 }
 
 /**
@@ -233,7 +288,12 @@ export async function commitSelection(
   await store.put('sets', input.setId, { ...set, status: 'submitted' } satisfies SetRecord)
   return {
     selectionId,
-    promptText: buildPrompt({ total: view.candidates.length, kept: promptKept, excluded: promptExcluded }),
+    promptText: buildPrompt({
+      total: view.candidates.length,
+      kept: promptKept,
+      excluded: promptExcluded,
+      policy: policySummary(await getPolicy(store)),
+    }),
     kept,
     excluded,
   }
@@ -244,7 +304,7 @@ export async function commitSelection(
  * @param store - deck store.
  */
 export async function clearData(store: DeckStore): Promise<void> {
-  for (const table of ['sets', 'sources', 'candidates', 'selections', 'session_active']) {
+  for (const table of ['sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active']) {
     const keys = [...store.entries(table)].map(([key]) => key)
     for (const key of keys) await store.delete(table, key)
   }

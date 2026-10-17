@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import type { ChatNodeViewProps } from '@deepseek-ai/dsh-client-ui-chat/client'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from './locales.ts'
+import type { DeckKey } from './locales.ts'
 import css from './DeckCard.module.css'
 
 /** Card props: owner data, copy, and the panel entry callback. */
@@ -32,15 +33,25 @@ export function DeckCard({ node, t, openDeck }: DeckCardProps): ReactNode {
           pending: String(data.pending),
         })}</span>
       </div>
+      {data.policySummary === undefined ? null : <p className={css.policy}>{t('policy.bar', { summary: data.policySummary })}</p>}
       <ul className={css.list}>
         {shown.map(candidate => (
           <li key={candidate.candidateId} className={css.row}>
-            <span className={css.name}>
-              {candidate.url === undefined
-                ? candidate.title
-                : <a href={candidate.url} target="_blank" rel="noreferrer">{candidate.title}</a>}
-            </span>
-            <span className={css[candidate.verdict]}>{t(`card.verdict.${candidate.verdict}` as const)}</span>
+            <div className={css.line}>
+              <span className={css.name}>
+                {candidate.url === undefined
+                  ? candidate.title
+                  : <a href={candidate.url} target="_blank" rel="noreferrer">{candidate.title}</a>}
+              </span>
+              <span className={css[candidate.verdict]}>{t(`card.verdict.${candidate.verdict}` as const)}</span>
+            </div>
+            {candidate.policyFlags === undefined || candidate.policyFlags.length === 0 ? null : (
+              <div className={css.flags}>
+                {candidate.policyFlags.map(flag => (
+                  <span key={flag} className={css.flag}>{t(`flag.${flag}` as DeckKey)}</span>
+                ))}
+              </div>
+            )}
           </li>
         ))}
       </ul>
