@@ -48,6 +48,15 @@
 - `npm pack` 会警告 `.npmrc` 含 pnpm 专有键，无害。
 - 一次性探测脚本（`Probe-*.ps1`、`tmp/*.mjs`）留在沙箱，不进 Git。
 
+## 阶段 1.5：沙箱升级到 0.2.1-rc.1 与适配（2026-10-17 用户指示，插在阶段 2 之前）
+
+背景：DSH 于 2026-10-17 05:22 UTC 发布 `dsh-v0.2.1-rc.1`（npm `next` tag；`latest` 仍为生产在用的 `0.2.0-rc.2`）。用户指示：沙箱先更新到新 RC，完成适配后再继续开发；生产 DSH 不受影响。产品 peer 基线是否切换由用户另行明确选择。
+
+- 升级：按沙箱升级流程更新 upstream 到 `dsh-v0.2.1-rc.1` 并更新 baseline.json（不绕过 `Assert-SandboxBaseline`、不静默升级共享基线），官方构建；证据与决策点见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 傍晚-2 段。
+- 复验：0.1.1 插件重装沙箱 profile（版本 bump 纪律不变），启动 Desktop 复验阶段 1 三项：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body；日志与截图落 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/`。
+- 适配评估输出：0.2.0-rc.2 接口假设清单逐项核对（两步 tab 注册、`dsh.client` manifest/bundle patch 装载链路、PLATFORM_MODULES 基线、clientBundle lazy-CJS 预设、peer 精确版本规则）；重点读 release notes 中插件系统相关变更（自定义插件索引源、启用/停用/卸载与依赖同步、启用热重载、实验性 Session 状态记录接口、pi-ai 路由变化、消息密钥脱敏）。
+- 通过标准：阶段 1 验收项在新 RC 沙箱全部复现，且适配结论成文；未复现则记录 pending 并评估回退（生产基线仍 0.2.0-rc.2）。
+
 ## 阶段 2：无模型链路（V3a）
 
 - Host：`defineDomain('source_deck')` 五表、`deck_submit_sources` 工具、`sourceDeck` Remote 命名空间（addSource/listSets/getSet/decide/commitSelection/clearData）、log-only 事件（set-opened/candidate-decided/selection-submitted）。

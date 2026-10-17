@@ -51,6 +51,16 @@
 | 插件安装结果 | profile `dependencies` 增加 `dsh-source-deck: file:...tgz`，`dsh.profile.bundles` 增加 `dsh-source-deck`；官方 CLI add 输出 `Packages: +1` 与 list 表格 |
 | 无密钥冒烟 | 阶段 1 验收不依赖 LLM 凭据；Desktop 启动后 guide 页出现插件入口、tab 打开、placeholder body 渲染（详见实现计划阶段 1 实测记录） |
 
+## 2026-10-17 傍晚-2：新 RC 0.2.1-rc.1 发布与沙箱先行升级计划（实现阶段入口变更）
+
+| 项目 | 证据与结果 |
+|---|---|
+| 新 RC 发布事实 | `npm view @deepseek-ai/dsh dist-tags`：`latest` = `0.2.0-rc.2`（生产在用）、`next` = `0.2.1-rc.1`、`alpha` = `0.2.1-alpha.5`；GitHub release `dsh-v0.2.1-rc.1`（prerelease）`published_at` = `2026-10-17T05:22:10Z`，为 0.2.1 系列首个 RC |
+| 用户指示 | 沙箱先更新到新 RC，完成适配后再继续开发；生产用的 DSH（0.2.0-rc.2）不受影响。产品支持基线切换（peer 声明）留待用户另行明确选择 |
+| 与插件开发相关的变更要点（release notes 摘录） | 自定义插件索引源；插件启用/停用/卸载及更新后依赖同步、启用热重载；实验性 Session 状态记录接口（插件写读自己的会话记录）；实验性 Claude Code Mods 兼容层；实验性开发者工具组合包；pi-ai 路由按模型能力处理系统提示词更新与工具动态增删；识别已发送消息中的密钥/令牌并默认脱敏按需查看 |
+| 升级执行口径 | 沙箱 upstream 更新到 `dsh-v0.2.1-rc.1` 并更新 baseline.json（不绕过 Assert-SandboxBaseline、不静默升级共享基线）→ 官方构建 → 0.1.1 插件重装复验阶段 1 验收项 → 证据落 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/` 与本文档；步骤与决策点见 HANDOFF.md |
+| 尚未验证 | 0.2.1-rc.1 沙箱升级本身及其对两步 tab 注册、dsh.client 装载链路、PLATFORM_MODULES 基线、clientBundle lazy-CJS 预设的影响；沙箱升级属开发环境，不改变产品 peer 声明与日用安装 |
+
 ## 尚未验证
 
 - **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 1 的"无密钥"标准按"验收不调用模型"达成，纯无密钥启动列为阶段 5 附加验证。
