@@ -27,6 +27,7 @@ const CLIENT_EXTERNALS: ReadonlySet<string> = new Set([
   'react-dom',
   'react-dom/client',
   '@deepseek-ai/cordis',
+  'zod',
   '@deepseek-ai/dsh-client-store',
   '@deepseek-ai/dsh-client-ui-slots',
   '@deepseek-ai/dsh-client-ui-primitives',
@@ -34,7 +35,11 @@ const CLIENT_EXTERNALS: ReadonlySet<string> = new Set([
 ])
 
 /** Node-half imports that stay external: the package's own peer dependencies. */
-const NODE_EXTERNALS: readonly string[] = ['@deepseek-ai/dsh', '@deepseek-ai/cordis']
+const NODE_EXTERNALS: readonly string[] = [
+  '@deepseek-ai/dsh',
+  '@deepseek-ai/dsh-typert-protocol',
+  '@deepseek-ai/cordis',
+]
 const isNodeExternal = (specifier: string): boolean =>
   NODE_EXTERNALS.some(name => specifier === name || specifier.startsWith(`${name}/`))
 
@@ -137,6 +142,10 @@ const clientConfig: UserConfig = {
     resolveId(source: string) {
       if (!source.startsWith('@deepseek-ai/')) return null
       if (CLIENT_EXTERNALS.has(source)) return null
+      // The Remote contribution factory is a self-contained wire layer with no
+      // shared runtime identity; upstream's INLINE_SAFE list names this exact
+      // subpath, and the plugin owns the contribution it constructs.
+      if (source === '@deepseek-ai/dsh-typert-protocol/remote-info') return null
       throw new Error(
         `client bundle purity: "${source}" is not a shell baseline module row; `
         + 'cross-plugin value imports are forbidden, collaborate through cordis services or import types only',

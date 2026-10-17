@@ -5,6 +5,8 @@
  * Browser half lives in the `./client` export; the client module system mounts
  * it on this same row because the row's specifier is the bare package name.
  */
+import type { Context } from '@deepseek-ai/cordis'
+import { SourceDeckRemote } from './remote-service.ts'
 
 /** Plugin identity, matching the bundle patch row id. */
 export const name = 'dsh-source-deck'
@@ -13,6 +15,9 @@ export const name = 'dsh-source-deck'
 export const inject: readonly string[] = []
 
 /**
- * Host plugin body: SourceDeck contributes nothing to the host tree yet.
+ * Host plugin body: mount the SourceDeck Remote service.
+ * @param ctx - profile root context.
  */
-export function apply(): void {}
+export function apply(ctx: Context): void {
+  ctx.plugin(SourceDeckRemote)
+}
