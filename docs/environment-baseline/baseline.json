@@ -1,17 +1,38 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "source": "https://github.com/deepseek-ai/deepseek-harness.git",
-  "tag": "dsh-v0.2.0-rc.2",
-  "version": "0.2.0-rc.2",
-  "commit": "639ed015397290b3745d163aafe02ffee4aa3f84",
-  "releasePublishedAtUtc": "2026-09-29T09:42:36Z",
+  "tag": "dsh-v0.2.1-rc.1",
+  "version": "0.2.1-rc.1",
+  "commit": "1600d8a1e140dcde43a1a0941940a0480712c011",
+  "releasePublishedAtUtc": "2026-10-17T05:22:10Z",
   "checkedOnAsiaShanghai": "2026-10-17",
   "distribution": "official-source-unpackaged-desktop",
   "nodeUsed": "26.7.0",
-  "pnpm": "11.7.0",
+  "pnpm": "11.28.5",
   "rootRelative": "sandbox/dsh-desktop",
-  "supportPolicy": "Exact current production RC; no alpha APIs or automatic baseline upgrades. RC is officially a prerelease.",
+  "supportPolicy": "Sandbox development baseline ahead of production. The user approved upgrading the shared sandbox to 0.2.1-rc.1 on 2026-10-17; production stays 0.2.0-rc.2 and product peer declarations stay 0.2.0-rc.2 until the user explicitly selects a new support baseline.",
   "productionExecutable": "E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe",
   "productionVersion": "0.2.0-rc.2",
-  "priorAlphaArchiveRelative": "archives/alpha-0.2.1-alpha.5-20261017T041240Z"
+  "sandboxRelation": "ahead-of-production",
+  "upgradeApproval": {
+    "approvedBy": "user",
+    "approvedOn": "2026-10-17",
+    "sandboxVersion": "0.2.1-rc.1",
+    "productionVersion": "0.2.0-rc.2",
+    "productPeerUnchanged": "0.2.0-rc.2",
+    "scope": "shared sandbox development environment only"
+  },
+  "priorProductionArchiveRelative": "archives/rc-0.2.0-rc.2-20261017T080338Z",
+  "sourceProvenance": {
+    "method": "official GitHub source archive, verified object-for-object against the GitHub git data API because this machine has no git binary",
+    "archiveSha256": "F36815915141E36C1308B95BC92CA47B8557CCC059600D95709F8A8CAF21C610",
+    "tagRefSha": "1600d8a1e140dcde43a1a0941940a0480712c011",
+    "verifiedObjects": {
+      "blobs": 16248,
+      "trees": 2451,
+      "commit": 1
+    },
+    "gitHead": "1600d8a1e140dcde43a1a0941940a0480712c011",
+    "note": "commit/tree/blob SHAs match the official API; *.cmd blobs were restored from the archive's eol=crlf export form to canonical LF before hashing. The reconstructed .git has no index file; it exists for baseline identification, not for commits."
+  }
 }

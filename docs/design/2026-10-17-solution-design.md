@@ -2,6 +2,8 @@
 
 日期：2026-10-17。状态：**设计稿，未实现**。接口证据见 [research/2026-10-17-rc-interface-evidence.md](../research/2026-10-17-rc-interface-evidence.md)（全部基于沙箱固定 RC `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`）。
 
+> 实施环境更新（2026-10-17 夜）：共用沙箱已按用户批准升级到 `0.2.1-rc.1` 作开发环境；方案与决策未变，接口差异与适配结论见 [research/2026-10-17-0.2.1-rc.1-interface-delta.md](../research/2026-10-17-0.2.1-rc.1-interface-delta.md)。产品 peer 仍为 `0.2.0-rc.2`，是否切换由用户另行选择。
+
 ## 1. 结论
 
 **推荐方案 A「右栏资料台 + 对话流候选卡片 + session.prompt 回传」**：SourceDeck 做成单 npm 包（`dsh-source-deck`，同时含 Host 半与 Client 半的组合包 bundle），主 UI 是右栏自定义 tab 类型，Agent 提交的候选资料以对话流业务卡片就地呈现，用户勾选/排除后由 Client 经自建 Remote 交给 Host，Host 落库并 emit 会话事件，最后 Client 调官方 `ctx.remote.session.prompt`（忙碌 `steer` / 空闲 `queue`）把选择摘要交回当前会话的 Agent。

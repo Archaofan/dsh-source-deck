@@ -9,10 +9,15 @@ try {
 } catch [IO.IOException] { $occupied = $true }
 $runPath = Join-Path $paths.Root '.active-run.json'
 $active = if (Test-Path -LiteralPath $runPath) { Get-Content -LiteralPath $runPath -Raw | ConvertFrom-Json } else { $null }
+$baselineProperties = $paths.Baseline.PSObject.Properties.Name
+$relation = if ($baselineProperties -contains 'sandboxRelation') { $paths.Baseline.sandboxRelation } else { 'matches-production' }
+$approval = if ($baselineProperties -contains 'upgradeApproval') { $paths.Baseline.upgradeApproval } else { $null }
 $checks = [ordered]@{
     officialVersion = $paths.Baseline.version
     productionVersion = $paths.Baseline.productionVersion
     matchesProduction = $paths.Baseline.version -eq $paths.Baseline.productionVersion -and $paths.Baseline.version -notmatch '-alpha\.'
+    sandboxRelation = $relation
+    upgradeApproval = $approval
     occupied = $occupied
     lastRun = $active
     desktopBuilt = Test-Path -LiteralPath (Join-Path $paths.Upstream 'apps/desktop/lib/main.js')

@@ -48,14 +48,21 @@
 - `npm pack` 会警告 `.npmrc` 含 pnpm 专有键，无害。
 - 一次性探测脚本（`Probe-*.ps1`、`tmp/*.mjs`）留在沙箱，不进 Git。
 
-## 阶段 1.5：沙箱升级到 0.2.1-rc.1 与适配（2026-10-17 用户指示，插在阶段 2 之前）
+## 阶段 1.5：沙箱升级到 0.2.1-rc.1 与适配（2026-10-17 已完成）
 
 背景：DSH 于 2026-10-17 05:22 UTC 发布 `dsh-v0.2.1-rc.1`（npm `next` tag；`latest` 仍为生产在用的 `0.2.0-rc.2`）。用户指示：沙箱先更新到新 RC，完成适配后再继续开发；生产 DSH 不受影响。产品 peer 基线是否切换由用户另行明确选择。
 
-- 升级：按沙箱升级流程更新 upstream 到 `dsh-v0.2.1-rc.1` 并更新 baseline.json（不绕过 `Assert-SandboxBaseline`、不静默升级共享基线），官方构建；证据与决策点见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 傍晚-2 段。
-- 复验：0.1.1 插件重装沙箱 profile（版本 bump 纪律不变），启动 Desktop 复验阶段 1 三项：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body；日志与截图落 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/`。
-- 适配评估输出：0.2.0-rc.2 接口假设清单逐项核对（两步 tab 注册、`dsh.client` manifest/bundle patch 装载链路、PLATFORM_MODULES 基线、clientBundle lazy-CJS 预设、peer 精确版本规则）；重点读 release notes 中插件系统相关变更（自定义插件索引源、启用/停用/卸载与依赖同步、启用热重载、实验性 Session 状态记录接口、pi-ai 路由变化、消息密钥脱敏）。
-- 通过标准：阶段 1 验收项在新 RC 沙箱全部复现，且适配结论成文；未复现则记录 pending 并评估回退（生产基线仍 0.2.0-rc.2）。
+执行结果（证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜段与 [../research/2026-10-17-0.2.1-rc.1-interface-delta.md](../research/2026-10-17-0.2.1-rc.1-interface-delta.md)）：
+
+- 基线：tag `dsh-v0.2.1-rc.1`，commit `1600d8a1e140dcde43a1a0941940a0480712c011`；本机无 git，官方源码包 + GitHub git data API 对象级校验（16,248 blobs / 2,451 trees / 1 commit 全部 SHA 一致）；`.git/HEAD` 指向该 commit。
+- 工具链：pnpm 11.28.5、Electron 44.7.0、primary runtime Node 24.21.0 / Python 3.12.14；官方构建 9 gate 全过（131.90s），323 个 client artifacts；构建记录 commit `1600d8a`。
+- 兼容性：0.1.1（peer `0.2.0-rc.2`）在 0.2.1-rc.1 下**安装保留但启动被拒**（诊断 `Plugin dsh-source-deck@0.1.1 is incompatible with dsh 0.2.1-rc.1`）。
+- 适配验证：用同一份 `src/` 构建仅沙箱的 `0.1.2-adapt.1`（peer `0.2.1-rc.1`、cordis `4.0.5`）并装入沙箱；阶段 1 三项复验全部通过：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body（`data-deck-state="placeholder"`）。截图 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/`。
+- 适配结论：两步 tab 注册、`dsh.client`/bundle patch 装载、lazy-CJS 预设、工具/Remote/存储/会话事件接口仍成立；变化项为兼容门（`engines.dsh` 优先且替代 peer 检查）、`PLATFORM_MODULES` 新增 `zod`/`@tanstack/react-virtual`、cordis 4.0.5、pnpm/Electron 版本；阶段 2 可按原设计推进。
+- 未改：产品 `package.json`（仍 0.1.1 / peer `0.2.0-rc.2`）、日用 DSH、上游产品源码。`0.1.2-adapt.1` 是沙箱测试产物，不是产品发布。
+
+**待用户决策**：产品 `peerDependencies` 是否切到 `0.2.1-rc.1`（或改用 `engines.dsh` 表达支持范围）。在用户确认前，沙箱升级只作开发环境，不宣称产品对 0.2.1-rc.1 的兼容。另：npm `next` 在本次工作期间已变为 `0.2.1-rc.2`，本次未评估。
+
 
 ## 阶段 2：无模型链路（V3a）
 

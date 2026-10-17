@@ -5,51 +5,56 @@
 ~~~text
 继续 SourceDeck（dsh-source-deck / 资料筛选台）项目。方案 A 已获用户批准（2026-10-17），不要重新设计，不要改动已批准的设计决策；确需变更先说明理由再改文档。
 
-**最新用户指示（2026-10-17，优先于本文其余内容）**：DSH 最近发布了新 RC `0.2.1-rc.1`（npm `next` tag，GitHub tag `dsh-v0.2.1-rc.1`，发布于 2026-10-17 05:22 UTC，是 0.2.1 系列首个 RC，汇总自 `0.2.0-rc.2` 以来的变更）。用户要求：**先把共用沙箱升级到 0.2.1-rc.1，完成适配后再继续阶段 2 开发**；**生产环境仍在用的 DSH（0.2.0-rc.2）不受影响、绝不动**。沙箱升级属环境操作，必须先说明理由、影响与验证方式，遵守工作区 AGENTS.md 的升级纪律。
+当前进度（2026-10-17 夜）：
+- 阶段 1（R1 冒烟）已完成并推送（commit f0d747916d82c482f8d865eb37305f3287860ffe）。
+- 阶段 1.5（沙箱升级到 0.2.1-rc.1 与适配）已完成：共用沙箱现为官方 dsh-v0.2.1-rc.1（commit 1600d8a1e140dcde43a1a0941940a0480712c011），官方构建通过（9 gate / 323 client artifacts），阶段 1 三项验收在新 RC 复验通过。
+- 生产 DSH 仍是 0.2.0-rc.2，未动；产品 peer 仍是 @deepseek-ai/dsh@0.2.0-rc.2（未切换，不宣称 0.2.1-rc.1 兼容）。沙箱里装的是仅用于适配验证的 0.1.2-adapt.1（peer 临时 0.2.1-rc.1、cordis 4.0.5），不是产品发布。
+- 下一步：阶段 2（V3a 无模型链路）。
 
 工作区根目录：E:/DSH-Desktop-Plugin-Dev
 项目目录：E:/DSH-Desktop-Plugin-Dev/dsh-source-deck
 私有远端：https://github.com/Archaofan/dsh-source-deck
 共用官方 Desktop 沙箱：E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop
 
-当前进度：阶段 1（R1 冒烟）已完成并推送（commit f0d747916d82c482f8d865eb37305f3287860ffe，远端已核对）。阶段 1 实测记录与已固化的实现事实见 docs/implementation/2026-10-17-implementation-plan.md、docs/DEVELOPMENT.md、docs/SETUP-VERIFICATION.md（傍晚两段记录）。下一步原计划是阶段 2（V3a 无模型链路），但现在**先做沙箱升级与适配**。
-
 接手第一步：读以下文件
 1. 工作区根 README.md 和 AGENTS.md（升级纪律与沙箱独占规则）；
 2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md；
 3. docs/design/2026-10-17-solution-design.md（主设计 v1.1）、docs/design/wireframes.md；
-4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md；
-5. docs/research/2026-10-17-rc-interface-evidence.md；
-6. sandbox/dsh-desktop/README.md、baseline.json、status.json（升级前先跑 Get-SandboxStatus.ps1 确认占用）。
+4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md（夜段：沙箱先行状态与待决策项）、docs/SETUP-VERIFICATION.md（夜段：升级与适配证据）；
+5. docs/research/2026-10-17-rc-interface-evidence.md（0.2.0-rc.2 基线证据）与 docs/research/2026-10-17-0.2.1-rc.1-interface-delta.md（新 RC 差异与适配结论）；
+6. docs/implementation/2026-10-17-implementation-plan.md（阶段 1 与 1.5 结果）；
+7. sandbox/dsh-desktop/README.md、baseline.json、status.json（升级前先跑 Get-SandboxStatus.ps1 确认占用）。
 
-沙箱升级到 0.2.1-rc.1 的建议步骤（先规划再执行，每步留证据）：
-a. 完整读 0.2.1-rc.1 release notes（GitHub releases 的 dsh-v0.2.1-rc.1），摘出与插件系统相关的变更：自定义插件索引源、插件启用/停用/卸载与依赖同步、启用热重载、实验性 Session 状态记录接口、pi-ai 路由（系统提示词更新/工具动态增删）等；
-b. 按沙箱 README 的升级流程更新 upstream 到新 tag 并更新 baseline.json（Assert-SandboxBaseline 会校验 commit 一致，不要绕过；不要静默升级共享基线），重新走官方构建；
-c. 升级后用 0.1.1 插件包重装沙箱 profile（版本 bump 纪律见 DEVELOPMENT.md），启动 Desktop 复验阶段 1 验收项：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body；记录新启动日志与截图到 sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/；
-d. 输出适配结论：哪些 0.2.0-rc.2 接口假设仍然成立（重点是两步 tab 注册、dsh.client manifest/bundle patch 装载链路、PLATFORM_MODULES 基线、clientBundle lazy-CJS 预设），哪些变了；
-e. **待用户确认的决策**：产品 peerDependencies 是否切到 0.2.1-rc.1（用户明确生产仍用 0.2.0-rc.2；工作区 AGENTS.md 要求支持基线切换需用户明确选择）。在用户确认前，沙箱升级只作为开发环境，不要改 peer 声明、不要宣称对 0.2.1-rc.1 的兼容。
+阶段 2（V3a 无模型链路）按已批准设计推进，不改设计的部分：
+- Host：defineDomain('source_deck') 五表、deck_submit_sources 工具、sourceDeck Remote 命名空间（addSource/listSets/getSet/decide/commitSelection/clearData）、log-only 事件（set-opened/candidate-decided/selection-submitted）。
+- Client：资料台面板（待处理/保留/排除分组、添加资料表单、提交按钮、策略摘要条占位）、对话流候选卡片、input.right 入口按钮。
+- 交付：手动添加→卡片→筛选→提交全链路；域文件可查；队列/steer 消息出现在会话投影；截图。
+- 注意：沙箱开发构建每次都要 bump 版本再 pack/install；当前沙箱 profile 依赖指向项目目录里的 dsh-source-deck-0.1.2-adapt.1.tgz（沙箱测试产物，*.tgz 被 Git 忽略）。
+
+待用户确认的决策（不得自行决定）：
+- 产品 peerDependencies 是否切换支持基线：保持 0.2.0-rc.2 / 切到 0.2.1-rc.1（精确 peer）/ 改用 engines.dsh 表达范围（0.2.1 兼容门优先读 engines.dsh 并完全替代 dsh peer 检查）。用户确认前不改 peer、不发布、不宣称新 RC 兼容。
+- 另：npm next 在升级后已变为 0.2.1-rc.2（0.2.1-rc.1 仍存在）。是否再升级沙箱同样需要用户明确选择；本次未评估 rc.2。
 
 硬约束：
 - 绝不启动或重启日用 DSH（127.0.0.1:19387）、不跑 dsh plugin --profile desktop；最终装到本 DSH 必须经用户明确批准。
-- 沙箱 Desktop 启动：powershell -NoProfile -ExecutionPolicy Bypass -File sandbox/dsh-desktop/scripts/Start-Desktop.ps1 -Project dsh-source-deck；启动日志在 sandbox/dsh-desktop/logs/，内含 dsh web URL（动态端口 + token）。
-- 沙箱 scripts 注释用 ASCII（曾因中文注释导致 PowerShell 解析器行合并）。
-- 凭据：沙箱已配好 DeepSeek API；不要再输出任何凭据值；用户已决定不轮换 2026-10-17 泄露的 key（记录见 docs/security/）。注意 0.2.1-rc.1 新增"已发送消息密钥脱敏"能力，与既有凭据纪律方向一致。
-- 提交推送后核对 HEAD 与 origin；不提交沙箱、缓存、凭据；失败记录 pending 不隐瞒。
-- 共用沙箱一次只一个项目占用；停进程只停本次记录的沙箱 PID（先校验命令行含 sandbox 路径）。
+- 沙箱 Desktop 启动：powershell -NoProfile -ExecutionPolicy Bypass -File sandbox/dsh-desktop/scripts/Start-Desktop.ps1 -Project dsh-source-deck；启动日志在 sandbox/dsh-desktop/logs/，内含 dsh web URL（动态端口 + token，不要把 token 写进文档/提交）。
+- 沙箱 scripts 注释用 ASCII。
+- 凭据：沙箱已配好 DeepSeek API；不要输出任何凭据值；用户已决定不轮换 2026-10-17 泄露的 key（记录见 docs/security/）。0.2.1 新增“已发送消息密钥脱敏”，与既有纪律一致。
+- 提交推送后核对 HEAD 与 origin；不提交沙箱、缓存、凭据、*.tgz；失败记录 pending 不隐瞒。
+- 共用沙箱一次只一个项目占用；停进程只停本次记录的沙箱 PID 经命令行校验含 sandbox 路径后停止。0.2.1 Desktop 主进程是 electron.exe（GUI 子系统），脚本已用 Start-Process 读取退出码。
 
-阶段 1 已固化的实现事实（改插件骨架前必读，详见 DEVELOPMENT.md 与实现计划）：
-- 构建=tsdown（lib/*.js）+ tsc（lib/types）；`/client` 必须是 `window.__ModuleLoader__.load({id, factory})` lazy-CJS 格式，本地 tsdown.config.ts 复刻了该预设；外部请求=基线 PLATFORM_MODULES，非基线 @deepseek-ai/* 值导入会被纯度门拒绝（类型 import type 擦除除外）。
-- ctx 上的 `slots`/`locale`/`sidebarRightTabs` 属性来自 `import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'`、`'@deepseek-ai/dsh-client-ui-sidebar-right/client'`、`'@deepseek-ai/dsh-client-ui-slots'` 的声明合并，缺一个 tsc 就报 Property does not exist。
-- tab 类型必须带 guide 条目，否则右栏 guide 页无入口、tab 不可达。
-- 每次改插件都要 bump version 再 pack/install（pnpm 同版本 file: 包不更新）。
-- 阶段 1 环境修复（沙箱资产，不进 Git）：desktop CLI 的 runtime/pnpm 已补齐；Common.ps1 的 $LASTEXITCODE 与 ErrorActionPreference 已修。
+阶段 1/1.5 已固化的实现与环境事实（改插件骨架或沙箱脚本前必读）：
+- 构建=tsdown（lib/*.js）+ tsc（lib/types）；/client 必须是 window.__ModuleLoader__.load({id, factory}) lazy-CJS（本地 tsdown.config.ts 复刻，新 RC 仍接受）。
+- 外部请求=基线 PLATFORM_MODULES（新 RC 新增 zod、@tanstack/react-virtual；当前插件不 import 二者），非基线 @deepseek-ai/* 值导入被纯度门拒绝（类型 import type 擦除除外）。
+- ctx 上的 slots/locale/sidebarRightTabs 来自声明合并 import type（dsh-client-ui-renderer/client、dsh-client-ui-sidebar-right/client、dsh-client-ui-slots），缺一个 tsc 报错。
+- tab 类型必须带 guide 条目，否则右栏 guide 页无入口。
+- 兼容门（0.2.1）：engines.dsh 优先且声明后替代 dsh peer 检查；未声明时按 peer。0.1.1（peer 0.2.0-rc.2）在新 RC 下安装保留但启动拒绝，诊断明确。
+- 构建需要 git commit；本机无 git，沙箱脚本通过 DSH_CLIENT_COMMIT_HASH 注入 baseline commit（官方支持的非 Git 构建路径），client build record 实测 1600d8a。
+- 沙箱脚本已修：$LASTEXITCODE 局部遮蔽导致的失败误报（改为 $global:LASTEXITCODE）；Desktop CLI 用 Start-Process -Wait -PassThru 取退出码；Assert-SandboxBaseline 支持“用户批准的沙箱先行版”。
+- 工具链：pnpm 11.28.5、Electron 44.7.0、primary runtime Node 24.21.0 / Python 3.12.14；runtime/pnpm 已补齐（desktop CLI 需要）。
+- 沙箱升级证据与对象校验细节：docs/SETUP-VERIFICATION.md 夜段；新 RC 接口差异：docs/research/2026-10-17-0.2.1-rc.1-interface-delta.md。
 
 保持中文沟通，先结论后理由，结论附真实命令输出。
 ~~~
 
-本提示词描述的是"沙箱升级 + 适配 + 继续实现"的入口；具体安装、启动和同步证据以 SETUP-VERIFICATION.md、沙箱 status.json 与实时检查为准。历史阶段（环境准备、方案设计、阶段 1 实现）的入口提示词见 Git 历史。
-
-保持中文沟通，先结论后理由，结论附真实命令输出。
-~~~
-
-本提示词描述的是实现阶段的工作入口；具体安装、启动和同步证据以 SETUP-VERIFICATION.md、沙箱 status.json 与实时检查为准。历史阶段（环境准备与方案设计）的入口提示词见 Git 历史。
+本提示词描述的是“升级与适配已完成、准备进入阶段 2”的入口；具体安装、启动和同步证据以 SETUP-VERIFICATION.md、沙箱 status.json 与实时检查为准。历史阶段（环境准备、方案设计、阶段 1 实现）的入口提示词见 Git 历史。

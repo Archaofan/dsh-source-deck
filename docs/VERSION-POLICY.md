@@ -9,8 +9,8 @@
 | 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，文件版本 `0.2.0-rc.2` |
 | 官方发布 tag | `dsh-v0.2.0-rc.2` |
 | 官方 commit | `639ed015397290b3745d163aafe02ffee4aa3f84` |
-| 共用沙箱 | 同一 RC 的官方源码开发版，独立 home / userData |
-| RC 工具链 | 官方 packageManager `pnpm@11.7.0` |
+| 共用沙箱 | 开发先行版 `0.2.1-rc.1`（用户 2026-10-17 批准，仅开发环境；生产仍是 `0.2.0-rc.2`） |
+| RC 工具链 | 沙箱 `0.2.1-rc.1` 声明 `pnpm@11.28.5`（旧基线为 11.7.0） |
 
 官方把 RC 也标为预发行版。这里“稳定基线”指用户已选定日用的 RC，不代表宣称其为官方最终正式版。
 
@@ -42,3 +42,20 @@
 - 升级适配结论（哪些 RC 接口假设仍成立/变化）写入 SETUP-VERIFICATION.md 与 implementation 计划，作为阶段 2 前置输入。
 
 切换前保留源码/运行时、验证记录与状态备份。不同版本会话及数据库不能假定可降级；本次 alpha → RC 使用全新沙箱状态，原 alpha 归档留在本机，不纳入 Git。现有日用 DSH 没有参与回退或覆盖安装。
+
+## 2026-10-17 夜：沙箱升级完成，沙箱先行生产
+
+执行结果：
+
+- 共用沙箱已升级到官方 `dsh-v0.2.1-rc.1`（commit `1600d8a1e140dcde43a1a0941940a0480712c011`），官方构建通过，阶段 1 三项验收复验通过；证据见 [SETUP-VERIFICATION.md](SETUP-VERIFICATION.md) 夜段。
+- `baseline.json` 记录 `sandboxRelation=ahead-of-production` 与用户批准（`upgradeApproval`）；`Assert-SandboxBaseline` 只在“沙箱与生产同版”或“有明确批准且版本逐项钉住”时通过，alpha 与未批准的新版仍拒绝。
+- **产品支持基线未变**：`peerDependencies` 仍精确 `@deepseek-ai/dsh@0.2.0-rc.2`，不宣称对 0.2.1-rc.1 兼容；沙箱中的 `0.1.2-adapt.1` 仅为适配测试产物（peer 临时改 0.2.1-rc.1、cordis 4.0.5），不进入产品发布。
+- 期间观察到 npm `next` 已从 `0.2.1-rc.1` 变为 `0.2.1-rc.2`（两版均存在）。本次未评估 rc.2；是否再升级仍按“用户明确选择”处理。
+
+**待用户决定**：支持基线是否切换。可选口径：
+
+1. 保持 `0.2.0-rc.2`（当前产品声明），沙箱仅作开发环境；
+2. 切换到 `0.2.1-rc.1`（精确 peer，单版本）；
+3. 用 `engines.dsh` 表达跨版本范围（0.2.1 兼容门会优先读取它并完全替代 dsh peer 检查，需在目标版本实测）。
+
+用户明确选择前，不修改 peer、不发布、不宣称新 RC 兼容。
