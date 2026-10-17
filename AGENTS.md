@@ -2,7 +2,7 @@
 
 同时遵守父目录 `E:/DSH-Desktop-Plugin-Dev/AGENTS.md` 和 README.md。工作目录固定为本项目文件夹。
 
-**当前状态（2026-10-17 夜更新）**：方案 A 已批准；**阶段 1（R1 冒烟）已完成并推送**；**阶段 1.5（沙箱升级到 0.2.1-rc.1 与适配）已完成**：沙箱为开发先行版 `0.2.1-rc.1`（用户批准、仅开发环境），阶段 1 三项验收在新 RC 复验通过，适配结论见 `docs/research/2026-10-17-0.2.1-rc.1-interface-delta.md`。生产 DSH 仍为 `0.2.0-rc.2`；**产品 peer 未切换**（仍精确 `0.2.0-rc.2`，不宣称 0.2.1-rc.1 兼容），是否切换由用户另行明确选择。沙箱中当前安装的是仅用于适配验证的 `0.1.2-adapt.1`（peer 临时指向 0.2.1-rc.1），不是产品发布。下一步：阶段 2（V3a 无模型链路）。详见 docs/VERSION-POLICY.md 夜段、docs/SETUP-VERIFICATION.md 夜段与 docs/HANDOFF.md。
+**当前状态（2026-10-17 夜更新）**：方案 A 已批准；**阶段 1（R1 冒烟）已完成并推送**；**阶段 1.5（沙箱升级与适配）已完成，最终基线为 `0.2.1-rc.2`**（用户批准、仅开发环境）：官方构建通过，阶段 1 三项验收在新 RC 复验通过，适配结论见 `docs/research/2026-10-17-0.2.1-rc.2-interface-delta.md`。生产 DSH 仍为 `0.2.0-rc.2`；**产品 peer 未切换**（仍精确 `0.2.0-rc.2`，不宣称 0.2.1 RC 兼容），是否切换由用户另行明确选择。沙箱中当前安装的是仅用于适配验证的 `0.1.3-adapt.1`（peer 临时指向 `0.2.1-rc.2`），不是产品发布。本机有 git（Hermes 自带 `git 2.54.0`，未加入会话 PATH），仓库提交与核对使用该 git 的进程级 `safe.directory`。下一步：阶段 2（V3a 无模型链路）。详见 docs/VERSION-POLICY.md 夜段、docs/SETUP-VERIFICATION.md 夜-2 段与 docs/HANDOFF.md。
 
 产品目标见 `docs/PROJECT-BRIEF.md`。关注 AI / Agent 日常交互，提供自己的 UI 控件及对话内便捷入口。视频、控制、协议、嵌入式等旧选题不属于本项目。
 

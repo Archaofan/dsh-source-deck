@@ -1,38 +1,34 @@
 {
   "schemaVersion": 2,
   "source": "https://github.com/deepseek-ai/deepseek-harness.git",
-  "tag": "dsh-v0.2.1-rc.1",
-  "version": "0.2.1-rc.1",
-  "commit": "1600d8a1e140dcde43a1a0941940a0480712c011",
-  "releasePublishedAtUtc": "2026-10-17T05:22:10Z",
+  "tag": "dsh-v0.2.1-rc.2",
+  "version": "0.2.1-rc.2",
+  "commit": "687f282e8625c6b8d11ff58211a90524be2e4317",
+  "releasePublishedAtUtc": "2026-10-17T08:16:33Z",
   "checkedOnAsiaShanghai": "2026-10-17",
   "distribution": "official-source-unpackaged-desktop",
   "nodeUsed": "26.7.0",
   "pnpm": "11.28.5",
   "rootRelative": "sandbox/dsh-desktop",
-  "supportPolicy": "Sandbox development baseline ahead of production. The user approved upgrading the shared sandbox to 0.2.1-rc.1 on 2026-10-17; production stays 0.2.0-rc.2 and product peer declarations stay 0.2.0-rc.2 until the user explicitly selects a new support baseline.",
+  "supportPolicy": "Sandbox development baseline ahead of production. The user approved upgrading the shared sandbox to the newest 0.2.1 RC on 2026-10-17; production stays 0.2.0-rc.2 and product peer declarations stay 0.2.0-rc.2 until the user explicitly selects a new support baseline.",
   "productionExecutable": "E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe",
   "productionVersion": "0.2.0-rc.2",
   "sandboxRelation": "ahead-of-production",
   "upgradeApproval": {
     "approvedBy": "user",
     "approvedOn": "2026-10-17",
-    "sandboxVersion": "0.2.1-rc.1",
+    "sandboxVersion": "0.2.1-rc.2",
     "productionVersion": "0.2.0-rc.2",
     "productPeerUnchanged": "0.2.0-rc.2",
-    "scope": "shared sandbox development environment only"
+    "scope": "shared sandbox development environment only",
+    "instruction": "Upgrade the sandbox content so it is adapted to the new DSH Desktop version."
   },
   "priorProductionArchiveRelative": "archives/rc-0.2.0-rc.2-20261017T080338Z",
+  "priorSandboxArchiveRelative": "archives/rc-0.2.1-rc.1-20261017T090812Z",
   "sourceProvenance": {
-    "method": "official GitHub source archive, verified object-for-object against the GitHub git data API because this machine has no git binary",
-    "archiveSha256": "F36815915141E36C1308B95BC92CA47B8557CCC059600D95709F8A8CAF21C610",
-    "tagRefSha": "1600d8a1e140dcde43a1a0941940a0480712c011",
-    "verifiedObjects": {
-      "blobs": 16248,
-      "trees": 2451,
-      "commit": 1
-    },
-    "gitHead": "1600d8a1e140dcde43a1a0941940a0480712c011",
-    "note": "commit/tree/blob SHAs match the official API; *.cmd blobs were restored from the archive's eol=crlf export form to canonical LF before hashing. The reconstructed .git has no index file; it exists for baseline identification, not for commits."
+    "method": "shallow git fetch of the official tag with the Hermes-bundled git 2.54.0",
+    "tagRefSha": "687f282e8625c6b8d11ff58211a90524be2e4317",
+    "gitHead": "687f282e8625c6b8d11ff58211a90524be2e4317",
+    "verification": "git status --short is empty and git rev-parse HEAD equals the tag ref SHA after checkout"
   }
 }

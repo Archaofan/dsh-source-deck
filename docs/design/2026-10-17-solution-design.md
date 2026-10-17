@@ -2,7 +2,7 @@
 
 日期：2026-10-17。状态：**设计稿，未实现**。接口证据见 [research/2026-10-17-rc-interface-evidence.md](../research/2026-10-17-rc-interface-evidence.md)（全部基于沙箱固定 RC `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`）。
 
-> 实施环境更新（2026-10-17 夜）：共用沙箱已按用户批准升级到 `0.2.1-rc.1` 作开发环境；方案与决策未变，接口差异与适配结论见 [research/2026-10-17-0.2.1-rc.1-interface-delta.md](../research/2026-10-17-0.2.1-rc.1-interface-delta.md)。产品 peer 仍为 `0.2.0-rc.2`，是否切换由用户另行选择。
+> 实施环境更新（2026-10-17 夜）：共用沙箱已按用户批准升级到 `0.2.1-rc.2` 作开发环境；方案与决策未变，接口差异与适配结论见 [research/2026-10-17-0.2.1-rc.2-interface-delta.md](../research/2026-10-17-0.2.1-rc.2-interface-delta.md)。产品 peer 仍为 `0.2.0-rc.2`，是否切换由用户另行选择。
 
 ## 1. 结论
 

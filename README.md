@@ -25,8 +25,9 @@ locally (see the header comment in `tsdown.config.ts`).
 `@deepseek-ai/dsh@0.2.0-rc.2` and `@deepseek-ai/cordis@4.0.4`, declared exactly
 in `peerDependencies`. No alpha-only APIs.
 
-The shared development sandbox moved to `dsh-v0.2.1-rc.1` on 2026-10-17 with the
-user's approval; the product declaration does not follow it. Stage-one acceptance
-was re-verified there with a sandbox-only `0.1.2-adapt.1` artifact (peer
-temporarily `0.2.1-rc.1`, cordis `4.0.5`); see `docs/research/2026-10-17-0.2.1-rc.1-interface-delta.md`.
-Switching the product baseline is a separate user decision.
+The shared development sandbox moved to the newest `dsh-v0.2.1-rc.2` on
+2026-10-17 with the user's approval; the product declaration does not follow it.
+Stage-one acceptance was re-verified there with a sandbox-only `0.1.3-adapt.1`
+artifact (peer temporarily `0.2.1-rc.2`, cordis `4.0.5`, rc.2 type packages);
+see `docs/research/2026-10-17-0.2.1-rc.2-interface-delta.md`. Switching the
+product baseline is a separate user decision.

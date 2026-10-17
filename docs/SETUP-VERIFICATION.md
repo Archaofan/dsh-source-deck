@@ -69,24 +69,38 @@
 |---|---|
 | 官方来源 | tag `dsh-v0.2.1-rc.1`，GitHub tag ref 指向 commit `1600d8a1e140dcde43a1a0941940a0480712c011`；release `published_at=2026-10-17T05:22:10Z`，`prerelease=true`。npm dist-tags 当时为 `latest=0.2.0-rc.2`、`next=0.2.1-rc.1`、`alpha=0.2.1-alpha.5` |
 | 升级后新事实 | 稍后再次查询 npm：`next` 已变为 `0.2.1-rc.2`（同时存在 `0.2.1-rc.1`）。本次按用户指示固定在 rc.1，未再次升级；是否跟随属于用户决策（见 HANDOFF） |
-| 源码取得 | 本机无 git，smart-HTTP shallow clone 两次在 pack 传输阶段被 `ECONNRESET`；改用官方源码包 `codeload.../tar.gz/refs/tags/dsh-v0.2.1-rc.1`（34,674,893 bytes，SHA-256 `F36815915141E36C1308B95BC92CA47B8557CCC059600D95709F8A8CAF21C610`） |
+| 源码取得 | 当时本会话 PATH 中没有 git（后确认 Hermes 自带 `git 2.54.0`，只是未加入 PATH），isomorphic-git shallow clone 两次在 pack 传输阶段被 `ECONNRESET`；改用官方源码包 `codeload.../tar.gz/refs/tags/dsh-v0.2.1-rc.1`（34,674,893 bytes，SHA-256 `F36815915141E36C1308B95BC92CA47B8557CCC059600D95709F8A8CAF21C610`） |
 | 对象级校验 | 从 GitHub git data API 取 commit 与递归 tree，按官方 SHA 写入 16,248 个 blob、2,451 个 tree、1 个 commit 对象；全部哈希一致，commit 对象精确复现 `1600d8a…`（author/committer 时区 +0800），`.git/HEAD` 指向该 commit。`*.cmd` 按 `.gitattributes` 的 `eol=crlf` 导出形式还原为 LF blob 后通过校验 |
 | 基线记录 | `baseline.json` 更新为 `version/tag=0.2.1-rc.1`、commit 上述、`pnpm=11.28.5`、`productionVersion=0.2.0-rc.2`、`sandboxRelation=ahead-of-production`，并记录 `upgradeApproval`（approvedBy=user、approvedOn=2026-10-17、productPeerUnchanged=0.2.0-rc.2）与来源校验字段；旧基线/日志/profile 清单归档于 `archives/rc-0.2.0-rc.2-20261017T080338Z/` |
 | 基线断言适配 | `Assert-SandboxBaseline` 现在接受两种状态：沙箱与生产同版，或“明确记录用户批准、且 approval 逐项钉住版本”的沙箱先行版；alpha 与未记录批准的新版仍拒绝。`Test-Sandbox.ps1` 增加“无批准的更新版”负例并通过 |
 | 退出码缺陷修复 | 原 `Invoke-SandboxPnpm`/`Invoke-SandboxDesktopCli` 在函数内先赋 `$LASTEXITCODE=0`，遮蔽了自动变量，导致子进程失败被当成成功（本轮首次 `Prepare-Desktop` 因此误报成功）。已改为读取 `$global:LASTEXITCODE`；Desktop CLI 的 `electron.exe` 是 GUI 子系统，改为 `Start-Process -Wait -PassThru` 读取退出码。实测失败命令现在抛出 `Command failed with exit 1` |
-| 构建环境适配 | 0.2.1 的 client build 调用 `git rev-parse HEAD`；本机无 git。按上游支持的非 Git 构建路径，在沙箱进程环境注入 `DSH_CLIENT_COMMIT_HASH=<baseline.commit>`。`.dsh-build/client-build-environment.json` 实测 `{"DSH_CLIENT_COMMIT_HASH":"1600d8a","DSH_CLIENT_VERSION":"0.2.1-rc.1"}` |
+| 构建环境适配 | 0.2.1 的 client build 调用 `git rev-parse HEAD`。本会话 PATH 中没有 git；按上游支持的非 Git 构建路径，在沙箱进程环境注入 `DSH_CLIENT_COMMIT_HASH=<baseline.commit>`。`.dsh-build/client-build-environment.json` 实测 `{"DSH_CLIENT_COMMIT_HASH":"1600d8a","DSH_CLIENT_VERSION":"0.2.1-rc.1"}` |
 | 工具链 | RC packageManager 变为 `pnpm@11.28.5`（沙箱已有该本地副本）；Electron 44.7.0；primary runtime Node 24.21.0 / Python 3.12.14 / pnpm 11.28.5。首次 `prepare:primary-runtime` 因 `fetch failed` 失败，复用旧基线已校验的下载缓存（锁文件版本一致）后成功，smoke 通过 |
 | 官方构建 | `pnpm run build`（9 个 gate）：`9 passed, 0 failed, 0 skipped in 131.90s`；`build: recorded 323 client artifact(s) with 2 public value(s)`（旧基线为 347 artifacts）。构建记录 digest `cc7c5c9f…` |
 | 0.1.1 安装（负向） | `Install-Plugin.ps1` 用 0.1.1（peer `0.2.0-rc.2`）安装：pnpm 显示 `Already up to date`，CLI 输出两条 `Plugin dsh-source-deck@0.1.1 is incompatible with dsh 0.2.1-rc.1: requirements {"@deepseek-ai/dsh":"0.2.0-rc.2"}`，并提示 `it stays installed but profile startup denies it until you grant an exemption`。启动后 guide 无「资料筛选台」入口，旧布局中遗留的「资料台」标签显示“这类内容还没有可用的查看方式” |
 | 适配测试包（仅沙箱） | 在 `sandbox/dsh-desktop/tmp/adapt-plugin` 以同一份 `src/` 构建 `0.1.2-adapt.1`：peer 改 `0.2.1-rc.1`、cordis 改 `4.0.5`，产物 `.tgz` 放项目目录（`*.tgz` 被 Git 忽略）。产品 `package.json` 未改（仍 `0.1.1` / peer `0.2.0-rc.2`）。安装退出码 0，profile 依赖指向该 tgz，`dsh.profile.bundles` 保留 `dsh-source-deck` |
 | 阶段 1 复验（新 RC） | 启动日志含 `dsh web: http://127.0.0.1:12649/?token=…`（端口动态）；guide 页文本 `开始 \| 资料筛选台 \| 收集候选资料，逐条筛选后交回 Agent \| …`；点击入口后 `data-deck-state="placeholder"`，正文「资料台已就绪 \| 候选资料会出现在这里。Agent 提交或手动添加后即可筛选。」；tab chip 文本「资料台」。截图 `logs/shots/upgrade-0.2.1-rc.1/`（desktop-right-sidebar.png、deck-tab-open.png、deck-tab-chip.png；不进 Git） |
-| 适配结论 | 逐项见 [research/2026-10-17-0.2.1-rc.1-interface-delta.md](research/2026-10-17-0.2.1-rc.1-interface-delta.md)：两步 tab 注册、`dsh.client`/bundle patch 装载、lazy-CJS 预设、工具/Remote/存储/会话事件接口均成立；兼容门改为 `engines.dsh` 优先、`PLATFORM_MODULES` 新增 `zod` 与 `@tanstack/react-virtual`、cordis 升 4.0.5、pnpm/Electron 升级 |
+| 适配结论 | 逐项见 [research/2026-10-17-0.2.1-rc.2-interface-delta.md](research/2026-10-17-0.2.1-rc.2-interface-delta.md)：两步 tab 注册、`dsh.client`/bundle patch 装载、lazy-CJS 预设、工具/Remote/存储/会话事件接口均成立；兼容门改为 `engines.dsh` 优先、`PLATFORM_MODULES` 新增 `zod` 与 `@tanstack/react-virtual`、cordis 升 4.0.5、pnpm/Electron 升级 |
 | 未受影响 | 日用 DSH 19387 未启动/重启；未运行 `dsh plugin --profile desktop`；产品 peer 声明与版本未改；沙箱升级未进 Git |
+
+## 2026-10-17 夜-2：沙箱再升级到 0.2.1-rc.2（用户指示“升级沙箱中的内容，确保适配新版本”）
+
+背景：rc.1 工作完成后，用户要求把沙箱内容升级到新版本。确认 GitHub tag `dsh-v0.2.1-rc.2` 存在（commit `687f282e8625c6b8d11ff58211a90524be2e4317`，release `published_at=2026-10-17T08:16:33Z`，npm `next` 指向它），且工具链与 rc.1 相同。
+
+| 项目 | 证据与结果 |
+|---|---|
+| 真实 git | 本机 git 位于 `C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe`（Hermes 自带，`git version 2.54.0.windows.1`），只是未加入本会话 PATH。之前“本机无 git”的结论只对本会话 PATH 成立，已在各文档更正 |
+| 源码更新 | 用真实 git 对 upstream 执行 `fetch --depth 1 origin refs/tags/dsh-v0.2.1-rc.2` 成功，`checkout --detach` 后 `git status --short` 为空、`git rev-parse HEAD` = `687f282…`。同时 `git reset` 为 rc.1 重建的仓库补了 index，`git status` 复核工作树与官方 commit 一致 |
+| 基线记录 | `baseline.json` 更新为 `dsh-v0.2.1-rc.2` / `687f282…` / `releasePublishedAtUtc=2026-10-17T08:16:33Z`，`upgradeApproval.sandboxVersion=0.2.1-rc.2`，`priorSandboxArchiveRelative=archives/rc-0.2.1-rc.1-20261017T090812Z`；rc.1 的 baseline/status/日志/脚本/profile 清单已归档 |
+| 工具链 | 与 rc.1 相同：pnpm 11.28.5、Electron 44.7.0、primary runtime Node 24.21.0 / Python 3.12.14；复用已校验的下载缓存，未新增下载 |
+| 官方构建 | `pnpm run build`：`9 passed, 0 failed, 0 skipped in 75.00s`；`build: recorded 325 client artifact(s) with 2 public value(s)`；构建记录 `{"DSH_CLIENT_COMMIT_HASH":"687f282","DSH_CLIENT_VERSION":"0.2.1-rc.2"}`，digest `cf3a2784…` |
+| rc.1 适配包处置 | profile 中的 `0.1.2-adapt.1`（peer 0.2.1-rc.1）在 rc.2 下不兼容，按版本 bump 纪律换装新构建 `0.1.3-adapt.1`（peer 0.2.1-rc.2、cordis 4.0.5、devDependencies 全部 `0.2.1-rc.2`）。安装退出码 0，无兼容警告 |
+| 阶段 1 复验（rc.2） | guide 页含 `开始 \| 资料筛选台 \| 收集候选资料，逐条筛选后交回 Agent \| …`；点击入口后 `data-deck-state="placeholder"`、正文「资料台已就绪 \| 候选资料会出现在这里。Agent 提交或手动添加后即可筛选。」；tab strip 含「资料台」。截图 `logs/shots/upgrade-0.2.1-rc.2/`（3 张；不进 Git） |
+| 未受影响 | 日用 DSH 19387 未启动/重启；`dsh plugin --profile desktop` 未运行；产品 `package.json` 仍 `0.1.1` / peer `0.2.0-rc.2`；上游产品源码未改 |
 
 ## 尚未验证
 
-- **产品是否切换支持基线**：未决定。切换前产品仍只声明 `0.2.0-rc.2`，不宣称对 `0.2.1-rc.1` 兼容；沙箱中的 `0.1.2-adapt.1` 仅为适配测试产物。
-- **0.2.1-rc.2**：npm `next` 已指向它；本次未评估、未升级。
+- **产品是否切换支持基线**：未决定。切换前产品仍只声明 `0.2.0-rc.2`，不宣称对 0.2.1-rc.1 / rc.2 兼容；沙箱中的 `0.1.3-adapt.1` 仅为适配测试产物。
 - **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 5 附加验证。
 - 停车后的正常菜单退出仍未验证（本轮为按记录 PID 的受控停止）。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。

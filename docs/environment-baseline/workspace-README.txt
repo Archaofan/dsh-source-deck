@@ -20,7 +20,7 @@
 
 ## 共用沙箱约定
 
-1. 只使用与用户生产环境一致的官方 RC / 正式发布基线。当前生产目标为 `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`，对应日用 Desktop 的 `0.2.0-rc.2`。**唯一例外**：2026-10-17 用户明确批准共用沙箱先行升级到 `dsh-v0.2.1-rc.1`（commit `1600d8a1e140dcde43a1a0941940a0480712c011`）作开发环境，生产与产品 `peerDependencies` 仍为 `0.2.0-rc.2`；该例外记录在 `sandbox/dsh-desktop/baseline.json` 的 `upgradeApproval`，且由 `Assert-SandboxBaseline` 校验。官方仍将 RC 标记为预发行版；**不维护 alpha 兼容、不使用 alpha 专有接口、不因出现新发布自动升级**。
+1. 只使用与用户生产环境一致的官方 RC / 正式发布基线。当前生产目标为 `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`，对应日用 Desktop 的 `0.2.0-rc.2`。**唯一例外**：2026-10-17 用户明确批准共用沙箱先行升级到 `dsh-v0.2.1-rc.2`（commit `687f282e8625c6b8d11ff58211a90524be2e4317`）作开发环境，生产与产品 `peerDependencies` 仍为 `0.2.0-rc.2`；该例外记录在 `sandbox/dsh-desktop/baseline.json` 的 `upgradeApproval`，且由 `Assert-SandboxBaseline` 校验。官方仍将 RC 标记为预发行版；**不维护 alpha 兼容、不使用 alpha 专有接口、不因出现新发布自动升级**。
 2. 采用官方未打包 Desktop 开发启动器，不运行覆盖安装器。安装位置、Harness home、Electron userData、缓存、临时文件和日志均在 `sandbox/dsh-desktop/`。`DSH_HOME` 单独设置不能隔离 Electron 数据，必须一并使用本工作区启动脚本。RC Host 使用官方配置分配独立回环端口，避免与生产实例默认 19387 冲突。
 3. 所有插件优先在此测试。共享同一份上游源码和运行时；同一时间只允许一个项目占用交互测试。用启动脚本中的项目标识及运行锁管理占用，跨项目测试前关闭上一实例。
 4. 试验材料放在 `sandbox/dsh-desktop/test-workspaces/<项目名>/`。不要默认把 Agent 指向日用资料、其他项目或整块磁盘；不要从日用 DSH 自动复制凭据、会话和全部配置。

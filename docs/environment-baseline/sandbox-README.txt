@@ -2,7 +2,7 @@
 
 本目录由整个工作区共用。基线见 [baseline.json](baseline.json)，实际验证状态见 [status.json](status.json)。它是官方源码构建的未打包 Desktop，不是同名社区桌面壳，也没有运行覆盖安装器。
 
-当前基线为 **开发先行版 `0.2.1-rc.1`**（官方 RC，仍标记 prerelease）；用户于 2026-10-17 明确批准沙箱先行升级，**生产仍是 `0.2.0-rc.2`**。`baseline.json` 用 `sandboxRelation: ahead-of-production` 与 `upgradeApproval` 记录该例外，`Assert-SandboxBaseline` 只在“与生产同版”或“批准记录逐项匹配”时通过；alpha 与未批准的新版仍拒绝。原 alpha 的源码、产物、数据和验证记录在 archives 内可恢复保存；旧 RC 基线归档在 `archives/rc-0.2.0-rc.2-*/`。不得把旧版本数据直接交给新版本读取。
+当前基线为 **开发先行版 `0.2.1-rc.2`**（官方 RC，仍标记 prerelease）；用户于 2026-10-17 明确批准沙箱先行升级，**生产仍是 `0.2.0-rc.2`**。`baseline.json` 用 `sandboxRelation: ahead-of-production` 与 `upgradeApproval` 记录该例外，`Assert-SandboxBaseline` 只在“与生产同版”或“批准记录逐项匹配”时通过；alpha 与未批准的新版仍拒绝。原 alpha 的源码、产物、数据和验证记录在 archives 内可恢复保存；旧 RC 基线归档在 `archives/rc-0.2.0-rc.2-*/` 与 `archives/rc-0.2.1-rc.1-*/`。不得把旧版本数据直接交给新版本读取。
 
 该 RC 的 Desktop Host 默认固定监听 19387，会与同时运行的日用 RC 冲突。沙箱 desktop profile 通过官方 `webserver` 配置限定 `host: 127.0.0.1`、`port: 0`，由 OS 分配空闲端口；完整保留压缩配置，不改上游代码或日用监听。启动脚本在首次创建 profile patch 时一并设置；保留该覆盖项。
 
@@ -72,9 +72,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\sandbox\dsh-desktop\script
 
 不自动追随 master、alpha 或新发布的 RC。只有用户明确选择新的生产 RC / 正式版本后，才关闭实例、记录旧基线和插件清单，核对官方来源，显式更新上游 checkout、baseline.json（含 productionVersion）和对应工具链，再准备和验证。保留旧版本和状态直到新基线验证完成；不同版本状态不可假定支持降级，新插件复用已验证基线，不自行升级。启动与准备脚本拒绝 alpha 或未被批准记录覆盖的基线。
 
-2026-10-17 的沙箱升级是用户批准的**开发环境先行**：`version=0.2.1-rc.1`、`productionVersion=0.2.0-rc.2`，批准记录写在 `baseline.json` 的 `upgradeApproval`。产品插件仍只声明生产基线；沙箱中的适配测试包不是产品发布。
+2026-10-17 的沙箱升级是用户批准的**开发环境先行**：`version=0.2.1-rc.2`、`productionVersion=0.2.0-rc.2`，批准记录写在 `baseline.json` 的 `upgradeApproval`。产品插件仍只声明生产基线；沙箱中的适配测试包不是产品发布。
 
-0.2.1 的构建需要 git commit 但本机没有 git；沙箱在进程环境注入 `DSH_CLIENT_COMMIT_HASH=<baseline commit>`（上游支持的非 Git 构建路径）。源码获取、对象校验与构建证据见 SourceDeck 的 SETUP-VERIFICATION.md 夜段。
+0.2.1 的构建需要 git commit。本机**有** git（Hermes 自带 `git 2.54.0`，`C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe`），但沙箱进程 PATH 默认不含它；沙箱在进程环境注入 `DSH_CLIENT_COMMIT_HASH=<baseline commit>`（上游支持的非 Git 构建路径），使构建不依赖 PATH 或 worktree 状态。源码获取、对象校验与构建证据见 SourceDeck 的 SETUP-VERIFICATION.md 夜-2 段。
 
 安装进 profile 的插件若与运行时 dsh 不兼容，0.2.1 的 CLI 会保留安装但打印 `Plugin … is incompatible with dsh …`，并在启动时拒绝装载该 bundle；负向验证以启动后 UI 是否出现为准。
 

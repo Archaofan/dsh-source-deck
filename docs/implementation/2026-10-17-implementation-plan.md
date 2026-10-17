@@ -48,20 +48,20 @@
 - `npm pack` 会警告 `.npmrc` 含 pnpm 专有键，无害。
 - 一次性探测脚本（`Probe-*.ps1`、`tmp/*.mjs`）留在沙箱，不进 Git。
 
-## 阶段 1.5：沙箱升级到 0.2.1-rc.1 与适配（2026-10-17 已完成）
+## 阶段 1.5：沙箱升级到 0.2.1 RC 与适配（2026-10-17 已完成，最终基线 rc.2）
 
-背景：DSH 于 2026-10-17 05:22 UTC 发布 `dsh-v0.2.1-rc.1`（npm `next` tag；`latest` 仍为生产在用的 `0.2.0-rc.2`）。用户指示：沙箱先更新到新 RC，完成适配后再继续开发；生产 DSH 不受影响。产品 peer 基线是否切换由用户另行明确选择。
+背景：DSH 于 2026-10-17 05:22 UTC 发布 `dsh-v0.2.1-rc.1`；用户指示沙箱先升级并完成适配，生产 DSH 不受影响。随后 `dsh-v0.2.1-rc.2`（2026-10-17T08:16:33Z）发布，用户要求把沙箱内容升级到新版本，于是最终基线为 rc.2。产品 peer 基线是否切换仍由用户另行明确选择。
 
-执行结果（证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜段与 [../research/2026-10-17-0.2.1-rc.1-interface-delta.md](../research/2026-10-17-0.2.1-rc.1-interface-delta.md)）：
+执行结果（证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜段/夜-2 段与 [../research/2026-10-17-0.2.1-rc.2-interface-delta.md](../research/2026-10-17-0.2.1-rc.2-interface-delta.md)）：
 
-- 基线：tag `dsh-v0.2.1-rc.1`，commit `1600d8a1e140dcde43a1a0941940a0480712c011`；本机无 git，官方源码包 + GitHub git data API 对象级校验（16,248 blobs / 2,451 trees / 1 commit 全部 SHA 一致）；`.git/HEAD` 指向该 commit。
-- 工具链：pnpm 11.28.5、Electron 44.7.0、primary runtime Node 24.21.0 / Python 3.12.14；官方构建 9 gate 全过（131.90s），323 个 client artifacts；构建记录 commit `1600d8a`。
-- 兼容性：0.1.1（peer `0.2.0-rc.2`）在 0.2.1-rc.1 下**安装保留但启动被拒**（诊断 `Plugin dsh-source-deck@0.1.1 is incompatible with dsh 0.2.1-rc.1`）。
-- 适配验证：用同一份 `src/` 构建仅沙箱的 `0.1.2-adapt.1`（peer `0.2.1-rc.1`、cordis `4.0.5`）并装入沙箱；阶段 1 三项复验全部通过：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body（`data-deck-state="placeholder"`）。截图 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.1/`。
+- 基线：tag `dsh-v0.2.1-rc.2`，commit `687f282e8625c6b8d11ff58211a90524be2e4317`；rc.2 用真实 git（Hermes 自带 2.54.0）`fetch --depth 1` 取得，`git status` 干净、`git rev-parse HEAD` 与 tag ref 一致。rc.1（`1600d8a…`）为中间验证版本，已归档。
+- 工具链：pnpm 11.28.5、Electron 44.7.0、primary runtime Node 24.21.0 / Python 3.12.14；官方构建 9 gate 全过（75.00s），325 个 client artifacts；构建记录 commit `687f282`、版本 `0.2.1-rc.2`。
+- 兼容性：0.1.1（peer `0.2.0-rc.2`）在新 RC 下**安装保留但启动被拒**（诊断 `Plugin dsh-source-deck@0.1.1 is incompatible with dsh 0.2.1-rc.1`）。
+- 适配验证：构建仅沙箱的 `0.1.3-adapt.1`（peer `0.2.1-rc.2`、cordis `4.0.5`、devDependencies 全部 `0.2.1-rc.2`）并装入沙箱；阶段 1 三项复验全部通过：guide 入口「资料筛选台」、tab chip「资料台」、placeholder body（`data-deck-state="placeholder"`）。截图 `sandbox/dsh-desktop/logs/shots/upgrade-0.2.1-rc.2/`。
 - 适配结论：两步 tab 注册、`dsh.client`/bundle patch 装载、lazy-CJS 预设、工具/Remote/存储/会话事件接口仍成立；变化项为兼容门（`engines.dsh` 优先且替代 peer 检查）、`PLATFORM_MODULES` 新增 `zod`/`@tanstack/react-virtual`、cordis 4.0.5、pnpm/Electron 版本；阶段 2 可按原设计推进。
-- 未改：产品 `package.json`（仍 0.1.1 / peer `0.2.0-rc.2`）、日用 DSH、上游产品源码。`0.1.2-adapt.1` 是沙箱测试产物，不是产品发布。
+- 未改：产品 `package.json`（仍 0.1.1 / peer `0.2.0-rc.2`）、日用 DSH、上游产品源码。`0.1.3-adapt.1` 是沙箱测试产物，不是产品发布。
 
-**待用户决策**：产品 `peerDependencies` 是否切到 `0.2.1-rc.1`（或改用 `engines.dsh` 表达支持范围）。在用户确认前，沙箱升级只作开发环境，不宣称产品对 0.2.1-rc.1 的兼容。另：npm `next` 在本次工作期间已变为 `0.2.1-rc.2`，本次未评估。
+**待用户决策**：产品 `peerDependencies` 是否切换支持基线（`0.2.1-rc.2` 精确 peer，或改用 `engines.dsh` 表达范围）。在用户确认前，沙箱升级只作开发环境，不宣称产品对新 RC 的兼容。
 
 
 ## 阶段 2：无模型链路（V3a）
