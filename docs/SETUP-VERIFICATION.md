@@ -36,7 +36,7 @@
 | 编辑事故记录 | 用 edit 工具写 Common.ps1 时，一行中文注释曾造成 PowerShell 解析器行合并（报 `Unexpected token '}'`）；改为 ASCII 注释后正常。后续沙箱脚本注释一律用 ASCII |
 | 验证后收尾 | 验证完成后按记录的沙箱 PID（31740/31656/41932/12508/10252，均校验命令行含 sandbox 路径）精确停止，日用 19387 进程 20816 未受影响；主进程退出码 -1 为被强杀的预期结果，启动阶段日志显示 Desktop 已稳定运行并通过 deepseek-account 链路 |
 
-凭据事故（必须向用户披露）：同日调试"脱敏"正则时一次失误把日用 `.credentials.yaml` 的多条真实密钥明文打印进对话记录（含 `DEEPSEEK_API_KEY` 与若干第三方账号 token）。已建议用户轮换相关凭据；沙箱侧后续只做键级操作，不再输出任何值。
+凭据事故（已按用户决定处置）：同日调试"脱敏"正则时一次失误把日用 `.credentials.yaml` 的多条真实密钥明文打印进对话记录（含 `DEEPSEEK_API_KEY`、`STEPFUN_API_KEY` 与 CODEARTS/TRAE/QODERCN/LOOMY 账号授权、`deepseek-account-platform`）。**用户 2026-10-17 明确决定不轮换，由我负责记录与后续纪律**；完整记录见 [security/2026-10-17-credential-exposure.md](security/2026-10-17-credential-exposure.md)（仅键名，无值）。暴露面仅限本机会话记录，未进任何仓库或沙箱文件。沙箱侧后续只做键级操作，不再输出任何值。
 
 ## 尚未验证
 

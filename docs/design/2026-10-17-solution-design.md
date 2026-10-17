@@ -304,4 +304,5 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 4. peer 精确写 `"0.2.0-rc.2"`。
 5. 所有开发实现只在沙箱 Desktop（`sandbox/dsh-desktop/`，基线 0.2.0-rc.2）验证，不影响日用 DSH；最终安装到本 DSH 需用户明确批准。
 6. 沙箱 Desktop 的 LLM API 直接使用本 DSH 已配置的 DeepSeek API（已配置，见 SETUP-VERIFICATION）。
-7. 凭据处置事故记录：2026-10-17 调试期间一次"脱敏"正则失误导致日用 `.credentials.yaml` 的多条密钥明文进入对话记录；已建议用户轮换（含 `DEEPSEEK_API_KEY`）；沙箱侧仅做最小化键级合并，不再输出任何值。
+7. 凭据处置事故记录：2026-10-17 调试期间一次"脱敏"正则失误导致日用 `.credentials.yaml` 的多条密钥明文进入对话记录；用户决定不轮换，由我记录并执行后续纪律（只做键级操作）。完整记录见 [../security/2026-10-17-credential-exposure.md](../security/2026-10-17-credential-exposure.md)。
+8. 沙箱 Desktop 的 LLM API 已配好（本 DSH 的 DeepSeek API，最小化 3 条）并通过真实调用验证；用户要求实现每个阶段都在沙箱内展示真实效果。

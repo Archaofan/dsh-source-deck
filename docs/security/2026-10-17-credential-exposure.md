@@ -1,0 +1,44 @@
+# 安全事故记录：凭据明文暴露（2026-10-17）
+
+状态：**已记录，用户明确决定不轮换（2026-10-17 原话："我不会轮换"）。由我负责记录与后续纪律。**
+本文件进 Git，**只含键名与处置，不含任何凭据值**。
+
+## 事故经过
+
+2026-10-17 13:2x–13:3x（Asia/Shanghai），在为沙箱配置 LLM API 的过程中，我执行了一条 PowerShell"脱敏"命令，意图只打印日用 `.credentials.yaml` 的键名结构。该命令的正则替换写反（把真实值保留在输出中），导致日用 `E:\DSH-Desktop\.dsh\.credentials.yaml` 中多条记录的真实密钥明文出现在当次命令输出里，进入本会话的对话记录。
+
+## 暴露范围（键名清单，值不记录）
+
+来自日用 `E:\DSH-Desktop\.dsh\.credentials.yaml`：
+
+- `refs.DEEPSEEK_API_KEY`（DeepSeek API key，35 字符，`sk-` 前缀）
+- `refs.STEPFUN_API_KEY`（阶跃星辰 API key）
+- `refs.CODEARTS_ACCOUNT_80F6F111`（华为云 CodeArts 账号 OAuth 授权，含 access/secret/security token 与 refresh token）
+- `refs.TRAE_ACCOUNT_6CEB51C9`（Trae 账号授权，含 access/refresh token）
+- `refs.QODERCN_ACCOUNT_14295D31`（Qoder CN 账号授权）
+- `refs.LOOMY_ACCOUNT_0D21AE44`（Loomy 账号授权）
+- `records.deepseek-account-platform/default`（DeepSeek 平台账号 token）与 `records.deepseek-account-platform/device`
+
+暴露面：本会话对话记录（本地会话日志 + 对话传输链路）。**未进入任何 Git 仓库、未写入项目文件、未写入沙箱文件**（沙箱 `.credentials.yaml` 只含上述 DeepSeek 三条的副本，是用户授权的正常配置，非本次事故新增暴露）。
+
+## 影响评估
+
+- `DEEPSEEK_API_KEY`：可被用于调用 DeepSeek API 并产生计费；也可读取账号额度信息。
+- 各第三方账号 token：可被用于对应平台的授权操作（域取决于各平台 token 权限）。
+- 对话记录本身在用户本机（`$DSH_HOME` 会话日志），不构成远程暴露，除非本机或日志外发。
+
+## 处置
+
+1. **用户决定不轮换**（2026-10-17）。风险由用户接受。
+2. 我的后续纪律（立即生效，已执行）：
+   - 任何涉及凭据的命令只输出"键名 + 长度/是否存在"级信息，绝不再输出值；
+   - 凭据只通过文件直接读取或 `gh auth token` 子进程获取，不进命令行参数、不进仓库、不进日志；
+   - 写 PowerShell 命令前先推演输出内容；"脱敏"正则必须先在小样本上验证再对真实文件执行。
+3. 监测建议（供用户参考，不强制）：定期查看 DeepSeek 平台 API 用量页，发现异常调用即回滚本决定并轮换。
+4. 若将来任何凭据值疑似外泄（进 Git、进日志、进对外文件），按同等格式追加新事故记录，并重新评估轮换。
+
+## 时间线
+
+- 13:2x 事故命令执行，明文进入对话记录。
+- 13:3x 我发现并向用户披露，建议轮换；同日完成沙箱 DeepSeek 凭据的最小化配置（键级验证）。
+- 13:59 用户决定不轮换，要求由我记录并按其计划继续实施。
