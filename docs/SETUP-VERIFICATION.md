@@ -220,7 +220,7 @@ tests       : 30 passed / 0 failed（新增 add-after-submission → 新集合�
 
 先读父目录 README.md / AGENTS.md、项目简报、VERSION-POLICY.md 与 HANDOFF.md。检查 Get-SandboxStatus.ps1、Start-Desktop.ps1 -CheckOnly 和 Git 同步状态；已通过的 RC 构建不必重复。方案必须以固定 RC 的真实公共接口为依据，资料和设计写入项目子目录，设计交用户审阅后再实现。
 
-## 2026-10-17 夜-7：v2 LLM 搜索轮次 + 聊天联动（产品 0.2.0 → 0.2.4）
+## 2026-10-17 夜-7：v2 LLM 搜索轮次 + 聊天联动（产品 0.2.0 → 0.2.5）
 
 背景：用户验收 0.1.17 后明确要求“更简单、字体更大、不配站点/正则、由当前对话的 LLM 搜索并整理、GitHub 仓库直接出图标/简介/链接、勾叉与补充说明驱动下一轮、可跳过/填原因、收藏夹”，并追加“资料台必须和当前聊天联动，不能是独立窗口”。调研与决策见 [research/2026-10-17-chat-deck-linkage.md](research/2026-10-17-chat-deck-linkage.md) 与 [design/2026-10-17-solution-design.md §14](design/2026-10-17-solution-design.md)。
 

@@ -1,6 +1,6 @@
 {
   "name": "dsh-source-deck",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "SourceDeck: collect candidate sources in a right-sidebar deck, screen them in the conversation flow, and hand the selection back to the Agent.",
   "type": "module",
   "main": "lib/index.js",
@@ -31,7 +31,8 @@
     "lib/client.js.map",
     "lib/types/**/*.d.ts",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "README.en.md"
   ],
   "scripts": {
     "build": "tsdown && tsc -p tsconfig.json",
