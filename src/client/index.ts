@@ -6,11 +6,16 @@ import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { CommitResult, SetView, AddSourceResult } from '../ops.ts'
 import type { Verdict } from '../model.ts'
 import { DeckBody } from './DeckBody.tsx'
+import { DeckCard } from './DeckCard.tsx'
+import { DeckEntryButton } from './DeckEntryButton.tsx'
 import { DeckTitle } from './DeckTitle.tsx'
-import { DECK_ID, deckDefinition } from './definition.ts'
+import { deckCardDefinition, DECK_CARD_KIND } from './card-definition.ts'
+import { DECK_ID, DECK_KIND, deckDefinition } from './definition.ts'
 import type { DeckFace } from './deck-face.ts'
 import { en, zh } from './locales.ts'
 import { TYPERT_REMOTE } from '../remote-info.ts'
@@ -53,7 +58,7 @@ declare module '@deepseek-ai/cordis' {
  * Required browser services: the tab registry, the keyed seat, copy, and the
  * Remote carrier this package mounts its contribution into.
  */
-export const inject = ['slots', 'locale', 'sidebarRightTabs', 'remote']
+export const inject = ['slots', 'locale', 'sidebarRightTabs', 'sidebarRight', 'uiConversation', 'remote']
 
 /**
  * Client plugin body: register the tab, mount the Remote namespace, and wire
@@ -93,6 +98,16 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   ctx.effect(() => ctx.sidebarRightTabs.register(deckDefinition(t)), 'dsh-source-deck: deck type')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-source-deck: dictionaries')
+  const openDeck = (): void => ctx.sidebarRight.openTab(DECK_KIND)
+  ctx.effect(() => ctx.uiConversation.events.register(deckCardDefinition), 'dsh-source-deck: deck card definition')
+  ctx.slots.inject('conversation.chat.node', () => ctx.slots.register(
+    { name: 'conversation.chat.node', key: DECK_CARD_KIND, locale: NS, inject: () => ({ openDeck }) },
+    DeckCard as never,
+  ))
+  ctx.slots.inject('conversation.input.right', () => ctx.slots.register(
+    { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck }) },
+    DeckEntryButton as never,
+  ))
   ctx.effect(() => ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register(
     { name: 'sidebar.right.pane.tab', key: DECK_ID, locale: NS, inject: () => ({ deck }) },
     DeckBody as never,

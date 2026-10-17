@@ -1,0 +1,14 @@
+.entry {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--dsw-border-subtle, rgba(127, 127, 127, 0.3));
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.entry:hover {
+  background: var(--dsw-surface-raised, rgba(127, 127, 127, 0.12));
+}

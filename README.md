@@ -5,8 +5,11 @@ SourceDeck — 资料筛选台。DeepSeek Harness Desktop 插件（Host 半 + Cl
 Stage one is complete and verified in the sandbox Desktop: the third-party
 `./client` half enters the boot graph, the `sourcedeck` right-Sidebar tab and
 its guide entry render, and the placeholder body mounts (evidence in
-`docs/implementation/2026-10-17-implementation-plan.md`). Stage two adds the
-`source_deck` domain, the `deck_submit_sources` tool, and the deck panel.
+`docs/implementation/2026-10-17-implementation-plan.md`). Stage two (V3a) is
+implemented and verified: the `source_deck` domain, `deck_submit_sources`
+tool, `sourceDeck` Remote, ignorable session records, the deck panel, the
+conversation card, and the composer entry. Evidence is in
+`docs/SETUP-VERIFICATION.md` (夜-4) and the sandbox screenshots.
 
 ## Build
 

@@ -39,6 +39,12 @@ export const zh = {
   'submit.none': '先保留或排除至少一条资料',
   'summary': '保留 {kept} · 排除 {excluded} · 待处理 {pending}',
   'source.open': '打开链接',
+  'card.title': '候选资料集',
+  'card.more': '另有 {count} 条，在资料台查看',
+  'card.open': '在资料台打开',
+  'card.verdict.pending': '待处理',
+  'card.verdict.kept': '保留',
+  'card.verdict.excluded': '排除',
   'error.prefix': '操作失败：',
 } satisfies Record<string, string>
 
@@ -70,5 +76,11 @@ export const en = {
   'submit.none': 'Keep or exclude at least one source first',
   'summary': 'Kept {kept} · Excluded {excluded} · Pending {pending}',
   'source.open': 'Open link',
+  'card.title': 'Candidate sources',
+  'card.more': '{count} more in the deck',
+  'card.open': 'Open in deck',
+  'card.verdict.pending': 'Pending',
+  'card.verdict.kept': 'Kept',
+  'card.verdict.excluded': 'Excluded',
   'error.prefix': 'Operation failed: ',
 } satisfies Record<DeckKey, string>

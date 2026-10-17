@@ -112,9 +112,28 @@
 | 已知后果 | 生产 Desktop 仍 `0.2.0-rc.2`；精确 peer `0.2.1-rc.2` 的 0.1.2 在生产升级前不会被其加载。用户已明确选择该基线；未做宽范围或双版本兼容 |
 | 未受影响 | 日用 DSH 19387 未启动/重启；沙箱升级、适配包与测试产物不入 Git；上游产品源码未改 |
 
+## 2026-10-17 夜-4：阶段 2（V3a 无模型链路）实现与验收
+
+背景：按已批准方案 A 实现 `source_deck` 域、`deck_submit_sources` 工具、自建 Remote、log-only 会话记录与资料台 UI。验证环境为沙箱 `0.2.1-rc.2`（开发先行基线），产品版本 `0.1.11`。
+
+| 项目 | 证据与结果 |
+|---|---|
+| Host 数据层 | `source_deck` 五表（per-record）；单元测试 `node --test`：dedupe 7 例 + ops 9 例，`pass 16 / fail 0` |
+| Remote | 单 `request(op, bodyJson)` namespace `sourceDeck`；`addSource/getActiveSet/getSet/decide/commitSelection/clearData` 分派；手写 Typert 贡献 + 协议同款原型 marker（tsdown 不降级装饰器） |
+| 工具 | `deck_submit_sources` 注册成功；会话日志 `request/header`（seq17）的工具目录包含 `deck_submit_sources`，证明模型可见 |
+| 会话记录 | 日志 seq4/seq6 `plugin:dsh-source-deck/set-snapshot`、seq5 `candidate-decided`、seq7 `selection-submitted`，均 `ignorable:true`；解压 25 个 zstd frame 后核对 |
+| 面板流程 | CDP 驱动：初始 empty（3 个输入）→ 添加后待处理 1 → 保留后 保留 1 → 提交显示「已提交，Agent 会收到筛选摘要。」 |
+| 域记录 | `sets.set-…` status=submitted；`candidates.cand-…` verdict=kept、decidedAt；`selections.sel-…` kept=[cand-…]；`sources.src-…` dedupeKey=`url:https://example.com/dsh-plugin-guide`（utm 已剥离） |
+| 回传 Agent | seq13 `user/message` 文本为「用户已筛选资料集（共 1 条候选）：保留 1 条：1）《DSH 插件机制概述》…请基于保留资料继续。」；来源为 `session.prompt` queue |
+| 对话卡片 | 会话内 `[data-deck-card=set-…]` 渲染「候选资料集 · 1 / 保留 1 · 排除 0 · 待处理 0 / DSH 插件机制概述 / 在资料台打开」；点击后资料台 `data-deck-state=ready` |
+| 输入区入口 | composer 存在按钮「资料台」（aria「资料筛选台」）；关闭资料台后点击入口，`data-deck-state` 由 null 变为 ready |
+| 截图 | `logs/shots/stage2-panel/`（添加、已提交）、`logs/shots/stage2-card/`（卡片、卡片打开资料台）、`logs/shots/stage2-final/`（最终卡片与面板）；均不进 Git |
+| 未受影响 | 日用 DSH 19387 未启动/重启；产品 peer 仍 `0.2.1-rc.2`；未做模型链路专项验收（属阶段 4 / V3b） |
+
 ## 尚未验证
 
-- **生产 Desktop 升级到 0.2.1-rc.2**：未进行，也不在本次范围内；在升级前 0.1.2 不会在日用环境加载。
+- **生产 Desktop 升级到 0.2.1-rc.2**：未进行，也不在本次范围内；在升级前 0.1.x 不会在日用环境加载。
+- **带模型的完整筛选链路（V3b）**：未做专项验收；本轮提交后 `session.prompt` 会唤醒 Agent，属设计内的“提交即唤醒”，但未验证 Agent 后续正确引用保留资料。
 - **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 5 附加验证。
 - 停车后的正常菜单退出仍未验证（本轮为按记录 PID 的受控停止）。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。

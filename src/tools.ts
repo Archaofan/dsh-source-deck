@@ -142,6 +142,5 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
         }
       },
     }), 'dsh-source-deck: deck_submit_sources tool')
-    console.log('[source-deck] deck_submit_sources registered')
   })
 }

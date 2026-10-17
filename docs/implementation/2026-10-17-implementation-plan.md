@@ -70,11 +70,12 @@
 - 已知后果：生产 Desktop 仍 `0.2.0-rc.2`，0.1.2 在生产升级前不会加载；未做宽范围兼容。
 - 证据：SETUP-VERIFICATION.md 夜-3 段、VERSION-POLICY.md 夜-3 段。
 
-## 阶段 2：无模型链路（V3a）
+## 阶段 2：无模型链路（V3a）— 已完成（2026-10-17，产品 0.1.11）
 
-- Host：`defineDomain('source_deck')` 五表、`deck_submit_sources` 工具、`sourceDeck` Remote 命名空间（addSource/listSets/getSet/decide/commitSelection/clearData）、log-only 事件（set-opened/candidate-decided/selection-submitted）。
-- Client：资料台面板（待处理/保留/排除分组、添加资料表单、提交按钮、策略摘要条占位）、对话流候选卡片（勾选/排除）、`input.right` 入口按钮。
-- 交付物：手动添加→卡片→筛选→提交全链路；域文件可查；队列/steer 消息出现在会话投影；截图。
+- Host：`source_deck` 五表（per-record）、`deck_submit_sources` 工具、自建 `sourceDeck` Remote（`request` 单方法分派 addSource/getActiveSet/getSet/decide/commitSelection/clearData）、log-only 会话记录（`plugin:dsh-source-deck/set-snapshot`、`candidate-decided`、`selection-submitted`，均 `ignorable:true`）。
+- Client：资料台面板（添加表单、待处理/保留/排除分组、保留/排除/撤销、提交）、对话流候选卡片（折叠 set-snapshot、在资料台打开）、`conversation.input.right`「资料台」入口。
+- 交付验证：手动添加→卡片→筛选→提交全链路；域文件可查（sets/candidates/selections/sources/session_active）；`session.prompt` queue 的 user/message 出现在会话投影；`deck_submit_sources` 出现在 request/header 工具目录；16 个单元测试全绿。证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-4 段；截图 `sandbox/dsh-desktop/logs/shots/stage2-panel/`、`stage2-card/`、`stage2-final/`。
+- 实现取舍：树外包无法运行 workspace 版 Typert 生成器，Remote 采用单 `request(op, bodyJson)` 方法 + 手写贡献；Host 端 `@Remote` 装饰器不被本项目 tsdown 降级，改为显式写入协议同款 `version:1` 原型 marker。后续若要具名 wire 方法，可再引入生成器而不改 UI。
 
 ## 阶段 3：来源范围配置（V7）
 
