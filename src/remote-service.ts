@@ -14,6 +14,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
+import { emitDeckRecord, snapshotOf } from './events.ts'
 import {
   addSource, clearData, commitSelection, decide, getActiveSet, getSet,
 } from './ops.ts'
@@ -59,7 +60,12 @@ export class SourceDeckRemote extends TypertRemoteService {
     }, 'dsh-source-deck: close storage domain')
   }
 
-  private async store() {
+  /**
+   * Open (once) and return the deck store shared by the Remote service and the
+   * `deck_submit_sources` tool.
+   * @returns the operation store.
+   */
+  async getStore() {
     if (this.closed) throw new Error('source-deck storage domain is closed')
     this.deck ??= openDeck(this.ctx)
     return (await this.deck).store
@@ -77,22 +83,26 @@ export class SourceDeckRemote extends TypertRemoteService {
       case 'ping':
         return JSON.stringify({ ok: true, op, message: 'source-deck remote' })
       case 'addSource': {
-        const result = await addSource(await this.store(), {
-          sessionId: stringField(args, 'sessionId'),
+        const sessionId = stringField(args, 'sessionId')
+        const store = await this.getStore()
+        const result = await addSource(store, {
+          sessionId,
           origin: (args.origin === 'agent' ? 'agent' : 'user'),
           ...(optionalString(args, 'title') === undefined ? {} : { title: optionalString(args, 'title') }),
           ...(optionalString(args, 'url') === undefined ? {} : { url: optionalString(args, 'url') }),
           ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
           ...(optionalString(args, 'snippet') === undefined ? {} : { snippet: optionalString(args, 'snippet') }),
         })
+        emitDeckRecord(this.ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot',
+          snapshotOf(result.setId, await getSet(store, result.setId)))
         return JSON.stringify(result)
       }
       case 'getActiveSet': {
-        const view = await getActiveSet(await this.store(), stringField(args, 'sessionId'))
+        const view = await getActiveSet(await this.getStore(), stringField(args, 'sessionId'))
         return JSON.stringify(view ?? null)
       }
       case 'getSet': {
-        const view = await getSet(await this.store(), stringField(args, 'setId'))
+        const view = await getSet(await this.getStore(), stringField(args, 'setId'))
         return JSON.stringify(view)
       }
       case 'decide': {
@@ -100,23 +110,42 @@ export class SourceDeckRemote extends TypertRemoteService {
         if (verdict !== 'kept' && verdict !== 'excluded' && verdict !== 'pending') {
           throw new Error('verdict must be kept, excluded, or pending')
         }
-        await decide(await this.store(), {
+        const store = await this.getStore()
+        const candidate = await decide(store, {
           candidateId: stringField(args, 'candidateId'),
           verdict,
           ...(optionalString(args, 'reason') === undefined ? {} : { reason: optionalString(args, 'reason') }),
         })
+        const view = await getSet(store, candidate.setId)
+        emitDeckRecord(this.ctx, view.set.sessionId, 'plugin:dsh-source-deck/candidate-decided', {
+          setId: candidate.setId,
+          candidateId: stringField(args, 'candidateId'),
+          verdict: candidate.verdict,
+          ...(candidate.reason === undefined ? {} : { reason: candidate.reason }),
+        })
+        emitDeckRecord(this.ctx, view.set.sessionId, 'plugin:dsh-source-deck/set-snapshot',
+          snapshotOf(candidate.setId, view))
         return JSON.stringify({ ok: true })
       }
       case 'commitSelection': {
-        const result = await commitSelection(await this.store(), {
-          sessionId: stringField(args, 'sessionId'),
+        const sessionId = stringField(args, 'sessionId')
+        const result = await commitSelection(await this.getStore(), {
+          sessionId,
           setId: stringField(args, 'setId'),
+          requestId: stringField(args, 'requestId'),
+        })
+        emitDeckRecord(this.ctx, sessionId, 'plugin:dsh-source-deck/selection-submitted', {
+          selectionId: result.selectionId,
+          setId: stringField(args, 'setId'),
+          sessionId,
+          kept: result.kept.length,
+          excluded: result.excluded.length,
           requestId: stringField(args, 'requestId'),
         })
         return JSON.stringify(result)
       }
       case 'clearData':
-        await clearData(await this.store())
+        await clearData(await this.getStore())
         return JSON.stringify({ ok: true })
       default:
         throw new Error(`unknown source-deck operation ${JSON.stringify(op)}`)

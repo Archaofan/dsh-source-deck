@@ -37,6 +37,7 @@ const CLIENT_EXTERNALS: ReadonlySet<string> = new Set([
 /** Node-half imports that stay external: the package's own peer dependencies. */
 const NODE_EXTERNALS: readonly string[] = [
   '@deepseek-ai/dsh',
+  '@deepseek-ai/dsh-session',
   '@deepseek-ai/dsh-typert-protocol',
   '@deepseek-ai/cordis',
 ]

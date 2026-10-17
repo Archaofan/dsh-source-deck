@@ -39,6 +39,7 @@ export interface CandidateView {
 
 /** One set with its candidates. */
 export interface SetView {
+  readonly setId: string
   readonly set: SetRecord
   readonly candidates: readonly CandidateView[]
 }
@@ -155,7 +156,7 @@ export async function getSet(store: DeckStore, setId: string): Promise<SetView> 
     })
   }
   candidates.sort((left, right) => left.candidate.createdAt.localeCompare(right.candidate.createdAt))
-  return { set, candidates }
+  return { setId, set, candidates }
 }
 
 /**
@@ -179,7 +180,7 @@ export async function getActiveSet(store: DeckStore, sessionId: string): Promise
 export async function decide(
   store: DeckStore,
   input: { candidateId: string; verdict: Verdict; reason?: string },
-): Promise<void> {
+): Promise<CandidateRecord> {
   const value = store.get('candidates', input.candidateId)
   if (!isRecord(value)) throw new Error(`deck candidate ${input.candidateId} was not found`)
   const candidate = value as unknown as CandidateRecord
@@ -190,6 +191,7 @@ export async function decide(
     ...(input.reason === undefined ? { reason: undefined } : { reason: input.reason }),
   }
   await store.put('candidates', input.candidateId, next)
+  return next
 }
 
 /**

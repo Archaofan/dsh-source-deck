@@ -7,17 +7,19 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { SourceDeckRemote } from './remote-service.ts'
+import { registerDeckTool } from './tools.ts'
 
 /** Plugin identity, matching the bundle patch row id. */
 export const name = 'dsh-source-deck'
 
-/** Host services this half waits on; none yet in stage one. */
+/** Host services this half waits on; the tools registration injects its own. */
 export const inject: readonly string[] = []
 
 /**
- * Host plugin body: mount the SourceDeck Remote service.
+ * Host plugin body: mount the SourceDeck Remote service and its deck tool.
  * @param ctx - profile root context.
  */
 export function apply(ctx: Context): void {
-  ctx.plugin(SourceDeckRemote)
+  const remote = new SourceDeckRemote(ctx)
+  registerDeckTool(ctx, () => remote.getStore())
 }
