@@ -1,0 +1,15 @@
+# 工作区级约定
+
+本文件适用于 `E:/DSH-Desktop-Plugin-Dev` 内所有项目。先读根 README.md 和目标项目 AGENTS.md。
+
+- 每个插件在根目录下独立文件夹中开发、独立初始化 Git、独立远端。SourceDeck 的唯一项目目录为 `dsh-source-deck/`，远端为 `https://github.com/Archaofan/dsh-source-deck.git`。
+- 统一复用 `sandbox/dsh-desktop/` 的官方 Desktop 沙箱。项目开始时检查 `baseline.json`、`status.json` 和运行占用；不要为每个插件重装一份或悄悄升级共享基线。
+- Desktop 使用官方未打包开发模式。必须同时隔离 DSH_HOME、Electron userData、APPDATA/LOCALAPPDATA、缓存和临时目录；使用沙箱脚本，不直接启动日用 DSH 或运行覆盖安装器。
+- 插件安装只通过沙箱 `Install-Plugin.ps1` 进入沙箱 desktop profile。不得运行指向默认 home 的全局插件命令，不修改日用配置、凭据、会话、PATH 或协议关联。
+- 共用交互沙箱一次只由一个项目占用。测试材料放 `sandbox/dsh-desktop/test-workspaces/<项目名>/`。插件之间的数据必须区分项目/会话；不同插件组合测试要明确记录启用清单。
+- 不从日用 DSH 自动导入账号、密钥或全量配置。需要模型登录时请用户在沙箱单独完成。报告区分无密钥启动验证与实际模型调用验证。
+- 上游官方仓库只作固定基线和运行环境，默认不修改其产品源码。升级或确有必要的适配先说明理由、影响与验证方式，不能把上游改动混入插件仓库。
+- 所有代码/文档阶段性修改完成必要检查后提交并推送本项目远端。同步后核对 HEAD 与 origin；失败就记录 pending，不隐瞒。不自动 force push 或提交沙箱、凭据、缓存及个人研究记忆摘录。
+- GitHub keyring、Electron 或构建若被执行沙箱限制，按证据申请单条主机执行权限。使用准确目录的进程级 Git 信任，不修改全局 safe.directory，不以关闭 TLS/系统防护解决环境问题。
+- 清理只限已确认属于本沙箱的路径；Windows 递归删除/移动前验证解析后的绝对路径。不要按进程名称终止所有 DSH/Electron/Node，只管理本次记录的沙箱进程。
+- 当前用户要求先准备环境与接手资料，新对话再开始 SourceDeck 的具体方案设计；在未完成设计评审前，不提前写插件产品代码或建立未经讨论的功能架构。

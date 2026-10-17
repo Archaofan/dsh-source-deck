@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "source": "https://github.com/deepseek-ai/deepseek-harness.git",
+  "tag": "dsh-v0.2.1-alpha.5",
+  "version": "0.2.1-alpha.5",
+  "commit": "1517a4dbca0a2789ff1d41ba439600f8547d23fa",
+  "releasePublishedAtUtc": "2026-10-16T12:23:28Z",
+  "checkedOnAsiaShanghai": "2026-10-17",
+  "distribution": "official-source-unpackaged-desktop",
+  "nodeUsed": "26.7.0",
+  "pnpm": "11.28.5",
+  "rootRelative": "sandbox/dsh-desktop",
+  "note": "Latest official release checked during setup; prerelease. No installer or production profile is used."
+}
