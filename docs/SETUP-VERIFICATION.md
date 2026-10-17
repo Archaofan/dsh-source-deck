@@ -96,11 +96,25 @@
 | 官方构建 | `pnpm run build`：`9 passed, 0 failed, 0 skipped in 75.00s`；`build: recorded 325 client artifact(s) with 2 public value(s)`；构建记录 `{"DSH_CLIENT_COMMIT_HASH":"687f282","DSH_CLIENT_VERSION":"0.2.1-rc.2"}`，digest `cf3a2784…` |
 | rc.1 适配包处置 | profile 中的 `0.1.2-adapt.1`（peer 0.2.1-rc.1）在 rc.2 下不兼容，按版本 bump 纪律换装新构建 `0.1.3-adapt.1`（peer 0.2.1-rc.2、cordis 4.0.5、devDependencies 全部 `0.2.1-rc.2`）。安装退出码 0，无兼容警告 |
 | 阶段 1 复验（rc.2） | guide 页含 `开始 \| 资料筛选台 \| 收集候选资料，逐条筛选后交回 Agent \| …`；点击入口后 `data-deck-state="placeholder"`、正文「资料台已就绪 \| 候选资料会出现在这里。Agent 提交或手动添加后即可筛选。」；tab strip 含「资料台」。截图 `logs/shots/upgrade-0.2.1-rc.2/`（3 张；不进 Git） |
-| 未受影响 | 日用 DSH 19387 未启动/重启；`dsh plugin --profile desktop` 未运行；产品 `package.json` 仍 `0.1.1` / peer `0.2.0-rc.2`；上游产品源码未改 |
+| 未受影响 | 日用 DSH 19387 未启动/重启；`dsh plugin --profile desktop` 未运行；产品 `package.json` 当时仍 `0.1.1` / peer `0.2.0-rc.2`（夜-3 已切换）；上游产品源码未改 |
+
+## 2026-10-17 夜-3：产品 peer 切换到 0.2.1-rc.2（用户决定）
+
+用户指示：“产品 peerDependencies 切换到最新基线。”
+
+| 项目 | 证据与结果 |
+|---|---|
+| 清单变更 | `package.json`：`version 0.1.1 → 0.1.2`；`peerDependencies` = `@deepseek-ai/dsh@0.2.1-rc.2`、`@deepseek-ai/cordis@4.0.5`（精确）；devDependencies 的 9 个官方 Client 包全部 `0.2.1-rc.2`，cordis `4.0.5`。`pnpm-lock.yaml` 同步更新 |
+| 依赖安装 | 沙箱 pnpm 11.28.5：`Done in 8.7s`（复用 store） |
+| 构建 | `tsdown` + `tsc` 均退出码 0；`lib/client.js` 首行仍为 `window.__ModuleLoader__.load({`；`npm pack` 产出 `dsh-source-deck-0.1.2.tgz`（6,713 bytes） |
+| 沙箱安装 | `Install-Plugin.ps1` 装入 0.1.2（替换 `0.1.3-adapt.1`），退出码 0，无兼容警告；profile 依赖指向 `dsh-source-deck-0.1.2.tgz` |
+| 阶段 1 复验 | 启动后 guide 含 `资料筛选台`（5 个匹配节点），点击入口后 `data-deck-state="placeholder"`、正文「资料台已就绪 \| 候选资料会出现在这里。Agent 提交或手动添加后即可筛选。」。截图 `logs/shots/peer-switch-0.1.2/`（desktop-right-sidebar.png、deck-tab-open.png；不进 Git） |
+| 已知后果 | 生产 Desktop 仍 `0.2.0-rc.2`；精确 peer `0.2.1-rc.2` 的 0.1.2 在生产升级前不会被其加载。用户已明确选择该基线；未做宽范围或双版本兼容 |
+| 未受影响 | 日用 DSH 19387 未启动/重启；沙箱升级、适配包与测试产物不入 Git；上游产品源码未改 |
 
 ## 尚未验证
 
-- **产品是否切换支持基线**：未决定。切换前产品仍只声明 `0.2.0-rc.2`，不宣称对 0.2.1-rc.1 / rc.2 兼容；沙箱中的 `0.1.3-adapt.1` 仅为适配测试产物。
+- **生产 Desktop 升级到 0.2.1-rc.2**：未进行，也不在本次范围内；在升级前 0.1.2 不会在日用环境加载。
 - **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 5 附加验证。
 - 停车后的正常菜单退出仍未验证（本轮为按记录 PID 的受控停止）。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。

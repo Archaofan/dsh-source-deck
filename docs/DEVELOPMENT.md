@@ -29,6 +29,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ..\sandbox\dsh-desktop\scrip
 
 **版本 bump 纪律**：pnpm 对相同 name@version 的 `file:` tgz 不替换已安装内容；每次迭代先 bump `package.json` 的 `version` 再 pack/install。
 
+**pnpm 11.28.5 的发布年龄例外**：官方 RC 包刚发布时会被 pnpm 的 minimumReleaseAge 策略挡住；安装 0.2.1-rc.2 后 pnpm 生成了 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`，精确列出本包需要的版本。该文件随仓库提交，保证后续安装可复现；升级基线时由 pnpm 重新生成或手工更新对应版本。
+
 **安装时的兼容门（0.2.1 起）**：安装前读包清单，按 `engines.dsh`（声明了就用它）或 dsh peer 判定；不兼容时 pnpm 可能显示 `Already up to date`，CLI 打印 `Plugin … is incompatible with dsh …` 并保留安装，但**profile 启动会拒绝装载该 bundle**。负向验证以启动后 guide/tab 是否出现为准，而不只看安装退出码。
 
 Git 更新按“检查 → commit → push → 核对 origin”执行。系统 keyring 在受限执行环境下可能读不到，需要该条命令的主机权限；用户已经完成官方 GitHub CLI OAuth 授权，不应因此反复要求重设 Token。该项目使用本地 credential helper 调用 `gh auth git-credential`。

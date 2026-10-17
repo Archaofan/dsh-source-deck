@@ -61,8 +61,14 @@
 - 适配结论：两步 tab 注册、`dsh.client`/bundle patch 装载、lazy-CJS 预设、工具/Remote/存储/会话事件接口仍成立；变化项为兼容门（`engines.dsh` 优先且替代 peer 检查）、`PLATFORM_MODULES` 新增 `zod`/`@tanstack/react-virtual`、cordis 4.0.5、pnpm/Electron 版本；阶段 2 可按原设计推进。
 - 未改：产品 `package.json`（仍 0.1.1 / peer `0.2.0-rc.2`）、日用 DSH、上游产品源码。`0.1.3-adapt.1` 是沙箱测试产物，不是产品发布。
 
-**待用户决策**：产品 `peerDependencies` 是否切换支持基线（`0.2.1-rc.2` 精确 peer，或改用 `engines.dsh` 表达范围）。在用户确认前，沙箱升级只作开发环境，不宣称产品对新 RC 的兼容。
+## 阶段 1.6：产品 peer 切换到 0.2.1-rc.2（2026-10-17 用户决定，已完成）
 
+用户指示：“产品 peerDependencies 切换到最新基线。”
+
+- `package.json`：版本 bump `0.1.1 → 0.1.2`；peer 精确 `@deepseek-ai/dsh@0.2.1-rc.2`、`@deepseek-ai/cordis@4.0.5`；devDependencies 的官方 Client 包全部 `0.2.1-rc.2`；`pnpm-lock.yaml` 同步。
+- 构建与验证：`tsdown` + `tsc` 通过；`npm pack` 产出 `dsh-source-deck-0.1.2.tgz`；装入沙箱后 guide 入口、tab chip、placeholder body 复验通过（截图 `sandbox/dsh-desktop/logs/shots/peer-switch-0.1.2/`）。
+- 已知后果：生产 Desktop 仍 `0.2.0-rc.2`，0.1.2 在生产升级前不会加载；未做宽范围兼容。
+- 证据：SETUP-VERIFICATION.md 夜-3 段、VERSION-POLICY.md 夜-3 段。
 
 ## 阶段 2：无模型链路（V3a）
 

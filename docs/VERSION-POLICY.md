@@ -6,17 +6,17 @@
 
 | 项目 | 固定值 |
 |---|---|
-| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，文件版本 `0.2.0-rc.2` |
-| 官方发布 tag | `dsh-v0.2.0-rc.2` |
-| 官方 commit | `639ed015397290b3745d163aafe02ffee4aa3f84` |
-| 共用沙箱 | 开发先行版 `0.2.1-rc.2`（用户 2026-10-17 批准，仅开发环境；生产仍是 `0.2.0-rc.2`） |
-| RC 工具链 | 沙箱 `0.2.1-rc.2` 声明 `pnpm@11.28.5`（旧基线为 11.7.0） |
+| 产品支持基线（用户选定） | `dsh-v0.2.1-rc.2`，commit `687f282e8625c6b8d11ff58211a90524be2e4317` |
+| 产品 peer 声明 | `@deepseek-ai/dsh@0.2.1-rc.2`、`@deepseek-ai/cordis@4.0.5`（精确） |
+| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，文件版本仍 `0.2.0-rc.2`（**升级前不会加载 0.1.2**） |
+| 共用沙箱 | 同一基线 `0.2.1-rc.2`（用户 2026-10-17 批准，仅开发环境） |
+| RC 工具链 | `0.2.1-rc.2` 声明 `pnpm@11.28.5`（旧基线为 11.7.0） |
 
-官方把 RC 也标为预发行版。这里“稳定基线”指用户已选定日用的 RC，不代表宣称其为官方最终正式版。
+官方把 RC 也标为预发行版。这里“稳定基线”指用户已选定支持的 RC，不代表宣称其为官方最终正式版。
 
 ## 设计、打包和发布
 
-- 当前只维护 `0.2.0-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。
+- 当前只维护 `0.2.1-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 升级到该基线前，产品包在日用环境不可用，这是用户明确选择的后果；不要为兼容旧生产而放宽 peer。
 - 设计中用到的工具、Remote、UI Slot、Agent 接续和持久化接口，必须在这个 RC 的源码与文档确认。最新网站、master 和 alpha 示例只能作参考，不能代替目标接口证据。
 - RC 缺少能力时调整方案、缩小首版范围或明确暂不支持。不能为完成首版要求用户升级 alpha，也不能复制 alpha 的私有实现绕过公共扩展机制。
 - 实现打包时按 RC 插件加载器实际采用的版本规则声明准确范围，并验证目标 RC 能加载、行为正常。不能只验证前端模拟或构建成功便宣称日用可用。
@@ -49,13 +49,17 @@
 
 - 共用沙箱最终升级到官方 `dsh-v0.2.1-rc.2`（commit `687f282e8625c6b8d11ff58211a90524be2e4317`，release `2026-10-17T08:16:33Z`）。过程为 rc.1（`1600d8a…`）先验证、再按用户“升级沙箱中的内容，确保适配新版本”的指示升级到 rc.2；两次都用真实 git 取得源码（rc.2 为 `git fetch --depth 1`，`git status` 干净），官方构建通过，阶段 1 三项验收复验通过；证据见 [SETUP-VERIFICATION.md](SETUP-VERIFICATION.md) 夜段与夜-2 段。
 - `baseline.json` 记录 `sandboxRelation=ahead-of-production` 与用户批准（`upgradeApproval`）；`Assert-SandboxBaseline` 只在“沙箱与生产同版”或“有明确批准且版本逐项钉住”时通过，alpha 与未批准的新版仍拒绝。rc.1 的基线、日志、脚本与 profile 清单归档在 `archives/rc-0.2.1-rc.1-20261017T090812Z/`。
-- **产品支持基线未变**：`peerDependencies` 仍精确 `@deepseek-ai/dsh@0.2.0-rc.2`，不宣称对 0.2.1-rc.1 / rc.2 兼容；沙箱中的 `0.1.3-adapt.1` 仅为适配测试产物（peer 临时改 0.2.1-rc.2、cordis 4.0.5、devDependencies 同步 rc.2 类型包），不进入产品发布。
+- **当时产品支持基线未变**（夜-3 已按用户决定切换）：`peerDependencies` 仍精确 `@deepseek-ai/dsh@0.2.0-rc.2`，不宣称对 0.2.1-rc.1 / rc.2 兼容；沙箱中的 `0.1.3-adapt.1` 仅为适配测试产物（peer 临时改 0.2.1-rc.2、cordis 4.0.5、devDependencies 同步 rc.2 类型包），不进入产品发布。
 - 更正环境事实：本机**有** git（Hermes 自带 `git 2.54.0`，`C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe`），只是此前未加入会话 PATH；rc.2 的源码获取与仓库复核已改用真实 git。
 
-**待用户决定**：支持基线是否切换。可选口径：
+## 2026-10-17 夜-3：产品 peer 切换到最新基线（用户决定）
 
-1. 保持 `0.2.0-rc.2`（当前产品声明），沙箱仅作开发环境；
-2. 切换到 `0.2.1-rc.1` 或 `0.2.1-rc.2`（精确 peer，单版本）；
-3. 用 `engines.dsh` 表达跨版本范围（0.2.1 兼容门会优先读取它并完全替代 dsh peer 检查，需在目标版本实测）。
+用户明确指示：“产品 peerDependencies 切换到最新基线。”
 
-用户明确选择前，不修改 peer、不发布、不宣称新 RC 兼容。
+执行结果：
+
+- 产品 `package.json`：版本 `0.1.1 → 0.1.2`；`peerDependencies` 改为 `@deepseek-ai/dsh@0.2.1-rc.2`、`@deepseek-ai/cordis@4.0.5`（精确）；devDependencies 的官方 Client 类型包全部改为 `0.2.1-rc.2`。
+- `pnpm-lock.yaml` 随依赖更新；`tsdown` + `tsc` 构建通过（rc.2 类型下无类型错误）；`npm pack` 产出 `dsh-source-deck-0.1.2.tgz`。
+- 沙箱安装 0.1.2（替换此前的 `0.1.3-adapt.1`），无兼容警告；启动后 guide 入口「资料筛选台」、tab chip「资料台」、placeholder body 复验通过。证据见 [SETUP-VERIFICATION.md](SETUP-VERIFICATION.md) 夜-3 段与 `logs/shots/peer-switch-0.1.2/`。
+- **后果（已知并接受）**：生产 Desktop 仍是 `0.2.0-rc.2`，精确 peer 为 `0.2.1-rc.2` 的 0.1.2 在生产升级前**不会加载**。不做多版本兼容；如需同时支持两个版本，另行讨论 `engines.dsh` 范围（0.2.1 兼容门优先读取它并替代 peer 检查）。
+- 沙箱中的适配测试包（`0.1.2-adapt.1`、`0.1.3-adapt.1`）保留在项目目录但被 Git 忽略，不再代表产品版本。

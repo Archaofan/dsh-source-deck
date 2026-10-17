@@ -8,7 +8,8 @@
 当前进度（2026-10-17 夜，最终）：
 - 阶段 1（R1 冒烟）已完成并推送。
 - 阶段 1.5（沙箱升级与适配）已完成：共用沙箱最终为官方 dsh-v0.2.1-rc.2（commit 687f282e8625c6b8d11ff58211a90524be2e4317，release 2026-10-17T08:16:33Z）。先按用户指示升级到 rc.1 验证，再按“升级沙箱中的内容，确保适配新版本”升级到 rc.2；两次都通过官方构建，阶段 1 三项验收在 rc.2 复验通过。
-- 生产 DSH 仍是 0.2.0-rc.2，未动；产品 peer 仍是 @deepseek-ai/dsh@0.2.0-rc.2（未切换，不宣称 0.2.1 RC 兼容）。沙箱里装的是仅用于适配验证的 0.1.3-adapt.1（peer 0.2.1-rc.2、cordis 4.0.5、rc.2 类型包），不是产品发布。
+- 阶段 1.6（用户决定）：产品 peerDependencies 已切换到最新基线——版本 0.1.2，peer 精确 @deepseek-ai/dsh@0.2.1-rc.2、@deepseek-ai/cordis@4.0.5，devDependencies 全部 0.2.1-rc.2。0.1.2 已装入沙箱并复验通过（guide/tab/placeholder）。
+- 生产 DSH 仍是 0.2.0-rc.2，未动；因此 0.1.2 在生产升级前不会被日用环境加载（已知后果，用户已选择）。
 - 下一步：阶段 2（V3a 无模型链路）。
 
 工作区根目录：E:/DSH-Desktop-Plugin-Dev
@@ -23,20 +24,21 @@ git：本机有 git，位于 C:\Users\Administrator\AppData\Local\hermes\git\cmd
 1. 工作区根 README.md 和 AGENTS.md（升级纪律与沙箱独占规则）；
 2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md；
 3. docs/design/2026-10-17-solution-design.md（主设计 v1.1）、docs/design/wireframes.md；
-4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md（夜段=rc.1，夜-2 段=rc.2 最终）；
+4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md（夜-2=rc.2，夜-3=peer 切换）；
 5. docs/research/2026-10-17-rc-interface-evidence.md（0.2.0-rc.2 基线证据）与 docs/research/2026-10-17-0.2.1-rc.2-interface-delta.md（新 RC 差异与适配结论）；
-6. docs/implementation/2026-10-17-implementation-plan.md（阶段 1 与 1.5 结果）；
+6. docs/implementation/2026-10-17-implementation-plan.md（阶段 1 / 1.5 / 1.6 结果）；
 7. sandbox/dsh-desktop/README.md、baseline.json、status.json（开始前先跑 Get-SandboxStatus.ps1 确认占用）。
 
 阶段 2（V3a 无模型链路）按已批准设计推进：
 - Host：defineDomain('source_deck') 五表、deck_submit_sources 工具、sourceDeck Remote 命名空间（addSource/listSets/getSet/decide/commitSelection/clearData）、log-only 事件（set-opened/candidate-decided/selection-submitted）。
 - Client：资料台面板（待处理/保留/排除分组、添加资料表单、提交按钮、策略摘要条占位）、对话流候选卡片、input.right 入口按钮。
 - 交付：手动添加→卡片→筛选→提交全链路；域文件可查；队列/steer 消息出现在会话投影；截图。
-- 沙箱开发构建每次都要 bump 版本再 pack/install；当前 profile 依赖指向项目目录里的 dsh-source-deck-0.1.3-adapt.1.tgz（沙箱测试产物，*.tgz 被 Git 忽略）。产品 package.json 仍 0.1.1，不要被沙箱测试包的版本带走。
+- 沙箱开发构建每次都要 bump 版本再 pack/install；当前 profile 依赖指向项目目录里的 dsh-source-deck-0.1.2.tgz（产品 0.1.2，已被 Git 忽略；旧的 *-adapt.1 包是适配期测试产物，不再使用）。
 
-待用户确认的决策（不得自行决定）：
-- 产品 peerDependencies 是否切换支持基线：保持 0.2.0-rc.2 / 切到 0.2.1-rc.2（精确 peer）/ 改用 engines.dsh 表达范围（0.2.1 兼容门优先读 engines.dsh 并完全替代 dsh peer 检查）。
-- 用户确认前不改 peer、不发布、不宣称新 RC 兼容。目前 rc.2 是 npm next 的最新 RC；无需再升级沙箱，除非用户明确指示。
+已决定的基线（2026-10-17，用户）：
+- 产品 peerDependencies 已切换到最新基线：@deepseek-ai/dsh@0.2.1-rc.2、@deepseek-ai/cordis@4.0.5，精确声明；产品版本 0.1.2。
+- 生产 Desktop 仍是 0.2.0-rc.2，因此 0.1.2 在生产升级前不会加载；这是用户已知后果。若以后需要同时支持两个版本，需要用户另行选择 engines.dsh 范围方案，不能自行放宽。
+- rc.2 是目前 npm next 的最新 RC；无需再升级沙箱，除非用户明确指示。
 
 硬约束：
 - 绝不启动或重启日用 DSH（127.0.0.1:19387）、不跑 dsh plugin --profile desktop；最终装到本 DSH 必须经用户明确批准。

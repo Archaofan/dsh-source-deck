@@ -92,25 +92,22 @@ dsh-source-deck/                 npm 包名 dsh-source-deck，dsh.bundle.patch �
 └── lib/                         构建产物（tsdown：Host lib + clientBundle lazy-CJS）
 ```
 
-兼容声明（实现阶段落 `package.json`，评审先确认）：
+兼容声明（实现阶段落 `package.json`；2026-10-17 用户决定切换支持基线后更新为 `0.2.1-rc.2`）：
 
 ```json
 {
   "name": "dsh-source-deck",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "peerDependencies": {
-    "@deepseek-ai/dsh": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-session": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-agent": "0.2.0-rc.2",
-    "@deepseek-ai/cordis": "<沙箱 vendor 版本>"
+    "@deepseek-ai/dsh": "0.2.1-rc.2",
+    "@deepseek-ai/cordis": "4.0.5"
   },
   "devDependencies": {
-    "@deepseek-ai/dsh-client-ui-chat": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-client-ui-sidebar-right": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-client-ui-session": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2"
+    "@deepseek-ai/dsh-client-ui-chat": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-sidebar-right": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-session": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.1-rc.2"
   },
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
@@ -119,7 +116,7 @@ dsh-source-deck/                 npm 包名 dsh-source-deck，dsh.bundle.patch �
 }
 ```
 
-peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能过 RC 门，但会顺带接受后续 minor 的 prerelease（node-semver 语义，未经 RC 断言），违背"只维护选定 RC"约定。每个实际 import 的 `@deepseek-ai/dsh-*` 都要进 peer（兼容门对每一项求交）。devDependencies 里的官方 Client 包只用于 `import type` 拿 SlotMap 声明（类型在构建期擦除，不进 bundle）。
+peer 一律写**精确 `0.2.1-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能过 RC 门，但会顺带接受后续 minor 的 prerelease（node-semver 语义，未经 RC 断言），违背"只维护选定 RC"约定。每个实际 import 的 `@deepseek-ai/dsh-*` 都要进 peer（兼容门对每一项求交）；实际 Host 半不 import 其他 dsh 包，因此最终 manifest 只保留 `@deepseek-ai/dsh` 与 cordis 两条 peer。devDependencies 里的官方 Client 包只用于 `import type` 拿 SlotMap 声明（类型在构建期擦除，不进 bundle）。
 
 ### 4.2 数据流
 
@@ -303,8 +300,9 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 1. 采用方案 A。
 2. 首版来源范围在配置页可配置：预置开源社区源（GitHub 等）+ 可配筛选参数（stars、最近更新时间等）+ 「LLM 自主」选项；目的是按需求缩窄范围，不改变"人工筛选"的产品核心。
 3. inject 唤醒即唤醒，先把功能实现（RC 无 inject Remote 出口的降级被接受）。
-4. peer 精确写 `"0.2.0-rc.2"`。
-5. 所有开发实现只在沙箱 Desktop（`sandbox/dsh-desktop/`，基线 0.2.0-rc.2）验证，不影响日用 DSH；最终安装到本 DSH 需用户明确批准。
+4. peer 精确写 `"0.2.0-rc.2"`（**2026-10-17 夜已被第 9 条取代**）。
+5. 所有开发实现只在沙箱 Desktop（`sandbox/dsh-desktop/`）验证，不影响日用 DSH；最终安装到本 DSH 需用户明确批准。
 6. 沙箱 Desktop 的 LLM API 直接使用本 DSH 已配置的 DeepSeek API（已配置，见 SETUP-VERIFICATION）。
 7. 凭据处置事故记录：2026-10-17 调试期间一次"脱敏"正则失误导致日用 `.credentials.yaml` 的多条密钥明文进入对话记录；用户决定不轮换，由我记录并执行后续纪律（只做键级操作）。完整记录见 [../security/2026-10-17-credential-exposure.md](../security/2026-10-17-credential-exposure.md)。
 8. 沙箱 Desktop 的 LLM API 已配好（本 DSH 的 DeepSeek API，最小化 3 条）并通过真实调用验证；用户要求实现每个阶段都在沙箱内展示真实效果。
+9. **2026-10-17 夜：用户决定产品 `peerDependencies` 切换到最新基线** `@deepseek-ai/dsh@0.2.1-rc.2` + `@deepseek-ai/cordis@4.0.5`（精确）；产品版本 0.1.2。生产 Desktop 仍 0.2.0-rc.2，0.1.2 在其升级前不会加载（用户已知）。此项取代第 4 条。
