@@ -3,7 +3,7 @@
 将下面整段发送到新对话。建议让新对话的工作目录直接指向 E:/DSH-Desktop-Plugin-Dev/dsh-source-deck。
 
 ~~~text
-继续 SourceDeck（dsh-source-deck / 资料筛选台）项目，先开始具体方案设计，不要直接实现。
+继续 SourceDeck（dsh-source-deck / 资料筛选台）项目，进入实现阶段。方案 A 已获用户批准（2026-10-17），不要重新设计，不要改动已批准的设计决策；确需变更先说明理由再改文档。
 
 工作区根目录：E:/DSH-Desktop-Plugin-Dev
 项目目录：E:/DSH-Desktop-Plugin-Dev/dsh-source-deck
@@ -12,26 +12,23 @@
 
 先读取：
 1. 工作区根 README.md 和 AGENTS.md；
-2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md；
-3. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md；
-4. E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop/README.md、baseline.json、status.json；
-5. docs/research/2026-10-17-reference-map.md。
+2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md（含方案批准结论）；
+3. docs/design/2026-10-17-solution-design.md（主设计 v1.1，§5.5 来源范围配置是用户新要求）、docs/design/wireframes.md；
+4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md（下午记录含沙箱 LLM API 配置与启动链路修复）；
+5. docs/research/2026-10-17-rc-interface-evidence.md；
+6. E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop/README.md、baseline.json、status.json。
 
-名称、独立项目 Git 和私有 GitHub 仓库已确定，官方 Desktop 源码/运行时及隔离操作脚本已准备。先核对 Git 状态、远端同步和沙箱实际状态；不要重新建仓、完整重装或另建一个共享沙箱。当前没有插件产品代码、package.json 或已经批准的架构。
+实现顺序按设计 §9 验收表：先做 R1 冒烟（最小 client half + 右栏空 tab 进 desktop boot graph，V0/V1），再做无模型链路（V3a）、策略配置（V7）、模型链路（V3b，沙箱 DeepSeek API 已就绪）、恢复/多会话/停用（V4–V6）、负向兼容（V2）。
 
-用户出于个人兴趣开发 AI / Agent 应用，明确选择“让 Agent 更好用的交互与功能插件”。不要再推荐控制、协议、嵌入式等职业专业工具；视频制作与审片也已挂起。
+硬约束：
+- 只维护 0.2.0-rc.2，peer 精确写 "0.2.0-rc.2"；不用 alpha 专有接口。
+- 所有安装与集成验证只用共用沙箱的 Install-Plugin.ps1 / Start-Desktop.ps1；绝不启动或重启日用 DSH（127.0.0.1:19387）、不跑 dsh plugin --profile desktop；最终装到本 DSH 必须经用户明确批准。
+- 沙箱 Desktop 启动：powershell -NoProfile -ExecutionPolicy Bypass -File sandbox/dsh-desktop/scripts/Start-Desktop.ps1 -Project dsh-source-deck；启动日志在 sandbox/dsh-desktop/logs/，内含 dsh web URL（动态端口 + token）。
+- 沙箱 scripts 注释用 ASCII（曾因中文注释导致 PowerShell 解析器行合并）。
+- 凭据：沙箱已按用户指示配好 DeepSeek API；不要再输出任何凭据值；用户已被建议轮换 2026-10-17 泄露的 key。
+- 提交推送后核对 HEAD 与 origin；不提交沙箱、缓存、凭据；失败记录 pending 不隐瞒。
 
-新增版本要求：用户日用 Desktop 是 0.2.0-rc.2，插件会自用，不升级 alpha。共用沙箱已从 alpha 回退到官方同一 RC；只维护用户选定的生产 RC / 正式版，不使用 alpha 专有接口，也不自动跟随新 RC。调研 API、持久化、UI Slot、Agent 接续时须以 RC checkout 为准；最新网站或 master 的示例只能作为待核对资料。RC 缺少的能力应调整设计或列为暂不支持，不要求用户升级 alpha。后续打包声明准确支持范围并在该 RC 内验收。
-
-SourceDeck 必须做成 DeepSeek Harness 官方 Desktop 插件，有自己的 UI 控件，也能方便地在对话过程中使用。核心场景是：Agent 或用户带来一批资料，用户直接筛选，然后让 Agent 继续阅读、比较或排除。不要把收藏链接、自动搜索评分或普通文本列表当成完整方案。
-
-这轮先做具体方案设计：优先查阅业界原始资料、现成 DSH 插件和沙箱中固定版本的官方接口，比较 2–3 种可落地方式，给出推荐理由。需要明确用户操作流程、对话内入口和自己的 UI、首版来源范围、资料/候选集/选择的身份与版本、重复项、持久化、Agent 接续、忙碌/取消/重启/多会话行为，以及首版验收。必要时给出可审阅草图。将设计写入本项目 docs/design/，让我审阅，再进入实现计划和开发。
-
-所有插件安装和集成验证优先复用根目录共用沙箱，使用其脚本；不要修改日用 DSH 或自动复制它的账号、凭据、会话和配置。普通 npm CLI 不能管理 Desktop 托管 profile，须使用已准备的官方 Desktop 开发管理入口。共享沙箱一次只允许一个项目占用，测试材料使用 test-workspaces/dsh-source-deck。
-
-后续项目修改完成必要检查后提交并推送对应远端，核对 HEAD 与 origin。GitHub CLI OAuth 已完成，凭据由系统 keyring 管理；受限 Agent 执行环境读不到 keyring 时申请该条命令的主机执行权限，不反复要求我重新设置 Token。不要上传沙箱、缓存、凭据或历史 Hindsight 摘录。
-
-保持中文沟通，先结论后理由。已经授权的准备和必要调研直接推进，不重复询问是否可以读文件、查资料或检查沙箱。
+保持中文沟通，先结论后理由，结论附真实命令输出。
 ~~~
 
-本提示词描述的是前置准备后的工作入口；具体安装、启动和同步证据以 SETUP-VERIFICATION.md、沙箱 status.json 与实时检查为准。
+本提示词描述的是实现阶段的工作入口；具体安装、启动和同步证据以 SETUP-VERIFICATION.md、沙箱 status.json 与实时检查为准。历史阶段（环境准备与方案设计）的入口提示词见 Git 历史。
