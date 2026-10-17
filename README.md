@@ -4,6 +4,8 @@
 
 **当前状态：前置环境与项目简报准备阶段，尚未设计和实现插件。** 新对话从具体方案设计开始。不要把选题预研当作已经批准的架构或接口。
 
+**支持目标：用户日用的 `0.2.0-rc.2`。** 只维护选定生产 RC / 正式版，沙箱已切换至同一 RC；不支持 alpha 专有功能，不自动跟随最新发布。见 [版本维护策略](docs/VERSION-POLICY.md)。
+
 - [项目简报](docs/PROJECT-BRIEF.md)
 - [前置调研来源](docs/research/2026-10-17-reference-map.md)
 - [开发环境](docs/DEVELOPMENT.md)

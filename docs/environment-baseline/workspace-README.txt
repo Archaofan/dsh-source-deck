@@ -20,12 +20,12 @@
 
 ## 共用沙箱约定
 
-1. 只使用 `deepseek-ai/deepseek-harness` 官方源码和发布版本。首次基线为 `dsh-v0.2.1-alpha.5`，commit `1517a4dbca0a2789ff1d41ba439600f8547d23fa`，2026-10-17 核对时为最新官方发布，属于预发行版本。
-2. 采用官方未打包 Desktop 开发启动器，不运行覆盖安装器。安装位置、Harness home、Electron userData、缓存、临时文件和日志均在 `sandbox/dsh-desktop/`。`DSH_HOME` 单独设置不能隔离 Electron 数据，必须一并使用本工作区启动脚本。
+1. 只使用与用户生产环境一致的官方 RC / 正式发布基线。当前固定为 `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`，对应日用 Desktop 的 `0.2.0-rc.2`。官方仍将 RC 标记为预发行版；本工作区以它作为已选定的日用基线，**不维护 alpha 兼容、不使用 alpha 专有接口、不因出现新发布自动升级**。
+2. 采用官方未打包 Desktop 开发启动器，不运行覆盖安装器。安装位置、Harness home、Electron userData、缓存、临时文件和日志均在 `sandbox/dsh-desktop/`。`DSH_HOME` 单独设置不能隔离 Electron 数据，必须一并使用本工作区启动脚本。RC Host 使用官方配置分配独立回环端口，避免与生产实例默认 19387 冲突。
 3. 所有插件优先在此测试。共享同一份上游源码和运行时；同一时间只允许一个项目占用交互测试。用启动脚本中的项目标识及运行锁管理占用，跨项目测试前关闭上一实例。
 4. 试验材料放在 `sandbox/dsh-desktop/test-workspaces/<项目名>/`。不要默认把 Agent 指向日用资料、其他项目或整块磁盘；不要从日用 DSH 自动复制凭据、会话和全部配置。
 5. 插件通过沙箱脚本安装到沙箱的 `desktop` profile；不得用未限定 home 的全局 `dsh plugin add`，不得改变日用 DSH 的插件列表、PATH、文件关联或 `dsh://` 默认处理程序。
-6. 上游版本固定记录在 [baseline.json](sandbox/dsh-desktop/baseline.json)。升级前保存当前基线和验证记录，关闭实例，核对新版本和官方来源，再执行安装、构建与启动验证；不要在每个项目开工时悄悄更新。
+6. 上游版本固定记录在 [baseline.json](sandbox/dsh-desktop/baseline.json)。仅在用户明确选择新的生产 RC / 正式版后调整支持目标；届时保存当前基线和验证记录，关闭实例，核对官方来源，再执行构建、启动和插件兼容验证。2026-10-17 已按用户要求将先前 alpha 沙箱可恢复归档，RC 使用全新 home/userData，不将 alpha 数据降级加载到 RC。
 7. 这是**开发隔离目录**，不是防恶意代码的 OS 安全边界。插件仍通过官方权限链访问文件和工具，不关闭系统防护或 TLS 校验。首次模型登录由用户在沙箱单独配置。
 
 入口与命令见 [沙箱操作说明](sandbox/dsh-desktop/README.md)。真实验证状态以 [status.json](sandbox/dsh-desktop/status.json) 为准；下载、构建、启动、Host 就绪和模型调用分别记录，不能互相冒充。

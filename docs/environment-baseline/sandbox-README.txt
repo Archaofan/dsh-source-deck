@@ -2,12 +2,16 @@
 
 本目录由整个工作区共用。基线见 [baseline.json](baseline.json)，实际验证状态见 [status.json](status.json)。它是官方源码构建的未打包 Desktop，不是同名社区桌面壳，也没有运行覆盖安装器。
 
+当前固定为生产同版 `0.2.0-rc.2`（官方 RC，仍标记 prerelease），不维护 alpha。原 alpha 的源码、产物、数据和验证记录在 archives 内可恢复保存，当前 RC 使用全新状态；不得把 alpha 数据直接交给 RC 读取。
+
+该 RC 的 Desktop Host 默认固定监听 19387，会与同时运行的日用 RC 冲突。沙箱 desktop profile 通过官方 `webserver` 配置限定 `host: 127.0.0.1`、`port: 0`，由 OS 分配空闲端口；完整保留压缩配置，不改上游代码或日用监听。启动脚本在首次创建 profile patch 时一并设置；保留该覆盖项。
+
 ## 路径
 
 | 路径 | 归属 |
 |---|---|
 | `upstream/` | 官方固定 tag checkout 与编译产物；保持产品源码不变 |
-| `tools/pnpm-11.28.5/` | 固定本地 pnpm，避免安装全局包管理器 |
+| `tools/pnpm-11.7.0/` | RC 固定本地 pnpm，避免安装全局包管理器 |
 | `cache/` | npm/pnpm/Electron 缓存 |
 | `home/` | 沙箱 DSH_HOME，包含 desktop profile、会话、设置和沙箱凭据 |
 | `electron-user-data/` | 独立 Electron 浏览器存储与桌面壳设置 |
@@ -56,7 +60,7 @@ pwsh -NoProfile -File .\sandbox\dsh-desktop\scripts\Test-Sandbox.ps1
 pwsh -NoProfile -File .\sandbox\dsh-desktop\scripts\Prepare-Desktop.ps1
 ```
 
-该命令按顺序进行冻结安装、官方构建、构建后检查、Electron 准备和官方 primary-runtime 准备；保留上游 lockfile、下载哈希与构建脚本策略。日志按步骤分别保存。受限 Agent 环境可能无法查询 Windows 用户信息或读系统凭据，此时申请相应命令的主机执行权限；不要关闭校验或全局提升日用应用。
+该命令按顺序进行冻结安装、RC 官方完整构建（pnpm run build）、Electron 准备和官方 primary-runtime 准备；保留上游 lockfile、下载哈希与构建脚本策略。RC 没有 alpha 的 build:artifacts / build:check 入口。日志按步骤分别保存。受限 Agent 环境可能无法查询 Windows 用户信息或读系统凭据，此时申请相应命令的主机执行权限；不要关闭校验或全局提升日用应用。
 
 ## 占用与恢复
 
@@ -66,7 +70,7 @@ pwsh -NoProfile -File .\sandbox\dsh-desktop\scripts\Prepare-Desktop.ps1
 
 ## 版本更新
 
-不自动追随 master。先关闭实例、记录旧基线和插件清单，核对官方新发布，显式更新上游 checkout 与 baseline.json，再准备和验证。保留旧版本和状态直到新基线验证完成；新插件复用已验证基线，不自行升级。
+不自动追随 master、alpha 或新发布的 RC。只有用户明确选择新的生产 RC / 正式版本后，才关闭实例、记录旧基线和插件清单，核对官方来源，显式更新上游 checkout、baseline.json（含 productionVersion）和对应工具链，再准备和验证。保留旧版本和状态直到新基线验证完成；不同版本状态不可假定支持降级，新插件复用已验证基线，不自行升级。启动与准备脚本拒绝 alpha 或与记录生产版本不符的基线。
 
 初次拉取遇到 Windows Schannel 在受限账号下的凭据错误，改用该命令的 OpenSSL TLS 后端后成功，未关闭证书校验。主机执行与沙箱账号不同导致 Git 所有权检查时，脚本只为准确上游路径设置进程级信任。
 
@@ -75,3 +79,5 @@ pwsh -NoProfile -File .\sandbox\dsh-desktop\scripts\Prepare-Desktop.ps1
 脚本同时限定 DSH_HOME、Electron userData、APPDATA、LOCALAPPDATA、临时目录和缓存；开发模式不会登记默认 `dsh://` 协议，也不注册 CLI PATH。启动脚本清除常见继承模型/GitHub Token 环境值，避免意外借用日用凭据；这些进程级变化在脚本退出后还原。
 
 目录隔离不能约束恶意 Host 插件的全部权限，插件仍需走官方工具与文件访问政策。默认不复制日用 DSH 数据，不运行 NSIS 安装器，不部署到日用环境。
+
+Check-ProductionPaths.ps1 的 Before / After 必须使用同一生产 Windows 账号。脚本记录 observerSid 并拒绝跨账号比较，避免受限 Agent 与主机账号的 HKCU / 用户 PATH 视图差异产生误报；身份未知的旧快照也不会直接用于该自动比较。

@@ -13,13 +13,15 @@
 先读取：
 1. 工作区根 README.md 和 AGENTS.md；
 2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md；
-3. docs/DEVELOPMENT.md、docs/SETUP-VERIFICATION.md；
-4. sandbox/dsh-desktop/README.md、baseline.json、status.json；
+3. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md；
+4. E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop/README.md、baseline.json、status.json；
 5. docs/research/2026-10-17-reference-map.md。
 
 名称、独立项目 Git 和私有 GitHub 仓库已确定，官方 Desktop 源码/运行时及隔离操作脚本已准备。先核对 Git 状态、远端同步和沙箱实际状态；不要重新建仓、完整重装或另建一个共享沙箱。当前没有插件产品代码、package.json 或已经批准的架构。
 
 用户出于个人兴趣开发 AI / Agent 应用，明确选择“让 Agent 更好用的交互与功能插件”。不要再推荐控制、协议、嵌入式等职业专业工具；视频制作与审片也已挂起。
+
+新增版本要求：用户日用 Desktop 是 0.2.0-rc.2，插件会自用，不升级 alpha。共用沙箱已从 alpha 回退到官方同一 RC；只维护用户选定的生产 RC / 正式版，不使用 alpha 专有接口，也不自动跟随新 RC。调研 API、持久化、UI Slot、Agent 接续时须以 RC checkout 为准；最新网站或 master 的示例只能作为待核对资料。RC 缺少的能力应调整设计或列为暂不支持，不要求用户升级 alpha。后续打包声明准确支持范围并在该 RC 内验收。
 
 SourceDeck 必须做成 DeepSeek Harness 官方 Desktop 插件，有自己的 UI 控件，也能方便地在对话过程中使用。核心场景是：Agent 或用户带来一批资料，用户直接筛选，然后让 Agent 继续阅读、比较或排除。不要把收藏链接、自动搜索评分或普通文本列表当成完整方案。
 

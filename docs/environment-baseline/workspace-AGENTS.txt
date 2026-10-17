@@ -4,6 +4,7 @@
 
 - 每个插件在根目录下独立文件夹中开发、独立初始化 Git、独立远端。SourceDeck 的唯一项目目录为 `dsh-source-deck/`，远端为 `https://github.com/Archaofan/dsh-source-deck.git`。
 - 统一复用 `sandbox/dsh-desktop/` 的官方 Desktop 沙箱。项目开始时检查 `baseline.json`、`status.json` 和运行占用；不要为每个插件重装一份或悄悄升级共享基线。
+- 所有插件只维护用户选定的生产 RC / 正式版本，当前准确目标为 `0.2.0-rc.2`；沙箱必须与其一致。禁止使用 alpha 专有 API、以 master / 最新文档代替 RC 接口证据，或为实现功能升级到 alpha。新 RC / 正式版也需用户明确选择后才切换支持基线；打包时声明准确支持范围并在该版本验收，不宣称未经测试的兼容性。
 - Desktop 使用官方未打包开发模式。必须同时隔离 DSH_HOME、Electron userData、APPDATA/LOCALAPPDATA、缓存和临时目录；使用沙箱脚本，不直接启动日用 DSH 或运行覆盖安装器。
 - 插件安装只通过沙箱 `Install-Plugin.ps1` 进入沙箱 desktop profile。不得运行指向默认 home 的全局插件命令，不修改日用配置、凭据、会话、PATH 或协议关联。
 - 共用交互沙箱一次只由一个项目占用。测试材料放 `sandbox/dsh-desktop/test-workspaces/<项目名>/`。插件之间的数据必须区分项目/会话；不同插件组合测试要明确记录启用清单。

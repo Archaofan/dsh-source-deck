@@ -20,13 +20,16 @@ function Get-SandboxPaths {
         HomePath = Join-Path $sandboxRoot 'home'
         UserData = Join-Path $sandboxRoot 'electron-user-data'
         Logs = Join-Path $sandboxRoot 'logs'
-        Pnpm = Join-Path $sandboxRoot 'tools/pnpm-11.28.5/package/bin/pnpm.cjs'
+        Pnpm = Join-Path $sandboxRoot "tools/pnpm-$($baseline.pnpm)/package/bin/pnpm.cjs"
         Node = (Get-Command node -ErrorAction Stop).Source
         Baseline = $baseline
     }
 }
 
 function Assert-SandboxBaseline($Paths) {
+    if ($Paths.Baseline.version -match '-alpha\.' -or $Paths.Baseline.version -ne $Paths.Baseline.productionVersion) {
+        throw 'Sandbox must match the approved production RC/release baseline; alpha is not supported.'
+    }
     if (-not (Test-Path -LiteralPath $Paths.Pnpm -PathType Leaf)) {
         throw 'Pinned local pnpm is missing. Restore the sandbox tooling before proceeding.'
     }

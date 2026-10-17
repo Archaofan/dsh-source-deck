@@ -25,7 +25,14 @@ $patchPath = Join-Path $profileDirectory 'cordis.patch.yml'
 if (-not (Test-Path -LiteralPath $patchPath)) {
     $documentsDirectory = $testWorkspace.Replace('\', '/')
     @(
-        '# Shared sandbox first-use workspace: keep the default outside system Documents.',
+        '# Shared sandbox: isolate RC Host port and the first-use workspace.',
+        '- id: webserver',
+        '  config:',
+        '    host: 127.0.0.1',
+        '    port: 0',
+        '    compression: gzip',
+        '    compressionLevel: 1',
+        '    compressionThresholdBytes: 1024',
         '- id: workspace-controller',
         '  config:',
         ('    documentsDirectory: "' + $documentsDirectory + '"')

@@ -3,6 +3,19 @@ param()
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $paths = Get-SandboxPaths
 Assert-SandboxBaseline $paths
+foreach ($unsupported in @(
+    @{ version = '0.2.1-alpha.5'; productionVersion = '0.2.1-alpha.5' },
+    @{ version = '0.2.0-rc.2'; productionVersion = '0.2.0-rc.1' }
+)) {
+    $unsupportedPaths = Get-SandboxPaths
+    $unsupportedPaths.Baseline.version = $unsupported.version
+    $unsupportedPaths.Baseline.productionVersion = $unsupported.productionVersion
+    $rejected = $false
+    try { Assert-SandboxBaseline $unsupportedPaths } catch {
+        $rejected = $_.Exception.Message -like 'Sandbox must match*'
+    }
+    if (-not $rejected) { throw 'An alpha or mismatched production baseline was accepted.' }
+}
 $original = [Environment]::GetEnvironmentVariable('DSH_HOME', 'Process')
 $saved = Push-SandboxEnvironment $paths
 try {
@@ -21,4 +34,4 @@ try {
 } finally {
     Exit-SandboxLease $paths $lease
 }
-Write-Output 'PASS: baseline, isolated paths, child-process environment, environment restoration and exclusive lease.'
+Write-Output 'PASS: production RC baseline, rejection of alpha/mismatched versions, isolated paths, child-process environment, environment restoration and exclusive lease.'

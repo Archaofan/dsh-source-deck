@@ -10,7 +10,7 @@ pwsh -NoProfile -File ..\sandbox\dsh-desktop\scripts\Get-SandboxStatus.ps1
 pwsh -NoProfile -File ..\sandbox\dsh-desktop\scripts\Start-Desktop.ps1 -Project dsh-source-deck
 ```
 
-沙箱采用官方 `dsh-v0.2.1-alpha.5` 源码开发模式，按 2026-10-17 的官方发布列表核对。具体准备与启动证据见 `SETUP-VERIFICATION.md` 及沙箱 status.json；并非对所有未来版本的兼容承诺。
+沙箱固定官方 `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`，与用户日用版本一致。工具链按 RC 自带声明使用本地 pnpm 11.7.0，执行 RC 的 `pnpm run build`；不要套用 alpha 才有的 build:artifacts / build:check。具体准备与启动证据见 `SETUP-VERIFICATION.md` 及沙箱 status.json；维护范围见 VERSION-POLICY.md。
 
 插件包打包和安装命令需在设计后建立项目构建配置。当前没有 package.json、产品代码、已安装的 SourceDeck 插件或实现测试；避免把环境准备误报成 MVP 已完成。
 

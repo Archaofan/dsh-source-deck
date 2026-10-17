@@ -13,6 +13,8 @@
 
 官方代码已固定拉取到 `E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop/upstream`，版本与 commit 见沙箱 baseline.json。优先读取实际目标版本：
 
+目标已改为生产 `0.2.0-rc.2`，不是 alpha。下面是查阅入口，不保证每个最新示例对应的接口都已存在于 RC；必须读 RC 实现确认，缺失时使用该版本支持的替代设计。原先 alpha 预研结论不能直接当作 RC 能力证明。
+
 - `apps/desktop/README.zh.md` 与 `apps/desktop/scripts/dev.ts`：独立 Desktop 开发模式和完整数据隔离。
 - `docs/cookbook/adding-a-tool.zh.md`、`adding-a-remote-api.zh.md`：Host 工具、Remote 和生命周期。
 - `docs/subsystems/sidebar-right.zh.md`、`slots.zh.md`：原生 UI 扩展与布局。

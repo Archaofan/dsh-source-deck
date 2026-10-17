@@ -1,14 +1,17 @@
 {
   "schemaVersion": 1,
   "source": "https://github.com/deepseek-ai/deepseek-harness.git",
-  "tag": "dsh-v0.2.1-alpha.5",
-  "version": "0.2.1-alpha.5",
-  "commit": "1517a4dbca0a2789ff1d41ba439600f8547d23fa",
-  "releasePublishedAtUtc": "2026-10-16T12:23:28Z",
+  "tag": "dsh-v0.2.0-rc.2",
+  "version": "0.2.0-rc.2",
+  "commit": "639ed015397290b3745d163aafe02ffee4aa3f84",
+  "releasePublishedAtUtc": "2026-09-29T09:42:36Z",
   "checkedOnAsiaShanghai": "2026-10-17",
   "distribution": "official-source-unpackaged-desktop",
   "nodeUsed": "26.7.0",
-  "pnpm": "11.28.5",
+  "pnpm": "11.7.0",
   "rootRelative": "sandbox/dsh-desktop",
-  "note": "Latest official release checked during setup; prerelease. No installer or production profile is used."
+  "supportPolicy": "Exact current production RC; no alpha APIs or automatic baseline upgrades. RC is officially a prerelease.",
+  "productionExecutable": "E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe",
+  "productionVersion": "0.2.0-rc.2",
+  "priorAlphaArchiveRelative": "archives/alpha-0.2.1-alpha.5-20261017T041240Z"
 }
