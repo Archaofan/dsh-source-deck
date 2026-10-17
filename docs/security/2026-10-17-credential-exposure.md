@@ -1,25 +1,25 @@
 # 安全事故记录：凭据明文暴露（2026-10-17）
 
 状态：**已记录，用户明确决定不轮换（2026-10-17 原话："我不会轮换"）。由我负责记录与后续纪律。**
-本文件进 Git，**只含键名与处置，不含任何凭据值**。
+本文件进 Git，**只含类别与处置，不含任何凭据值或账号标识**。
 
 ## 事故经过
 
-2026-10-17 13:2x–13:3x（Asia/Shanghai），在为沙箱配置 LLM API 的过程中，我执行了一条 PowerShell"脱敏"命令，意图只打印日用 `.credentials.yaml` 的键名结构。该命令的正则替换写反（把真实值保留在输出中），导致日用 `E:\DSH-Desktop\.dsh\.credentials.yaml` 中多条记录的真实密钥明文出现在当次命令输出里，进入本会话的对话记录。
+2026-10-17 13:2x–13:3x（Asia/Shanghai），在为沙箱配置 LLM API 的过程中，我执行了一条 PowerShell"脱敏"命令，意图只打印日用凭据文件的键名结构。该命令的正则替换写反（把真实值保留在输出中），导致日用凭据文件中的多条记录的真实密钥明文出现在当次命令输出里，进入本会话的对话记录。
 
-## 暴露范围（键名清单，值不记录）
+## 暴露范围（类别清单，值不记录）
 
-来自日用 `E:\DSH-Desktop\.dsh\.credentials.yaml`：
+来自日用凭据文件：
 
-- `refs.DEEPSEEK_API_KEY`（DeepSeek API key，35 字符，`sk-` 前缀）
-- `refs.STEPFUN_API_KEY`（阶跃星辰 API key）
-- `refs.CODEARTS_ACCOUNT_80F6F111`（华为云 CodeArts 账号 OAuth 授权，含 access/secret/security token 与 refresh token）
-- `refs.TRAE_ACCOUNT_6CEB51C9`（Trae 账号授权，含 access/refresh token）
-- `refs.QODERCN_ACCOUNT_14295D31`（Qoder CN 账号授权）
-- `refs.LOOMY_ACCOUNT_0D21AE44`（Loomy 账号授权）
-- `records.deepseek-account-platform/default`（DeepSeek 平台账号 token）与 `records.deepseek-account-platform/device`
+- 一个 LLM API key（DeepSeek）
+- 一个第三方模型 API key（阶跃星辰）
+- 一个华为云 CodeArts 账号 OAuth 授权（含 access/secret/security token 与 refresh token）
+- 一个 Trae 账号授权（含 access/refresh token）
+- 一个 Qoder CN 账号授权
+- 一个 Loomy 账号授权
+- DeepSeek 平台账号 token 与 device 记录
 
-暴露面：本会话对话记录（本地会话日志 + 对话传输链路）。**未进入任何 Git 仓库、未写入项目文件、未写入沙箱文件**（沙箱 `.credentials.yaml` 只含上述 DeepSeek 三条的副本，是用户授权的正常配置，非本次事故新增暴露）。
+暴露面：本会话对话记录（本地会话日志 + 对话传输链路）。**未进入任何 Git 仓库、未写入项目文件、未写入沙箱文件**（沙箱凭据文件只含上述 DeepSeek 三条的副本，是用户授权的正常配置，非本次事故新增暴露）。
 
 ## 影响评估
 
