@@ -22,9 +22,17 @@ export type { DeckBodyProps } from './DeckBody.tsx'
 /** This plugin's copy namespace. */
 const NS = 'sourceDeck'
 
+/** Result envelope returned by the Remote carrier. */
+export interface RemoteResultLike {
+  readonly ok: boolean
+  readonly value?: string
+  readonly code?: string
+  readonly message?: string
+}
+
 /** SourceDeck wire surface mounted by this half. */
 export interface SourceDeckWire {
-  request(op: string, body: string): Promise<{ ok: boolean; op: string; message: string }>
+  request(op: string, body: string): Promise<RemoteResultLike>
 }
 
 declare module '@deepseek-ai/cordis' {
@@ -66,9 +74,15 @@ export async function apply(ctx: ClientContext): Promise<void> {
     // property; strict `ctx.get` reads the global store without a topology
     // edge from this plugin to the namespace it just mounted.
     const wire = ctx.get('remote.sourceDeck') as unknown as SourceDeckWire
-    const result = await wire.request('ping', '{}')
-    ;(globalThis as Record<string, unknown>).__sourceDeckSpike = result
-    console.log('[source-deck] remote spike', result)
+    const added = await wire.request('addSource', JSON.stringify({
+      sessionId: 'remote-smoke',
+      origin: 'user',
+      title: 'SourceDeck Remote smoke',
+      url: 'https://example.com/sourcedeck-smoke?utm_source=smoke',
+    }))
+    const active = await wire.request('getActiveSet', JSON.stringify({ sessionId: 'remote-smoke' }))
+    ;(globalThis as Record<string, unknown>).__sourceDeckSmoke = { added, active }
+    console.log('[source-deck] remote smoke', added, active)
   } catch (error) {
     const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error)
     ;(globalThis as Record<string, unknown>).__sourceDeckError = detail

@@ -1,6 +1,6 @@
 {
     "name":  "dsh-source-deck",
-    "version":  "0.1.5",
+    "version":  "0.1.6",
     "description":  "SourceDeck: collect candidate sources in a right-sidebar deck, screen them in the conversation flow, and hand the selection back to the Agent.",
     "type":  "module",
     "main":  "lib/index.js",
