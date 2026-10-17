@@ -8,6 +8,14 @@
 
 一句话理由：RC 没有"筛选面板→回传 Agent"的专用 API，但官方提供了三块成体系的积木——右栏 tab 类型（ui-sidebar-files 先例）、对话流业务节点（ConversationNodeDefinition 先例）、`session.prompt` Remote（内置输入框的同款回传路径）；方案 A 是唯一把"常驻筛选空间、就地筛选、官方回传"三者同时凑齐且不改 agent loop 的组合。方案 B（输入框浮层）和方案 C（仅工具卡片）分别缺少常驻空间与批量比较能力，降级为 A 的辅助入口。
 
+### 1.1 目标场景（2026-10-17 用户确认）
+
+- **想法验证 / 造轮子前调研**："我想实现一个想法，先确认这个功能有没有成熟的、或有人已经造了的轮子。"
+- **工程优化调研**："某某功能需要你先去调研相关的开源高星、还经常在更新的实现，然后学习来优化当前实现。"
+- **资料汇总与对比**：一批来源（文章、仓库、文档）进来后人工筛选、汇总、对比，再把结论交回 Agent 继续。
+
+共同结构：**先声明范围 → 收集候选 → 人工筛选 → 交回 Agent**。SourceDeck 覆盖全链路；范围声明是其中可配置的一环（见 §5.5 来源范围配置）。
+
 ## 2. 设计边界（RC 实测能力盘点）
 
 ### 2.1 可直接使用
@@ -67,15 +75,17 @@ dsh-source-deck/                 npm 包名 dsh-source-deck，dsh.bundle.patch �
 │   ├── tools.ts                 Host 工具 deck_submit_sources（defineTool）
 │   ├── remote.ts                TypertRemoteService「sourceDeck」命名空间
 │   │     addSource / listSets / getSet / decide / commitSelection / clearData
+│   │     getScopePolicy / setScopePolicy
 │   ├── domain.ts                defineDomain('source_deck') + open/读写
 │   ├── events.ts                SessionEventMap 声明合并（log-only 事件）
+│   ├── scope-policy.ts          来源范围策略：预置源参数 schema + 合规校验
 │   └── prompt.ts                选择摘要文本构造（模型面向）
 ├── src/client/index.ts          Client 半：apply/inject（exports["./client"]）
 │   ├── deck-tab.ts              sidebarRightTabs.register + sidebar.right.pane.tab 注册
 │   ├── deck-store.ts            注册期 slot store（面板视图状态）
 │   ├── set-card.ts              ConversationNodeDefinition + conversation.chat.node 注册
 │   ├── entry-button.ts          conversation.input.right 注册（打开资料台）
-│   └── settings.ts              settings.section 注册（数据管理）
+│   └── settings.ts              settings.section 注册（数据管理 + 来源范围配置）
 ├── locale/{en,zh}.json          产品文案（typed locale dictionary）
 └── lib/                         构建产物（tsdown：Host lib + clientBundle lazy-CJS）
 ```
@@ -132,19 +142,38 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 
 ## 5. 用户操作流程
 
-主流程（6 步）：
+主流程（7 步）：
 
-1. **带入资料**。两条路：① Agent 在对话中调用 `deck_submit_sources`（搜索/阅读后）；② 用户在右栏资料台点"添加资料"，填 URL/标题/备注（可粘贴正文）。
-2. **出现候选**。对话流出现候选卡片（列出标题/域名/snippet，重复项合并标注）；右栏资料台自动打开（或点 `input.right` 的「资料台」按钮打开），显示同一集合。
-3. **筛选**。卡片或面板中逐条「保留 / 排除（可填理由）」；面板按 待处理/保留/排除 分组，显示计数。此阶段不打扰 Agent。
-4. **提交**。面板点「提交给 Agent」。系统构造选择摘要（保留清单+排除理由），经 `session.prompt` 进入当前会话：Agent 忙碌 → steer（下一步边界生效）；空闲 → queue（新轮次）。
+0. **声明范围**（一次性，可随时改）。用户在设置页「来源范围」选择来源类型并填筛选参数（如 GitHub：stars ≥ 500、近 6 个月有提交、语言 Go/TypeScript、排除 fork/archived）；或选「LLM 自主」只留一段指导语。策略持久化，提交候选时自动生效（§5.5）。
+1. **带入资料**。两条路：① Agent 在对话中调用 `deck_submit_sources`（按当前策略检索后提交，可携带 stars/最近更新等元数据）；② 用户在右栏资料台点"添加资料"，填 URL/标题/备注（可粘贴正文）。
+2. **出现候选**。对话流出现候选卡片（列出标题/域名/snippet、策略合规标记，重复项合并标注）；右栏资料台自动打开（或点 `input.right` 的「资料台」按钮打开），显示同一集合。
+3. **筛选**。卡片或面板中逐条「保留 / 排除（可填理由）」；面板按 待处理/保留/排除 分组，显示计数；不符合策略的候选有标记但仍可保留（用户最终拍板）。此阶段不打扰 Agent。
+4. **提交**。面板点「提交给 Agent」。系统构造选择摘要（保留清单+排除理由+策略符合情况），经 `session.prompt` 进入当前会话：Agent 忙碌 → steer（下一步边界生效）；空闲 → queue（新轮次）。
 5. **Agent 继续**。Agent 在下一轮/下一步看到摘要与保留资料 URL，按用户意图阅读/比较/排除。
 6. **回溯**。任何时候重开资料台可看历史集合与决定；对话流卡片随会话持久，重启后回放重建。
+
+### 5.5 来源范围配置（2026-10-17 用户确认加入）
+
+**定位**：这不是"内置搜索引擎+自动评分"，而是**把用户的来源约束结构化，作为 Agent 检索与人工筛选的共同基准**。SourceDeck 不联网抓取；元数据由 Agent 提交（LLM 检索时自然获得 stars、最近提交时间等），Host 只做策略比对、标记与展示。首版预置三种策略类型：
+
+| 类型 | 参数（首版） | 用途 |
+|---|---|---|
+| `github` | `minStars`、`updatedWithinMonths`、`languages[]`、`licenses[]`、`topics[]`、`excludeForks`、`excludeArchived` | "调研开源高星且活跃更新的实现" |
+| `web` | `domainsAllow[]`、`domainsBlock[]`、`preferOfficialDocs` | 文章/文档/教程类来源 |
+| `llm-freeform` | `guidance`（自由文本，如"优先官方文档与高星项目"） | 不缩窄范围，只传达倾向 |
+
+**生效方式**：
+- 工具 `deck_submit_sources` 的返回文本与 `source-deck/set-opened` 事件都附带当前策略摘要，Agent 提交时即知晓约束；下一批候选可自行修正（flags 反馈闭环）。
+- 每条 candidate 入库时 Host 按策略计算 `policyFlags`（如 `stars-below`、`stale`、`fork`、`archived`、`domain-blocked`）；卡片与面板显示标记，不阻断保留。
+- 策略可随时在设置页修改；修改只影响后续提交的候选（已入库候选的 flags 不重算，保持历史原样）。
+
+**明确不做（首版）**：程序化调 GitHub API 校验元数据（需网络审批，列为扩展）；多策略 profile 切换（首版单例默认策略 + 每会话可覆盖的记录）；评分/排序算法（只做阈值标记）。
 
 分支流程：
 
 - **重复项**：同集合内规范化 URL 相同 → 合并为一条候选，标注"×N"；跨集合同 URL → 新候选指向已有 source 记录（不复制资料）；标题相似但 URL 不同 → 并列显示，不自动合并（用户判断）。
 - **失败项**：无标题且无 URL 的条目在入库前拒绝，工具返回 isError 说明；远程添加返回 Remote 错误码 `sourcedeck/invalid-source`。
+- **策略不符**：候选照常入库并标记；用户可保留（覆盖策略）或排除。
 - **停止 Agent**：使用官方 composer 的停止按钮；SourceDeck 不重复做取消 UI。已入队的选择摘要由官方队列编辑处理。
 - **清理**：设置页「清除 SourceDeck 数据」删除域数据文件（仅 `$DSH_HOME/storages/source_deck*`），会话事件流不删（官方无删除接口）。
 
@@ -159,8 +188,8 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 | `ConversationNodeDefinition` + `conversation.chat.node`（keyed，key=`source-deck/set`） | 对话流候选卡片 | conversation.zh.md:171-243 完整例 |
 | `tool.call.toolview`（keyed，key=`deck_submit_sources`） | 工具调用行的紧凑展示 | 首版可先用 generic 行 + 卡片，toolview 作为增强 |
 | `conversation.input.right`（list） | 「资料台」入口按钮 → `ctx.sidebarRight.openTab('sourcedeck')` | additive，避开 single 遮蔽 |
-| `settings.section`（list/root） | 数据管理页（清除数据、来源说明） | |
-| `ctx.remote.sourceDeck.*` | addSource/listSets/getSet/decide/commitSelection/clearData | 自建 Remote 命名空间 |
+| `settings.section`（list/root） | 数据管理页（清除数据）+ 来源范围配置页（策略编辑器） | 两块同页或两个 section |
+| `ctx.remote.sourceDeck.*` | addSource/listSets/getSet/decide/commitSelection/clearData/getScopePolicy/setScopePolicy | 自建 Remote 命名空间 |
 | `ctx.remote.session.prompt` | 提交选择给 Agent | 官方唯一回传路径 |
 | `ctx.storageDomain` | 域 `source_deck`（per-record） | 私有账本 |
 | `SessionEventMap` 声明合并 | `source-deck/set-opened` / `candidate-decided` / `selection-submitted`（log-only，`ignorable:true`） | 模型可见 + 回放真源 |
@@ -173,9 +202,12 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 |---|---|---|
 | `sets` | `set-<uuid>` | `{sessionId, origin:'agent'\|'user', createdAt, status:'open'\|'submitted'}` |
 | `sources` | `src-<uuid>` | `{url?, title, note?, snippet?, contentRef?, origin, dedupeKey, createdAt}` |
-| `candidates` | `cand-<uuid>` | `{setId, sourceId, verdict:'pending'\|'kept'\|'excluded', reason?, decidedAt?}` |
+| `candidates` | `cand-<uuid>` | `{setId, sourceId, verdict:'pending'\|'kept'\|'excluded', reason?, decidedAt?, policyFlags?: string[]}` |
 | `selections` | `sel-<uuid>` | `{setId, sessionId, kept:[candidateId], excluded:[{candidateId, reason}], submittedAt, requestId}` |
-| `session_active` | sessionId | `{setId}`（每会话活跃集；避免用域级 global 单例造成多会话互踩） |
+| `scope_policies` | `policy-<uuid>`（首版单例，另可建 `default` 键） | `{kind:'github'\|'web'\|'llm-freeform', params:{minStars?, updatedWithinMonths?, languages?, licenses?, topics?, excludeForks?, excludeArchived?, domainsAllow?, domainsBlock?, preferOfficialDocs?, guidance?}, createdAt, updatedAt}` |
+| `session_active` | sessionId | `{setId, policyId?}`（每会话活跃集与策略覆盖；避免用域级 global 单例造成多会话互踩） |
+
+`sources` 记录新增可选元数据 `meta?: {stars?, pushedAt?, language?, license?, forks?, archived?, topics?}`（Agent 提交时携带，用于策略比对与展示；缺失时该维度不校验）。
 
 `contentRef`：用户粘贴的正文 → `ctx.spillStore.saveText` 的 `SpillRef`；上传文件 → `ctx.attachments.saveFile` 的 `FileAttachmentRef`。域记录只存引用+元数据，不存全文。
 
@@ -226,10 +258,11 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 | V1 | 无密钥启动 | client half 进 desktop boot graph；右栏出现「资料台」tab；设置出现 SourceDeck 页 | **最高风险，最先验**；失败则整体方案回到备选（见 §10） |
 | V2 | 负向兼容 | peer 故意写错范围后安装 | 被 preflight 拒绝或 boot skip 且有可见诊断 |
 | V3a | 无模型链路 | 用户手动添加来源 → 卡片渲染 → 勾选/排除 → 提交 | 域文件可查；事件入日志；队列/steer 消息出现在会话投影 |
-| V3b | 模型链路（需沙箱单独登录模型） | Agent 调用 `deck_submit_sources` → 卡片 → 筛选 → 提交 → Agent 后续轮引用保留资料 | 下一轮请求历史含选择摘要；Agent 行为体现筛选结果 |
+| V3b | 模型链路（沙箱 LLM API 已配好，复用本 DSH 的 DeepSeek API） | Agent 调用 `deck_submit_sources` → 卡片 → 筛选 → 提交 → Agent 后续轮引用保留资料 | 下一轮请求历史含选择摘要；Agent 行为体现筛选结果 |
 | V4 | 恢复 | 重启 Desktop 后重开会话 | 卡片从事件回放重建；资料台从域恢复 |
 | V5 | 多会话 | 两个会话各自提交候选 | 互不串扰；session_active 各自独立 |
 | V6 | 停用/卸载/重置 | 停用→启用；卸载→数据仍在；设置页清除数据 | 行为符合 §8.2 |
+| V7 | 来源范围配置 | 设置 GitHub 策略（stars≥500/近6月）→ Agent 提交含低星候选 | 候选带 `stars-below` 标记；卡片/面板显示标记；仍可保留；改策略后新候选按新策略校验 |
 
 每项记录真实命令与输出（工作区惯例：结论附原始输出）。
 
@@ -241,21 +274,34 @@ peer 一律写**精确 `0.2.0-rc.2`**：`^0.2.0` 虽因 `includePrerelease` 能�
 | R2 | npm 上的官方 Client 包版本与沙箱 RC 源码构建的类型面是否一致（2026-10-17 实测 npm 有 `dsh-client-ui-chat@0.2.0-rc.2`） | SlotMap 声明合并类型对不上则编译或运行时注册失败 | 用 `@0.2.0-rc.2` 精确版本；若类型不符，退化为自己在 `declare module` 中补最小声明并在文档记录 |
 | R3 | `conversation.chat.node` / `sidebar.right.pane.tab` 对第三方包的注册校验（SlotMap 声明合并的 import type 边） | 卡片/面板注册被拒 | 随 R1 冒烟一起验证；失败则备选：工具结果视图走 `tool.call.toolview`（ui-tool 同机制） |
 | R4 | 复刻 `clientBundle` 构建预设（tsdown 配置、CSS、基线外部解析） | bundle 格式不对则激活失败 | 按 adding-a-settings-card.zh.md:58-60 复刻；V1 验证 |
-| R5 | 沙箱内模型登录与真实调用（当前未验证） | V3b 无法完成 | 由用户在沙箱单独登录；无密钥验证与模型调用验证分开记录 |
-| R6 | `session.prompt` 的 steer 时序（下一步边界）与用户预期差异 | 用户以为"立即插话" | UI 文案与文档说明；首版接受 |
+| R5 | 沙箱内模型真实调用 | V3b 无法完成 | 已解除：2026-10-17 沙箱 `$DSH_HOME` 已按用户指示配置本 DSH 的 DeepSeek API（仅 DeepSeek 条目最小化合并）；无密钥启动与模型调用验证仍分开记录 |
+| R6 | `session.prompt` 的 steer 时序（下一步边界）与用户预期差异 | 用户以为"立即插话" | UI 文案与文档说明；用户已确认"唤醒就唤醒，先实现功能" |
 | R7 | 域数据与事件流不一致的边界（如 emit 失败） | 面板与卡片显示分歧 | 写域先于 emit；emit 失败记日志不阻塞；以事件流为准的口径写入文档 |
 | R8 | 多 Host 进程/重连时 `domain/changed` 仅进程内 | 面板活数据不刷新 | 首版面板用"操作后主动重取 + slot store"，不依赖跨进程推送 |
+| R9 | 策略元数据（stars/pushedAt）由 Agent 自报，可能不准或缺失 | flags 误标 | 标记只作参考不阻断；缺失维度不校验；程序化校验列为扩展 |
 
 ## 11. 首版明确不做（边界）
 
-- 自动网页搜索、抓取正文、相关性评分（重做既有插件且偏离人工筛选价值）。
+- 程序化联网检索：自动网页搜索、抓取正文、调 GitHub API 校验元数据（元数据由 Agent 提交，Host 只做阈值标记；网络能力留给 LLM 侧工具）。
+- 相关性评分/自动排序算法（只做策略阈值标记，人工拍板）。
 - 收藏夹/书签同步、跨设备同步。
 - 显式版本链对象、diff 视图（记录只增不改 + 事件流已提供历史）。
 - 自定义资源协议 `dsh-resource://sourcedeck/...` 与多资料集多 tab 寻址（首版单活跃集 + `openTab`）。
+- 多策略 profile 切换（首版单例默认策略 + 每会话覆盖记录）。
 - `/deck` 输入触发菜单（input trigger 全局层限制；`input.right` 按钮已覆盖入口）。
 - 二进制附件进输入框（RC 无公开 API；URL 列表 + 正文 ref 已够用）。
 - subagent 子会话投递（ownership fence；主会话优先）。
 
 ## 12. 后续扩展边界（记录，不实现）
 
-多资料集与资源协议地址寻址；工具结果 toolview 增强卡片；Host 侧 Web 搜索工具适配（用户明确要求时）；版本链与 diff；`/deck` 输入触发；候选去重的相似标题模糊匹配；导出候选集（markdown/json）。
+多资料集与资源协议地址寻址；工具结果 toolview 增强卡片；程序化 GitHub API 元数据校验（用户明确要求时，需处理网络审批）；版本链与 diff；`/deck` 输入触发；候选去重的相似标题模糊匹配；导出候选集（markdown/json）；策略 profile 多配置切换。
+
+## 13. 已确认事项记录（2026-10-17 用户指示）
+
+1. 采用方案 A。
+2. 首版来源范围在配置页可配置：预置开源社区源（GitHub 等）+ 可配筛选参数（stars、最近更新时间等）+ 「LLM 自主」选项；目的是按需求缩窄范围，不改变"人工筛选"的产品核心。
+3. inject 唤醒即唤醒，先把功能实现（RC 无 inject Remote 出口的降级被接受）。
+4. peer 精确写 `"0.2.0-rc.2"`。
+5. 所有开发实现只在沙箱 Desktop（`sandbox/dsh-desktop/`，基线 0.2.0-rc.2）验证，不影响日用 DSH；最终安装到本 DSH 需用户明确批准。
+6. 沙箱 Desktop 的 LLM API 直接使用本 DSH 已配置的 DeepSeek API（已配置，见 SETUP-VERIFICATION）。
+7. 凭据处置事故记录：2026-10-17 调试期间一次"脱敏"正则失误导致日用 `.credentials.yaml` 的多条密钥明文进入对话记录；已建议用户轮换（含 `DEEPSEEK_API_KEY`）；沙箱侧仅做最小化键级合并，不再输出任何值。

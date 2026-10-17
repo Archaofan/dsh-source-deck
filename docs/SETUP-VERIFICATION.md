@@ -21,25 +21,24 @@
 
 当前日志位于沙箱 logs/：install.log、build.log、electron-install.log、primary-runtime.log、desktop.log、frontend-check.json、plugin-list.log、production-host-after.json、production-paths-after.json。日志可能含瞬时本地访问令牌，不纳入 Git、不上传。结构化当前状态见沙箱 status.json。
 
-## alpha 归档与版本回退
+## 2026-10-17 下午：沙箱 LLM API 复用与启动链路修复（方案设计阶段）
 
-原 alpha 源码、编译产物、home/userData、试验材料、操作脚本和验证记录完整保存在沙箱 archives/alpha-0.2.1-alpha.5-20261017T041240Z/，没有删除。只复用可校验的包管理/Electron 缓存及工具目录，RC 使用新拉取的固定 tag 与全新可变状态，没有将 alpha 会话或数据库降级加载到 RC。
+背景：用户明确指示"沙箱内 desktop 的 API，直接用本 DSH 已配置的 DeepSeek API"（2026-10-17 原话）。这是对"不从日用 DSH 导入密钥"惯例的**用户授权例外**，仅限 DeepSeek 相关条目，最小化复制。
 
-初次 alpha 准备曾通过 7 个构建 gate 和 2 个检查 gate；这些只属于归档版本，不能证明 RC 兼容。Git 历史中的 alpha 环境快照也不再是当前执行基线。当前 docs/environment-baseline/ 已同步 RC 的说明与脚本，实际执行仍以根目录共用沙箱为准。
+| 项目 | 证据与结果 |
+|---|---|
+| 沙箱凭据配置 | 从日用 `E:\DSH-Desktop\.dsh\.credentials.yaml` 仅提取 3 条 DeepSeek 相关条目（`refs.DEEPSEEK_API_KEY`、`records.deepseek-account-platform/default`、`records.deepseek-account-platform/device`），合并写入沙箱 `sandbox/dsh-desktop/home/.credentials.yaml`（写入前备份为 `.bak-<时间戳>`，权限 0600）。沙箱原有记录 `client-connection/browser-session` 保留。全程未输出任何凭据值；脚本见沙箱 tmp/gitpush/credential-sync.mjs（仅报键名与长度） |
+| DeepSeek API 实际调用 | 用沙箱 key 打 `https://api.deepseek.com/v1/chat/completions`（deepseek-chat，max_tokens=1）：**HTTP 200**，返回 response id `e5899001-5cda-4383-9e59-ddf3740d6e5a`，model `deepseek-flash`，usage total 6 tokens。证明 key 有效、沙箱可完成真实模型调用 |
+| 沙箱 Desktop 启动 | `Start-Desktop.ps1 -Project dsh-source-deck` 成功启动 Electron（pid 31740 主进程 + 31656 Host）；inspect 端口 19329/19322/19330 就位；日用 19387 仍由原进程 20816 监听，未受影响 |
+| 启动链路修复 1 | `Assert-SandboxBaseline` 原来强制调用 `git`，本机无 git → 启动失败。改为 `Get-UpstreamCommit`：git 可用时用 git，否则回退解析 `.git/HEAD` 与 `packed-refs`。实测 upstream HEAD `639ed015397290b3745d163aafe02ffee4aa3f84` = baseline.commit，断言 PASS |
+| 启动链路修复 2 | `start:desktop` 脚本嵌套调用 `pnpm`，沙箱 PATH 无 pnpm → 失败。按 pnpm 官方惯例在 `tools/pnpm-home/pnpm.cmd` 建 shim（转发到固定 pnpm 11.7.0），并在 `Push-SandboxEnvironment` 将 PNPM_HOME 加入进程 PATH。实测 `pnpm --version` → `11.7.0` |
+| 编辑事故记录 | 用 edit 工具写 Common.ps1 时，一行中文注释曾造成 PowerShell 解析器行合并（报 `Unexpected token '}'`）；改为 ASCII 注释后正常。后续沙箱脚本注释一律用 ASCII |
 
-## 本次适配与观察限制
-
-RC Desktop Host 在源码中默认传入端口 19387。首次启动因此与日用实例冲突；失败日志保存在 desktop-first-start-port-conflict.log。修复仅使用官方 profile 配置覆盖 webserver 的完整配置，未修改上游产品源码或停止日用实例；重新启动的实测结果才计入上表。
-
-生产设置对照的一次跨账号调用曾出现 HKCU/PATH 假差异：受限执行账号与 Administrator 看到不同用户注册表。已按实际生产账号比较回退前保留的主机快照，结果 unchanged=true；脚本现记录 observerSid 并拒绝跨账号或身份未知的 Before/After 对照。今后两次观察必须使用同一生产 Windows 账号。
-
-GitHub CLI OAuth 已完成，凭据由系统 keyring 管理。构建、Electron 和 GitHub 若被受限执行账号阻挡，使用相应单条主机执行权限；不改全局 Git 身份/safe.directory，不关闭 TLS 校验。缓存和临时目录都在沙箱，执行后还原父进程环境。
-
-启动仍有上游开发模式的 dsh-desktop:mandatory-status IPC handler 缺失及 Electron CSP 提示；Host 和认证前端可达，但尚未逐项检查这些提示的图形交互影响。受控停止令启动脚本最终返回非零，不代表此前启动验证失败，也不等于通过菜单正常退出已验收。
+凭据事故（必须向用户披露）：同日调试"脱敏"正则时一次失误把日用 `.credentials.yaml` 的多条真实密钥明文打印进对话记录（含 `DEEPSEEK_API_KEY` 与若干第三方账号 token）。已建议用户轮换相关凭据；沙箱侧后续只做键级操作，不再输出任何值。
 
 ## 尚未验证
 
-- 模型登录和模型 API 调用；第一次使用需在沙箱独立配置。
+- **无密钥启动**（不带任何 LLM 凭据的 Desktop 启动与右栏 tab 冒烟）：仍未验证，属实现阶段 V1；与上面的"已配 key 启动"分开记录。
 - 截图、完整图形交互流程及通过菜单正常退出。
 - 真实 SourceDeck 包的安装/移除、UI 和 Agent 接续；尚无产品 package.json、产品代码或批准架构。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。
