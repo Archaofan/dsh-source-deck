@@ -8,7 +8,7 @@ try {
     $probe.Dispose()
 } catch [IO.IOException] { $occupied = $true }
 $runPath = Join-Path $paths.Root '.active-run.json'
-$active = if (Test-Path -LiteralPath $runPath) { Get-Content -LiteralPath $runPath -Raw | ConvertFrom-Json } else { $null }
+$active = if (Test-Path -LiteralPath $runPath) { Get-Content -LiteralPath $runPath -Raw -Encoding UTF8 | ConvertFrom-Json } else { $null }
 $baselineProperties = $paths.Baseline.PSObject.Properties.Name
 $relation = if ($baselineProperties -contains 'sandboxRelation') { $paths.Baseline.sandboxRelation } else { 'matches-production' }
 $approval = if ($baselineProperties -contains 'upgradeApproval') { $paths.Baseline.upgradeApproval } else { $null }
@@ -25,6 +25,6 @@ $checks = [ordered]@{
     primaryRuntimePrepared = Test-Path -LiteralPath (Join-Path $paths.Upstream 'apps/desktop/.desktop-build/targets/win-x64/runtime/primary-runtime/runtime.json')
     dshHome = $paths.HomePath
     electronUserData = $paths.UserData
-    recordedVerification = if (Test-Path -LiteralPath (Join-Path $paths.Root 'status.json')) { Get-Content -LiteralPath (Join-Path $paths.Root 'status.json') -Raw | ConvertFrom-Json } else { $null }
+    recordedVerification = if (Test-Path -LiteralPath (Join-Path $paths.Root 'status.json')) { Get-Content -LiteralPath (Join-Path $paths.Root 'status.json') -Raw -Encoding UTF8 | ConvertFrom-Json } else { $null }
 }
 $checks | ConvertTo-Json -Depth 8

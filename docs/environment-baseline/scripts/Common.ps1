@@ -12,7 +12,7 @@ function Set-SandboxProcessEnvironment([string]$Name, $Value) {
 function Get-SandboxPaths {
     $sandboxRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
     $workspaceRoot = [IO.Path]::GetFullPath((Join-Path $sandboxRoot '../..'))
-    $baseline = Get-Content -LiteralPath (Join-Path $sandboxRoot 'baseline.json') -Raw | ConvertFrom-Json
+    $baseline = Get-Content -LiteralPath (Join-Path $sandboxRoot 'baseline.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     return [pscustomobject]@{
         Root = $sandboxRoot
         Workspace = $workspaceRoot
