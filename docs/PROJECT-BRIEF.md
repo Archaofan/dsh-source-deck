@@ -1,6 +1,8 @@
 # 项目简报
 
-日期：2026-10-17。名称由用户确认：**SourceDeck / dsh-source-deck**，中文名“资料筛选台”。
+日期：2026-10-17。名称由用户确认：**SourceDeck / dsh-source-deck**，中文名“资料台”。
+
+> 2026-10-17 v2 修订：用户验收 0.1.17 后要求首屏只问需求、由当前会话 LLM 搜索、GitHub 可视化卡片、勾叉/补充说明驱动下一轮、收藏夹，并明确“资料台必须和当前聊天联动，不能是独立窗口”。来源范围配置降为可选高级项。实现与证据见 [design/2026-10-17-solution-design.md §14](design/2026-10-17-solution-design.md)、[research/2026-10-17-chat-deck-linkage.md](research/2026-10-17-chat-deck-linkage.md) 与 [SETUP-VERIFICATION.md 夜-7](SETUP-VERIFICATION.md)。下文“五表/配置页”是首版历史设计记录。
 
 ## 已确认目标
 

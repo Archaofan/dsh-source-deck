@@ -113,3 +113,14 @@
 
 - 每阶段提交推送并核对 HEAD/origin；沙箱、缓存、凭据不进 Git。
 - 阶段失败：记录 pending 与证据，不隐瞒；R1 失败触发设计 §10 回退评估。
+
+## 阶段 7：v2 LLM 搜索轮次 + 聊天联动 — 已完成（2026-10-17，产品 0.2.4）
+
+用户当天验收后的修订目标：去掉站点/正则前置配置，首屏只问需求；由当前会话的 LLM 搜索并提交；GitHub 可视化卡片；勾叉/跳过/可选原因 + 补充说明驱动下一轮；收藏夹；字体放大；资料台与当前聊天联动。
+
+- 域：从六表扩到八表，新增 `rounds`（setId/sessionId/index/request/note/createdAt）与 `favorites`；候选与会话活跃记录增加 `roundId`。
+- Host：`search-prompt.ts` 生成中文搜索指令（需求、补充说明、最近对话、保留正例、排除原因、条数上限；续搜 4 条）；`conversation-context.ts` 读 Session 最近 5 条对话并过滤运行时噪声；`startRound` 建轮次并返回 prompt；`deck_submit_sources` 自动归入当前轮；新增收藏 CRUD；Remote 暴露 startRound/listFavorites/addFavorite/removeFavorite。
+- UI：首屏“你想找什么？”+ 示例 + 开始查找；轮次流卡片（头像/描述/stars/语言/链接、☆、✓、✕、跳过、原因保存）；底部补充说明 + 继续查找 + 提交；收藏夹搜索/加入/移除；字体放大、2 列网格、5 分钟轮询。
+- 聊天联动：`/deck` 客户端命令；对话卡片显示最近轮次；Host 搜索 prompt 带最近对话；提交摘要回到对话。
+- 验证：35 个单元测试全绿；真实模型两轮（Go 日志库 6 条、Rust 运行时 6–7 条）；原因/跳过/收藏/`/deck`/上下文/重启恢复均实测。证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-7 段；调研见 [../research/2026-10-17-chat-deck-linkage.md](../research/2026-10-17-chat-deck-linkage.md)。
+

@@ -1,15 +1,16 @@
 /**
- * `deck_submit_sources` tool: the agent's path into the deck.
+ * `deck_submit_sources` tool: the Agent's path into the deck.
  *
- * The tool validates each candidate, deduplicates on the normalized source
- * key, computes non-blocking policy flags from optional metadata, appends a
- * whole-set log record, and returns a bounded summary plus the active policy.
+ * The deck's search button sends a prompt to the current conversation; the
+ * Agent runs its normal search tools and submits the results here. The tool
+ * validates and deduplicates each candidate, tags it with the active round,
+ * and appends a whole-set log record for replay.
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { DeckStore } from './model.ts'
-import { addSource, getPolicy, getSet } from './ops.ts'
+import { addSource, getSet } from './ops.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
-import { policySummary, type SourceMeta } from './scope-policy.ts'
+import type { SourceMeta } from './scope-policy.ts'
 
 /** The tool-registry slice this module needs. */
 interface ToolService {
@@ -69,6 +70,11 @@ function metaOf(value: Record<string, unknown>, index: number): SourceMeta | und
   const forks = number('forks')
   const archived = flag('archived')
   const fork = flag('fork')
+  const description = text('description')
+  const repo = text('repo')
+  const owner = text('owner')
+  const image = text('image')
+  const homepage = text('homepage')
   return {
     ...(stars === undefined ? {} : { stars }),
     ...(pushedAt === undefined ? {} : { pushedAt }),
@@ -78,6 +84,11 @@ function metaOf(value: Record<string, unknown>, index: number): SourceMeta | und
     ...(archived === undefined ? {} : { archived }),
     ...(fork === undefined ? {} : { fork }),
     ...(topics === undefined ? {} : { topics: topics as string[] }),
+    ...(description === undefined ? {} : { description }),
+    ...(repo === undefined ? {} : { repo }),
+    ...(owner === undefined ? {} : { owner }),
+    ...(image === undefined ? {} : { image }),
+    ...(homepage === undefined ? {} : { homepage }),
   }
 }
 
@@ -106,7 +117,7 @@ function sourcesOf(args: unknown): SubmittedSource[] {
 /** JSON Schema for one optional source-metadata object. */
 const META_SCHEMA = {
   type: 'object',
-  description: 'Optional source metadata the Host compares with the active source policy.',
+  description: 'Optional source metadata; GitHub fields render the deck card.',
   properties: {
     stars: { type: 'number', description: 'GitHub stargazers count.' },
     pushedAt: { type: 'string', description: 'ISO timestamp of the last push.' },
@@ -116,6 +127,11 @@ const META_SCHEMA = {
     archived: { type: 'boolean', description: 'Whether the repository is archived.' },
     fork: { type: 'boolean', description: 'Whether the repository is itself a fork.' },
     topics: { type: 'array', items: { type: 'string' }, description: 'Repository topics.' },
+    description: { type: 'string', description: 'One or two sentence description shown on the card.' },
+    repo: { type: 'string', description: 'GitHub repository as owner/repo.' },
+    owner: { type: 'string', description: 'GitHub owner login, used for the avatar.' },
+    image: { type: 'string', description: 'Explicit card image URL.' },
+    homepage: { type: 'string', description: 'Project homepage or docs URL.' },
   },
   additionalProperties: false,
 }
@@ -131,11 +147,11 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
     if (tools === undefined) return
     scoped.effect(() => tools.register({
       name: 'deck_submit_sources',
-      description: 'Submit candidate sources to the user\'s SourceDeck panel. '
+      description: 'Submit the results of a SourceDeck search round. '
         + 'Each source needs a title or URL; duplicates are merged by normalized URL or title. '
-        + 'Pass GitHub metadata (stars, pushedAt, language, fork, archived, topics) when available: '
-        + 'the Host flags candidates that fall outside the user\'s active source policy. '
-        + 'The user screens the candidates and may hand the kept ones back in a later message.',
+        + 'For GitHub repositories include meta.owner, meta.repo, meta.description, meta.stars and meta.language '
+        + 'so the deck can render a rich card; for articles include a one-line note. '
+        + 'Submit the whole round in one call; the user reviews it and may ask for another round.',
       parameters: {
         type: 'object',
         properties: {
@@ -164,7 +180,6 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
           properties: {
             count: { type: 'integer' },
             setId: { type: 'string' },
-            policy: { type: 'string' },
             candidates: {
               type: 'array',
               items: {
@@ -172,48 +187,43 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
                 properties: {
                   title: { type: 'string' },
                   url: { type: 'string' },
-                  policyFlags: { type: 'array', items: { type: 'string' } },
                 },
                 required: ['title'],
                 additionalProperties: false,
               },
             },
           },
-          required: ['count', 'setId', 'policy', 'candidates'],
+          required: ['count', 'setId', 'candidates'],
           additionalProperties: false,
         },
         render: (_args: unknown, value: unknown) => [{
           type: 'text',
           text: isObject(value) && typeof value.count === 'number'
-            ? `已收入 ${value.count} 条候选到资料台，等待用户筛选。当前来源策略：${String(value.policy ?? '未设置')}`
-            : '已收入候选到资料台。',
+            ? `已提交 ${value.count} 条候选到资料台。`
+            : '已提交候选到资料台。',
         }],
       },
       async execute(args: unknown, exec: DeckToolExec) {
         const sessionId = exec.agent?.session.id
         if (sessionId === undefined) throw new Error('deck_submit_sources requires an owning agent session')
         const store = await getStore()
-        const policy = await getPolicy(store)
-        const summary = policySummary(policy)
         const submitted = sourcesOf(args)
         const results = []
         for (const source of submitted) {
           const added = await addSource(store, { sessionId, origin: 'agent', ...source })
           emitDeckRecord(ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot',
-            snapshotOf(added.setId, await getSet(store, added.setId), summary))
+            snapshotOf(added.setId, await getSet(store, added.setId)))
           results.push(added)
         }
         const setId = results[0]?.setId
-        if (setId === undefined) return { count: 0, setId: '', policy: summary, candidates: [] }
+        if (setId === undefined) return { count: 0, setId: '', candidates: [] }
         const view = await getSet(store, setId)
         return {
           count: view.candidates.length,
           setId,
-          policy: summary,
           candidates: view.candidates.map(entry => ({
             title: entry.source.title,
             ...(entry.source.url === undefined ? {} : { url: entry.source.url }),
-            ...(entry.candidate.policyFlags === undefined ? {} : { policyFlags: entry.candidate.policyFlags }),
           })),
         }
       },

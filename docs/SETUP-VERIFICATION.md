@@ -219,3 +219,42 @@ tests       : 30 passed / 0 failed（新增 add-after-submission → 新集合�
 ## 接手
 
 先读父目录 README.md / AGENTS.md、项目简报、VERSION-POLICY.md 与 HANDOFF.md。检查 Get-SandboxStatus.ps1、Start-Desktop.ps1 -CheckOnly 和 Git 同步状态；已通过的 RC 构建不必重复。方案必须以固定 RC 的真实公共接口为依据，资料和设计写入项目子目录，设计交用户审阅后再实现。
+
+## 2026-10-17 夜-7：v2 LLM 搜索轮次 + 聊天联动（产品 0.2.0 → 0.2.4）
+
+背景：用户验收 0.1.17 后明确要求“更简单、字体更大、不配站点/正则、由当前对话的 LLM 搜索并整理、GitHub 仓库直接出图标/简介/链接、勾叉与补充说明驱动下一轮、可跳过/填原因、收藏夹”，并追加“资料台必须和当前聊天联动，不能是独立窗口”。调研与决策见 [research/2026-10-17-chat-deck-linkage.md](research/2026-10-17-chat-deck-linkage.md) 与 [design/2026-10-17-solution-design.md §14](design/2026-10-17-solution-design.md)。
+
+| 项目 | 证据与结果 |
+|---|---|
+| 首屏 | 0.2.0 沙箱实测：`资料台 | 收藏夹 | ↻ | 你想找什么？ | 直接说需求… | 示例 chips | 开始查找`；无站点/正则/策略配置 |
+| 真实模型第一轮 | Go 日志库请求 → Agent 搜索并 `deck_submit_sources` → 6 条卡片，含 GitHub 头像 URL、简介、★25k/26k/13k、Go、打开链接 |
+| 第二轮 | 勾选 2 条保留、排除 1 条并填原因、补充说明“只要 MIT/BSD，优先结构化日志” → `第 2 轮` 出现；Agent 用时 2 分 09 秒，提交 3 条新候选；旧 120 秒超时会误判并停止刷新，已放宽到 300 秒 |
+| 卡片 | Rust 轮实测 6–7 条；`img.complete=true, naturalWidth=80`；卡片显示头像、描述、stars、语言、链接、☆ 收藏、✓ 保留、✕ 排除 |
+| 跳过 | 排除后点「跳过」→ 候选记录 `verdict: "pending"`（可反悔，不进入保留/排除） |
+| 原因 | 排除原因保存按钮 → 候选记录 `reason: "保存按钮测试-维护不活跃"`；下一轮 prompt 会带排除项与原因 |
+| 收藏夹 | 收藏 smol 后打开收藏夹，显示 smol 与早前 zap；支持搜索、加入资料台、移除；重开仍在 |
+| `/deck` | 输入 `/` 菜单出现「打开资料台 / deck / 把本轮对话的需求交给资料台搜索和筛选」；`/deck` + Enter 打开当前会话资料台 |
+| 对话上下文 | Host 抽取最近对话写入 prompt；实测含 `用户：我在调研 Rust 异步运行时，偏好 tokio…`，且已过滤 `Current runtime context` / `Time sampled…` 等运行时噪声 |
+| 对话卡片 | 卡片显示 `候选资料集 · 12 / 保留 1 / 待处理 11 / 第 2 轮 · 继续找 3 个类似的 Rust 异步运行时…`，与资料台共享状态 |
+| 字体/布局 | 正文 13.5px、卡片标题 14px、轮次 13.5px；2 列自适应卡片网格 |
+| 测试 | 35 passed / 0 failed（新增 rounds/favorites/conversation-context） |
+
+```text
+0.2.0 round1 : 6 cards (zap/logrus/zerolog/charmbracelet/tint/phuslu)
+               avatars https://github.com/<owner>.png?size=80
+0.2.0 round2 : note 只要 MIT/BSD，优先结构化日志 → 3 new candidates,
+               completed in 2m09s (old poll stopped at 2m)
+0.2.3 rust   : 6 cards, avatars naturalWidth=80
+               exclude + reason → reason persisted
+               skip → verdict pending
+               favorite → 收藏夹 smol + zap
+/deck        : menu row 打开资料台; Enter → data-deck-state=empty
+context      : prompt includes 用户：我在调研 Rust… tokio; NOISE=false
+card         : 第 2 轮 · 继续找 3 个类似的 Rust 异步运行…
+tests        : 35 passed / 0 failed
+截图          : logs/shots/deck-v2/（landing、round1、round1-decided、round2、
+               favorites、round-rust、slash-menu、deck-from-command）
+```
+
+已知未做（后续）：`/deck <query>` 带参命令、模型主动 `deck_open` 工具（需要 Host→Client 推送通道）、把某条对话消息作为显式上下文附件、卡片内直接继续下一轮。
+

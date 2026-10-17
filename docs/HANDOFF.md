@@ -5,16 +5,18 @@
 ~~~text
 继续 SourceDeck（dsh-source-deck / 资料筛选台）项目。方案 A 已获用户批准（2026-10-17），不要重新设计，不要改动已批准的设计决策；确需变更先说明理由再改文档。
 
-当前进度（2026-10-17 最终）：
+当前进度（2026-10-17 最终，v2）：
 - 阶段 1（R1 冒烟）、1.5（沙箱升级与适配，基线 0.2.1-rc.2）、1.6（产品 peer 切换）均已完成。
-- **阶段 2（V3a 无模型链路）已完成**：0.1.11 起实现 source_deck 域、deck_submit_sources、sourceDeck Remote、ignorable 会话记录、资料台面板、对话卡片、input.right 入口。
-- **阶段 3（V7 来源范围配置）已完成**：0.1.12 增加 scope_policies 表、三种策略（GitHub/web/LLM 自主）、设置页编辑器、策略摘要与 candidate.policyFlags；29 个单元测试全绿。
-- **阶段 4（V3b 模型链路）已完成**：Agent 实际调用 deck_submit_sources（会话日志 seq19），提交后 session.prompt 摘要含保留 Bun 与策略，下一轮助手明确基于 Bun 继续（seq41）。
-- **阶段 5（V4/V5/V6/V2）已完成**：重启恢复、多会话隔离、设置页清除数据、卸载/重装、peer 负向安装拒绝（0.2.1-rc.2 主机拒绝 peer 0.2.0-rc.2 的包并回滚）。
-- **UI/可用性迭代（阶段 6）已完成**：0.1.17；调研高星右侧面板实践（docs/research/2026-10-17-right-panel-ux-research.md）；面板改为固定头部/进度/策略、过滤+搜索、批量保留/排除、行内理由与撤销、折叠添加、固定提交、K/X/U// 快捷键、空状态引导；默认策略改为 LLM 自主，设置页提供 GitHub 高星/官方文档/LLM 预设与图例；卡片支持行内保留/排除；30 个单元测试全绿。
-- 生产 Desktop 已由用户经 Codex 升级到 0.2.1-rc.2，与沙箱一致；**插件尚未安装到生产**，等待用户明确批准。
-- 证据：docs/SETUP-VERIFICATION.md 夜-4、夜-5、夜-6 段；截图在 sandbox/dsh-desktop/logs/shots/（stage2-*、stage3-*、stage4-*、stage5-*、ui-iteration/），不进 Git。
-- 下一步：用户验收；如批准，按生产安装流程安装 0.1.17。
+- **阶段 2（V3a 无模型链路）已完成**：source_deck 域、deck_submit_sources、sourceDeck Remote、ignorable 会话记录、资料台面板、对话卡片、input.right 入口。
+- **阶段 3（V7 来源范围配置）已完成**：scope_policies 表、三种策略（GitHub/web/LLM 自主）、设置页编辑器、策略摘要与 candidate.policyFlags；现降为可选高级项。
+- **阶段 4（V3b 模型链路）已完成**：Agent 实际调用 deck_submit_sources，提交后 session.prompt 摘要含保留项，下一轮助手基于保留项继续。
+- **阶段 5（V4/V5/V6/V2）已完成**：重启恢复、多会话隔离、设置页清除数据、卸载/重装、peer 负向安装拒绝。
+- **阶段 6（0.1.17 UI 迭代）已完成**：固定头部/进度、过滤+搜索、批量操作、行内理由、折叠添加、快捷键等。
+- **阶段 7（0.2.x v2，用户 2026-10-17 当天修订）已完成**：八表域（新增 rounds/favorites）；首屏自然语言需求，当前会话 LLM 用自身工具搜索；结果按轮次渲染 GitHub 可视化卡片（头像/简介/stars/语言/链接）；✓/✕/跳过/可选原因、补充说明驱动下一轮；收藏夹搜索/加入资料台/移除；`/deck` 命令、Host 抽取最近对话作为搜索上下文、对话卡片显示最近轮次；字体放大、2 列卡片、5 分钟轮询。35 个单元测试全绿。
+- 生产 Desktop 已由用户经 Codex 升级到 0.2.1-rc.2，与沙箱一致；**插件尚未安装到生产**，等待用户明确批准。交付包 `dsh-source-deck-0.2.4.tgz` 由用户自行安装。
+- 证据：docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段；截图在 sandbox/dsh-desktop/logs/shots/（stage2-*、stage3-*、stage4-*、stage5-*、ui-iteration/、deck-v2/），不进 Git。
+- 聊天联动调研：docs/research/2026-10-17-chat-deck-linkage.md；设计修订：docs/design/2026-10-17-solution-design.md §14。
+- 下一步：用户验收 0.2.4；如批准，按生产安装流程安装 tgz。
 
 工作区根目录：E:/DSH-Desktop-Plugin-Dev
 项目目录：E:/DSH-Desktop-Plugin-Dev/dsh-source-deck
@@ -34,9 +36,9 @@ git：本机有 git，位于 C:\Users\Administrator\AppData\Local\hermes\git\cmd
 7. sandbox/dsh-desktop/README.md、baseline.json、status.json（开始前先跑 Get-SandboxStatus.ps1 确认占用）。
 
 验收与后续（全部阶段已完成）：
-- 用户验收：按 docs/SETUP-VERIFICATION.md 夜-4/夜-5 段与截图逐项确认；可重新跑 `node --test tests/*.test.ts`（29 例）。
-- 生产安装（需用户明确批准）：生产已是 0.2.1-rc.2，与 peer 匹配；按生产安装流程走 App「设置 → 插件」或市场接口，不要用 `dsh plugin --profile desktop`。
-- 沙箱开发构建每次都要 bump 版本再 pack/install；当前 profile 依赖指向项目目录里的 dsh-source-deck-0.1.17.tgz（产品 0.1.17，已被 Git 忽略）。
+- 用户验收：按 docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段与截图逐项确认；可重新跑 `node --test tests/*.test.ts`（35 例）。
+- 生产安装（需用户明确批准）：生产已是 0.2.1-rc.2，与 peer 匹配；按生产安装流程走 App「设置 → 插件」并选择本地 tgz，不要用 `dsh plugin --profile desktop`。
+- 沙箱开发构建每次都要 bump 版本再 pack/install；当前 profile 依赖指向项目目录里的 dsh-source-deck-0.2.4.tgz（产品 0.2.4，已被 Git 忽略）。
 
 已决定的基线（2026-10-17，用户）：
 - 产品 peerDependencies 已切换到最新基线：@deepseek-ai/dsh@0.2.1-rc.2、@deepseek-ai/cordis@4.0.5，精确声明；产品版本 0.1.12。

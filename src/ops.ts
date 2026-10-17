@@ -4,14 +4,15 @@
  */
 import { dedupeKey } from './dedupe.ts'
 import { buildPrompt } from './prompt.ts'
+import { buildSearchPrompt } from './search-prompt.ts'
 import {
   computeFlags, DEFAULT_POLICY, normalizePolicy, policySummary,
   type ScopePolicy,
 } from './scope-policy.ts'
 import {
   newId,
-  type CandidateRecord, type DeckStore, type Origin, type SelectionRecord,
-  type SessionActiveRecord, type SetRecord, type SourceRecord, type Verdict,
+  type CandidateRecord, type DeckStore, type FavoriteRecord, type Origin, type RoundRecord,
+  type SelectionRecord, type SessionActiveRecord, type SetRecord, type SourceRecord, type Verdict,
 } from './model.ts'
 
 /** One policy record as stored. */
@@ -51,11 +52,41 @@ export interface CandidateView {
   readonly source: SourceRecord
 }
 
-/** One set with its candidates. */
+/** One round with its record identity. */
+export interface RoundView {
+  readonly roundId: string
+  readonly round: RoundRecord
+}
+
+/** One set with its rounds and candidates. */
 export interface SetView {
   readonly setId: string
   readonly set: SetRecord
+  readonly rounds: readonly RoundView[]
   readonly candidates: readonly CandidateView[]
+}
+
+/** Input for starting one search round. */
+export interface StartRoundInput {
+  readonly sessionId: string
+  readonly request: string
+  readonly note?: string
+  /** Compact recap of the current conversation. */
+  readonly conversation?: string
+}
+
+/** Result of starting one search round. */
+export interface StartRoundResult {
+  readonly roundId: string
+  readonly round: RoundRecord
+  readonly view: SetView
+  readonly promptText: string
+}
+
+/** One favorite as rendered by the library. */
+export interface FavoriteView {
+  readonly favoriteId: string
+  readonly favorite: FavoriteRecord
 }
 
 /** Result of a submission. */
@@ -151,6 +182,43 @@ export async function startNewSet(store: DeckStore, sessionId: string, origin: O
   return setId
 }
 
+function roundsOf(store: DeckStore, setId: string): RoundView[] {
+  const rounds: RoundView[] = []
+  for (const [roundId, value] of store.entries('rounds')) {
+    if (!isRecord(value)) continue
+    const round = value as unknown as RoundRecord
+    if (round.setId === setId) rounds.push({ roundId, round })
+  }
+  return rounds.sort((left, right) => left.round.index - right.round.index)
+}
+
+/**
+ * Start one search round for the session's open set and build the prompt that
+ * asks the current conversation to search and submit candidates.
+ * @param store - deck store.
+ * @param input - user request and optional follow-up note.
+ * @returns the round, the current view, and the model-facing prompt.
+ */
+export async function startRound(store: DeckStore, input: StartRoundInput): Promise<StartRoundResult> {
+  const request = input.request.trim()
+  if (request === '') throw new Error('search request must not be empty')
+  const setId = await ensureActiveSet(store, input.sessionId, 'agent')
+  const previous = roundsOf(store, setId)
+  const round: RoundRecord = {
+    setId,
+    sessionId: input.sessionId,
+    index: previous.length === 0 ? 1 : previous[previous.length - 1]!.round.index + 1,
+    request,
+    ...(input.note === undefined || input.note.trim() === '' ? {} : { note: input.note.trim() }),
+    createdAt: now(),
+  }
+  const roundId = newId('round')
+  await store.put('rounds', roundId, round)
+  await store.put('session_active', input.sessionId, { setId, roundId })
+  const view = await getSet(store, setId)
+  return { roundId, round, view, promptText: buildSearchPrompt({ round, view, ...(input.conversation === undefined ? {} : { conversation: input.conversation }) }) }
+}
+
 /**
  * Add one source and its pending candidate, deduplicating on the normalized key.
  * @param store - deck store.
@@ -193,11 +261,14 @@ export async function addSource(store: DeckStore, input: AddSourceInput): Promis
     }
   }
   const candidateId = newId('cand')
+  const active = store.get('session_active', input.sessionId)
+  const roundId = isRecord(active) && typeof active.roundId === 'string' ? active.roundId : undefined
   const candidate: CandidateRecord = {
     setId,
     sourceId,
     verdict: 'pending',
     createdAt: now(),
+    ...(roundId === undefined ? {} : { roundId }),
     ...(policyFlags.length === 0 ? {} : { policyFlags }),
   }
   await store.put('candidates', candidateId, candidate)
@@ -226,7 +297,7 @@ export async function getSet(store: DeckStore, setId: string): Promise<SetView> 
     })
   }
   candidates.sort((left, right) => left.candidate.createdAt.localeCompare(right.candidate.createdAt))
-  return { setId, set, candidates }
+  return { setId, set, rounds: roundsOf(store, setId), candidates }
 }
 
 /**
@@ -315,11 +386,72 @@ export async function commitSelection(
 }
 
 /**
+ * Save one source to the session-independent favorites library.
+ * @param store - deck store.
+ * @param input - source facts.
+ * @returns the favorite identity.
+ */
+export async function addFavorite(store: DeckStore, input: {
+  title: string
+  url?: string
+  note?: string
+  snippet?: string
+  meta?: SourceRecord['meta']
+}): Promise<FavoriteView> {
+  const title = input.title.trim()
+  if (title === '' && (input.url === undefined || input.url.trim() === '')) {
+    throw new Error('favorite needs a title or url')
+  }
+  const key = dedupeKey({ url: input.url, title })
+  for (const [favoriteId, value] of store.entries('favorites')) {
+    if (!isRecord(value)) continue
+    const favorite = value as unknown as FavoriteRecord
+    if (dedupeKey({ url: favorite.url, title: favorite.title }) === key) return { favoriteId, favorite }
+  }
+  const favoriteId = newId('fav')
+  const favorite: FavoriteRecord = {
+    title: title === '' ? (input.url ?? '').trim() : title,
+    ...(input.url === undefined ? {} : { url: input.url }),
+    ...(input.note === undefined ? {} : { note: input.note }),
+    ...(input.snippet === undefined ? {} : { snippet: input.snippet }),
+    ...(input.meta === undefined ? {} : { meta: input.meta }),
+    addedAt: now(),
+  }
+  await store.put('favorites', favoriteId, favorite)
+  return { favoriteId, favorite }
+}
+
+/**
+ * List saved sources, newest first.
+ * @param store - deck store.
+ * @returns the favorites.
+ */
+export function listFavorites(store: DeckStore): FavoriteView[] {
+  const favorites: FavoriteView[] = []
+  for (const [favoriteId, value] of store.entries('favorites')) {
+    if (!isRecord(value)) continue
+    favorites.push({ favoriteId, favorite: value as unknown as FavoriteRecord })
+  }
+  return favorites.sort((left, right) => right.favorite.addedAt.localeCompare(left.favorite.addedAt))
+}
+
+/**
+ * Remove one favorite.
+ * @param store - deck store.
+ * @param favoriteId - favorite identity.
+ */
+export async function removeFavorite(store: DeckStore, favoriteId: string): Promise<void> {
+  await store.delete('favorites', favoriteId)
+}
+
+/**
  * Delete every record owned by the deck domain.
  * @param store - deck store.
  */
 export async function clearData(store: DeckStore): Promise<void> {
-  for (const table of ['sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active']) {
+  for (const table of [
+    'sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active', 'rounds', 'favorites',
+  ]) {
     const keys = [...store.entries(table)].map(([key]) => key)
     for (const key of keys) await store.delete(table, key)
   }

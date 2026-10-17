@@ -19,6 +19,9 @@ export const DECK_CARD_KIND = 'source-deck-set'
 export interface DeckCardData {
   readonly setId: string
   readonly policySummary?: string
+  readonly roundCount: number
+  readonly latestRoundIndex?: number
+  readonly latestRequest?: string
   readonly candidates: readonly {
     readonly candidateId: string
     readonly title: string
@@ -49,9 +52,13 @@ function dataOf(event: ConversationMatch['event']): DeckCardData {
     ...(candidate.reason === undefined ? {} : { reason: candidate.reason }),
     ...(candidate.policyFlags === undefined ? {} : { policyFlags: candidate.policyFlags }),
   }))
+  const rounds = snapshot.rounds ?? []
+  const latest = rounds[rounds.length - 1]
   return {
     setId: snapshot.setId,
     ...(snapshot.policySummary === undefined ? {} : { policySummary: snapshot.policySummary }),
+    roundCount: rounds.length,
+    ...(latest === undefined ? {} : { latestRoundIndex: latest.index, latestRequest: latest.request }),
     candidates,
     kept: candidates.filter(candidate => candidate.verdict === 'kept').length,
     excluded: candidates.filter(candidate => candidate.verdict === 'excluded').length,

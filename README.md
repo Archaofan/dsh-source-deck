@@ -1,23 +1,24 @@
 # dsh-source-deck
 
-SourceDeck — 资料筛选台。DeepSeek Harness Desktop 插件（Host 半 + Client 半单包）。
+SourceDeck — 资料台。DeepSeek Harness Desktop 插件（Host 半 + Client 半单包）。
 
-Stages one through five are implemented and verified in the sandbox Desktop:
-the third-party `./client` half enters the boot graph; the `sourcedeck` tab,
-its guide entry, the deck panel, the conversation card, and the composer entry
-render; the `source_deck` six-table domain, `deck_submit_sources` tool, and
-`sourceDeck` Remote serve both manual and model-driven submissions; ignorable
-session records replay into the card; a source-scope policy (GitHub / web /
-LLM-freeform) flags candidates from Agent metadata; and restart recovery,
-session isolation, data clearing, uninstall/reinstall, and peer rejection were
-exercised. The panel and card were then iterated for usability: a fixed
-progress/policy header, filter tabs and search, bulk decisions, inline
-exclusion reasons with undo, a collapsed add form, a sticky submit bar,
-keyboard shortcuts, and a neutral LLM-freeform default policy with one-click
-GitHub/docs presets (research in
-`docs/research/2026-10-17-right-panel-ux-research.md`). Evidence is in
-`docs/SETUP-VERIFICATION.md` (夜-4 through 夜-6) and the sandbox screenshots.
-The plugin is not installed into the production Desktop.
+Stages one through six are implemented and verified in the sandbox Desktop. The
+0.2.x product revision turns the deck into a conversation-shaped, LLM-driven
+screening surface: the first screen is a plain “你想找什么？” request; the Host
+sends a structured search prompt into the current session, the Agent uses its
+own search tools, and `deck_submit_sources` results arrive as visual cards
+(GitHub avatar, description, stars, language, link). Each round keeps its
+request and optional note; ✓/✕/skip and an optional exclusion reason feed the
+next round; favorites are saved and searchable; `/deck` opens the deck for the
+current conversation, and the Host includes a compact recap of recent chat
+turns in every search prompt. The old source-scope policy still exists as an
+optional settings surface, but it is no longer required to start. The domain
+now has eight tables (`sets`, `sources`, `candidates`, `selections`,
+`scope_policies`, `session_active`, `rounds`, `favorites`). Evidence is in
+`docs/SETUP-VERIFICATION.md` (夜-4 through 夜-7), chat-linkage research in
+`docs/research/2026-10-17-chat-deck-linkage.md`, and the design revision in
+`docs/design/2026-10-17-solution-design.md` §14. 35 unit tests pass. The plugin
+is not installed into the production Desktop.
 
 ## Build
 
@@ -35,9 +36,5 @@ locally (see the header comment in `tsdown.config.ts`).
 
 `@deepseek-ai/dsh@0.2.1-rc.2` and `@deepseek-ai/cordis@4.0.5`, declared exactly in
 `peerDependencies` (user decision, 2026-10-17). No alpha-only APIs. The sandbox and
-the verified target are both `dsh-v0.2.1-rc.2`; stage-one acceptance passed with the
-product build `0.1.2` (see `docs/SETUP-VERIFICATION.md`).
-
-The production Desktop still runs `0.2.0-rc.2`. Because the exact peer requirement
-is now `0.2.1-rc.2`, this release does not load there; upgrade the production
-Desktop to `0.2.1-rc.2` before installing it.
+the verified target are both `dsh-v0.2.1-rc.2`; the production Desktop has also been
+upgraded to `0.2.1-rc.2`, so this package's peer matches production.

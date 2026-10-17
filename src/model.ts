@@ -1,5 +1,5 @@
 /**
- * SourceDeck data model: the six domain tables and their record fields.
+ * SourceDeck data model: the domain tables and their record fields.
  * Records are plain JSON; the Host validates them before storage.
  */
 import type { SourceMeta } from './scope-policy.ts'
@@ -23,7 +23,7 @@ export interface SourceRecord {
   readonly meta?: SourceMeta
 }
 
-/** One candidate set. */
+/** One candidate set (one screening thread). */
 export interface SetRecord {
   readonly sessionId: string
   readonly origin: Origin
@@ -31,10 +31,23 @@ export interface SetRecord {
   status: 'open' | 'submitted'
 }
 
+/** One search round inside a set. */
+export interface RoundRecord {
+  readonly setId: string
+  readonly sessionId: string
+  readonly index: number
+  readonly request: string
+  readonly note?: string
+  readonly keptCount?: number
+  readonly excludedCount?: number
+  readonly createdAt: string
+}
+
 /** One candidate inside a set. */
 export interface CandidateRecord {
   readonly setId: string
   readonly sourceId: string
+  readonly roundId?: string
   verdict: Verdict
   reason?: string
   decidedAt?: string
@@ -56,10 +69,23 @@ export interface SelectionRecord {
 export interface SessionActiveRecord {
   readonly setId: string
   readonly policyId?: string
+  readonly roundId?: string
+}
+
+/** One saved source, independent of any screening thread. */
+export interface FavoriteRecord {
+  readonly title: string
+  readonly url?: string
+  readonly note?: string
+  readonly snippet?: string
+  readonly meta?: SourceMeta
+  readonly addedAt: string
 }
 
 /** Tables owned by the `source_deck` domain. */
-export const TABLES = ['sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active'] as const
+export const TABLES = [
+  'sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active', 'rounds', 'favorites',
+] as const
 
 /** The storage surface the operations need; the domain handle and tests both provide it. */
 export interface DeckStore {
@@ -70,6 +96,6 @@ export interface DeckStore {
 }
 
 /** Generate one record identity with its table prefix. */
-export function newId(prefix: 'set' | 'src' | 'cand' | 'sel'): string {
+export function newId(prefix: 'set' | 'src' | 'cand' | 'sel' | 'round' | 'fav'): string {
   return `${prefix}-${crypto.randomUUID()}`
 }

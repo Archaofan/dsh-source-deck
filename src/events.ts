@@ -22,11 +22,26 @@ declare module '@deepseek-ai/dsh-session/types' {
       readonly origin: Origin
       readonly status: 'open' | 'submitted'
       readonly policySummary?: string
+      readonly rounds: readonly {
+        readonly roundId: string
+        readonly index: number
+        readonly request: string
+        readonly note?: string
+        readonly createdAt: string
+      }[]
       readonly candidates: readonly {
         readonly candidateId: string
         readonly sourceId: string
+        readonly roundId?: string
         readonly title: string
         readonly url?: string
+        readonly summary?: string
+        readonly repo?: string
+        readonly owner?: string
+        readonly stars?: number
+        readonly language?: string
+        readonly image?: string
+        readonly homepage?: string
         readonly verdict: Verdict
         readonly reason?: string
         readonly policyFlags?: readonly string[]
@@ -74,15 +89,44 @@ export interface DeckSnapshot {
   readonly origin: Origin
   readonly status: 'open' | 'submitted'
   readonly policySummary?: string
+  readonly rounds: readonly {
+    readonly roundId: string
+    readonly index: number
+    readonly request: string
+    readonly note?: string
+    readonly createdAt: string
+  }[]
   readonly candidates: readonly {
     readonly candidateId: string
     readonly sourceId: string
+    readonly roundId?: string
     readonly title: string
     readonly url?: string
+    readonly summary?: string
+    readonly repo?: string
+    readonly owner?: string
+    readonly stars?: number
+    readonly language?: string
+    readonly image?: string
+    readonly homepage?: string
     readonly verdict: Verdict
     readonly reason?: string
     readonly policyFlags?: readonly string[]
   }[]
+}
+
+/** Derive ``owner/repo`` and the owner login from a GitHub URL. */
+function githubOf(url: string | undefined): { repo?: string; owner?: string } {
+  if (url === undefined) return {}
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname !== 'github.com' && parsed.hostname !== 'www.github.com') return {}
+    const [owner, repo] = parsed.pathname.split('/').filter(part => part !== '')
+    if (owner === undefined) return {}
+    return { owner, ...(repo === undefined ? {} : { repo: `${owner}/${repo}` }) }
+  } catch {
+    return {}
+  }
 }
 
 /**
@@ -99,15 +143,34 @@ export function snapshotOf(setId: string, view: SetView, policy?: string): DeckS
     origin: view.set.origin,
     status: view.set.status,
     ...(policy === undefined ? {} : { policySummary: policy }),
-    candidates: view.candidates.map(entry => ({
-      candidateId: entry.candidateId,
-      sourceId: entry.candidate.sourceId,
-      title: entry.source.title,
-      ...(entry.source.url === undefined ? {} : { url: entry.source.url }),
-      verdict: entry.candidate.verdict,
-      ...(entry.candidate.reason === undefined ? {} : { reason: entry.candidate.reason }),
-      ...(entry.candidate.policyFlags === undefined ? {} : { policyFlags: entry.candidate.policyFlags }),
+    rounds: view.rounds.map(({ roundId, round }) => ({
+      roundId,
+      index: round.index,
+      request: round.request,
+      ...(round.note === undefined ? {} : { note: round.note }),
+      createdAt: round.createdAt,
     })),
+    candidates: view.candidates.map(entry => {
+      const github = githubOf(entry.source.url)
+      const meta = entry.source.meta ?? {}
+      return {
+        candidateId: entry.candidateId,
+        sourceId: entry.candidate.sourceId,
+        ...(entry.candidate.roundId === undefined ? {} : { roundId: entry.candidate.roundId }),
+        title: entry.source.title,
+        ...(entry.source.url === undefined ? {} : { url: entry.source.url }),
+        ...(entry.source.note === undefined && meta.description === undefined ? {} : { summary: entry.source.note ?? meta.description }),
+        ...(meta.repo === undefined && github.repo === undefined ? {} : { repo: meta.repo ?? github.repo }),
+        ...(meta.owner === undefined && github.owner === undefined ? {} : { owner: meta.owner ?? github.owner }),
+        ...(meta.stars === undefined ? {} : { stars: meta.stars }),
+        ...(meta.language === undefined ? {} : { language: meta.language }),
+        ...(meta.image === undefined ? {} : { image: meta.image }),
+        ...(meta.homepage === undefined ? {} : { homepage: meta.homepage }),
+        verdict: entry.candidate.verdict,
+        ...(entry.candidate.reason === undefined ? {} : { reason: entry.candidate.reason }),
+        ...(entry.candidate.policyFlags === undefined ? {} : { policyFlags: entry.candidate.policyFlags }),
+      }
+    }),
   }
 }
 

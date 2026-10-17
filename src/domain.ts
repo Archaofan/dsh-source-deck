@@ -76,10 +76,28 @@ function validateCandidate(value: unknown): void {
   requiredString(value.sourceId, 'candidate.sourceId')
   requiredEnum(value.verdict, 'candidate.verdict', ['pending', 'kept', 'excluded'])
   requiredString(value.createdAt, 'candidate.createdAt')
+  if (value.roundId !== undefined) requiredString(value.roundId, 'candidate.roundId')
   if (value.policyFlags !== undefined
     && (!Array.isArray(value.policyFlags) || value.policyFlags.some(flag => typeof flag !== 'string'))) {
     throw new Error('candidate.policyFlags must be an array of strings')
   }
+}
+
+function validateRound(value: unknown): void {
+  if (!isObject(value)) throw new Error('round record must be an object')
+  requiredString(value.setId, 'round.setId')
+  requiredString(value.sessionId, 'round.sessionId')
+  if (typeof value.index !== 'number' || !Number.isInteger(value.index) || value.index < 1) {
+    throw new Error('round.index must be a positive integer')
+  }
+  requiredString(value.request, 'round.request')
+  requiredString(value.createdAt, 'round.createdAt')
+}
+
+function validateFavorite(value: unknown): void {
+  if (!isObject(value)) throw new Error('favorite record must be an object')
+  requiredString(value.title, 'favorite.title')
+  requiredString(value.addedAt, 'favorite.addedAt')
 }
 
 function validatePolicy(value: unknown): void {
@@ -116,6 +134,8 @@ const DOMAIN_SPEC = {
     candidates: { valueSchema: recordSchema(validateCandidate) },
     selections: { valueSchema: recordSchema(validateSelection) },
     scope_policies: { valueSchema: recordSchema(validatePolicy) },
+    rounds: { valueSchema: recordSchema(validateRound) },
+    favorites: { valueSchema: recordSchema(validateFavorite) },
     session_active: { valueSchema: recordSchema(validateSessionActive) },
   },
 } as const

@@ -49,6 +49,15 @@
   color: var(--dsw-text-secondary, currentColor);
 }
 
+.round {
+  margin: 0;
+  font-size: 11px;
+  color: var(--dsw-text-secondary, currentColor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .flags {
   display: flex;
   flex-wrap: wrap;

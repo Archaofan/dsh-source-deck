@@ -37,6 +37,9 @@ export function DeckCard({ node, t, openDeck, decide }: DeckCardProps): ReactNod
           pending: String(data.pending),
         })}</span>
       </div>
+      {data.latestRoundIndex === undefined ? null : (
+        <p className={css.round}>{t('card.round', { index: String(data.latestRoundIndex), request: data.latestRequest ?? '' })}</p>
+      )}
       {data.policySummary === undefined ? null : <p className={css.policy}>{t('policy.bar', { summary: data.policySummary })}</p>}
       <ul className={css.list}>
         {shown.map(candidate => (

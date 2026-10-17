@@ -19,6 +19,16 @@ export interface SourceMeta {
   readonly archived?: boolean
   readonly fork?: boolean
   readonly topics?: readonly string[]
+  /** Short human-readable description shown on the card. */
+  readonly description?: string
+  /** `owner/repo` for a GitHub source, when known. */
+  readonly repo?: string
+  /** GitHub owner login, used for the avatar. */
+  readonly owner?: string
+  /** Explicit card image URL; falls back to the GitHub owner avatar. */
+  readonly image?: string
+  /** Project homepage or docs site. */
+  readonly homepage?: string
 }
 
 /** One policy's parameters. Only fields for the selected kind are meaningful. */

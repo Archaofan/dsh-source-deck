@@ -15,13 +15,21 @@ import type { Context } from '@deepseek-ai/cordis'
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
+import { recentConversation } from './conversation-context.ts'
+import type { Session } from '@deepseek-ai/dsh-session'
 import {
-  addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, setPolicy, startNewSet,
+  addFavorite, addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, listFavorites,
+  removeFavorite, setPolicy, startNewSet, startRound,
 } from './ops.ts'
 import { policySummary, type SourceMeta } from './scope-policy.ts'
 
 /** One operation body shape; operations validate the fields they use. */
 type OperationBody = Record<string, unknown>
+
+/** The owner slice of the agent registry needed for conversation context. */
+interface AgentLookup {
+  get(id: string): { readonly session: Session } | undefined
+}
 
 function bodyOf(raw: string): OperationBody {
   if (raw.trim() === '') return {}
@@ -89,6 +97,11 @@ function metaOf(body: OperationBody): SourceMeta | undefined {
   const archived = flag('archived')
   const fork = flag('fork')
   const topics = list('topics')
+  const description = text('description')
+  const repo = text('repo')
+  const owner = text('owner')
+  const image = text('image')
+  const homepage = text('homepage')
   return {
     ...(stars === undefined ? {} : { stars }),
     ...(pushedAt === undefined ? {} : { pushedAt }),
@@ -98,6 +111,11 @@ function metaOf(body: OperationBody): SourceMeta | undefined {
     ...(archived === undefined ? {} : { archived }),
     ...(fork === undefined ? {} : { fork }),
     ...(topics === undefined ? {} : { topics }),
+    ...(description === undefined ? {} : { description }),
+    ...(repo === undefined ? {} : { repo }),
+    ...(owner === undefined ? {} : { owner }),
+    ...(image === undefined ? {} : { image }),
+    ...(homepage === undefined ? {} : { homepage }),
   }
 }
 
@@ -154,6 +172,37 @@ export class SourceDeckRemote extends TypertRemoteService {
         emitDeckRecord(this.ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot',
           snapshotOf(result.setId, await getSet(store, result.setId), policySummary(await getPolicy(store))))
         return JSON.stringify(result)
+      }
+      case 'startRound': {
+        const sessionId = stringField(args, 'sessionId')
+        const agents = this.ctx.get('agents') as unknown as AgentLookup | undefined
+        const conversation = agents?.get(sessionId) === undefined
+          ? undefined
+          : recentConversation(agents.get(sessionId)!.session)
+        const result = await startRound(await this.getStore(), {
+          sessionId,
+          request: stringField(args, 'request'),
+          ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
+          ...(conversation === undefined ? {} : { conversation }),
+        })
+        return JSON.stringify(result)
+      }
+      case 'listFavorites':
+        return JSON.stringify(listFavorites(await this.getStore()))
+      case 'addFavorite': {
+        const store = await this.getStore()
+        const favorite = await addFavorite(store, {
+          title: optionalString(args, 'title') ?? '',
+          ...(optionalString(args, 'url') === undefined ? {} : { url: optionalString(args, 'url') }),
+          ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
+          ...(optionalString(args, 'snippet') === undefined ? {} : { snippet: optionalString(args, 'snippet') }),
+          ...(metaOf(args) === undefined ? {} : { meta: metaOf(args) }),
+        })
+        return JSON.stringify(favorite)
+      }
+      case 'removeFavorite': {
+        await removeFavorite(await this.getStore(), stringField(args, 'favoriteId'))
+        return JSON.stringify({ ok: true })
       }
       case 'getScopePolicy': {
         const policy = await getPolicy(await this.getStore())

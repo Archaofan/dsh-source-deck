@@ -9,7 +9,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
-import type { CommitResult, SetView, AddSourceResult } from '../ops.ts'
+import type { CommitResult, SetView, AddSourceResult, FavoriteView, StartRoundResult } from '../ops.ts'
 import type { Verdict } from '../model.ts'
 import type { ScopePolicy } from '../scope-policy.ts'
 import { DeckBody } from './DeckBody.tsx'
@@ -97,9 +97,15 @@ export async function apply(ctx: ClientContext): Promise<void> {
       })
       return result.ok
     },
+    startRound: async (sessionId: string, request: string, note?: string) =>
+      await call('startRound', { sessionId, request, ...(note === undefined ? {} : { note }) }) as StartRoundResult,
     loadPolicy: async () => await call('getScopePolicy', {}) as PolicyView,
     savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
     newSet: async (sessionId: string) => await call('newSet', { sessionId }) as { setId: string },
+    listFavorites: async () => await call('listFavorites', {}) as FavoriteView[],
+    addFavorite: async (input: { title: string; url?: string; note?: string; snippet?: string }) =>
+      await call('addFavorite', { ...input }) as FavoriteView,
+    removeFavorite: async (favoriteId: string) => { await call('removeFavorite', { favoriteId }) },
     clearData: async () => { await call('clearData', {}) },
   }
 
@@ -136,6 +142,28 @@ export async function apply(ctx: ClientContext): Promise<void> {
     },
     ScopePolicySection as never,
   ))
+  ctx.inject(['commandUi'], (scope) => {
+    const commands = scope.get('commandUi') as unknown as {
+      register(contribution: {
+        name: string
+        label?(): string
+        description?(): string
+        available(session: unknown): boolean
+        ui: { kind: 'action'; run(session: unknown): void }
+      }): () => void
+    } | undefined
+    if (commands === undefined) return
+    scope.effect(() => commands.register({
+      name: 'deck',
+      label: () => t('command.open'),
+      description: () => t('command.hint'),
+      available: () => true,
+      ui: {
+        kind: 'action',
+        run: () => { openDeck() },
+      },
+    }), 'dsh-source-deck: /deck command')
+  })
   ctx.effect(() => ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register(
     { name: 'sidebar.right.pane.tab', key: DECK_ID, locale: NS, inject: () => ({ deck }) },
     DeckBody as never,
