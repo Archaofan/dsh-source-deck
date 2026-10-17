@@ -1,0 +1,8 @@
+# SourceDeck profile bundle patch.
+# One row over the profile root: the Host half, loaded from the bare package
+# name so the client module system also mounts the ./client half on this row.
+# Row order carries no load semantics (activation is service driven).
+
+- insert:
+    - id: dsh-source-deck
+      name: dsh-source-deck

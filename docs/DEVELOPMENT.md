@@ -12,7 +12,20 @@ pwsh -NoProfile -File ..\sandbox\dsh-desktop\scripts\Start-Desktop.ps1 -Project 
 
 沙箱固定官方 `dsh-v0.2.0-rc.2`，commit `639ed015397290b3745d163aafe02ffee4aa3f84`，与用户日用版本一致。工具链按 RC 自带声明使用本地 pnpm 11.7.0，执行 RC 的 `pnpm run build`；不要套用 alpha 才有的 build:artifacts / build:check。具体准备与启动证据见 `SETUP-VERIFICATION.md` 及沙箱 status.json；维护范围见 VERSION-POLICY.md。
 
-插件包打包和安装命令需在设计后建立项目构建配置。当前没有 package.json、产品代码、已安装的 SourceDeck 插件或实现测试；避免把环境准备误报成 MVP 已完成。
+插件包打包和安装命令（阶段 1 起生效，2026-10-17 实测）：
+
+```powershell
+# 安装依赖（peer 不自动安装；避免拉入 @deepseek-ai/dsh 全家桶的大二进制依赖）
+node ..\sandbox\dsh-desktop\tools\pnpm-11.7.0\package\bin\pnpm.cjs install --config.auto-install-peers=false
+# 构建（tsdown 管 JS；tsc 只发 lib/types；直接跑 tsdown 可绕过 pnpm run 的依赖检查）
+node node_modules\tsdown\dist\run.mjs
+node node_modules\typescript\bin\tsc -p tsconfig.json
+# 打包与安装进沙箱
+npm.cmd pack --pack-destination .
+pwsh -NoProfile -File ..\sandbox\dsh-desktop\scripts\Install-Plugin.ps1 -Project dsh-source-deck -PackagePath .\dsh-source-deck-<version>.tgz
+```
+
+**版本 bump 纪律**：pnpm 对相同 name@version 的 `file:` tgz 不替换已安装内容；每次迭代先 bump `package.json` 的 `version` 再 pack/install。
 
 Git 更新按“检查 → commit → push → 核对 origin”执行。系统 keyring 在受限执行环境下可能读不到，需要该条命令的主机权限；用户已经完成官方 GitHub CLI OAuth 授权，不应因此反复要求重设 Token。该项目使用本地 credential helper 调用 `gh auth git-credential`。
 

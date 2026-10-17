@@ -38,11 +38,23 @@
 
 凭据事故（已按用户决定处置）：同日调试"脱敏"正则时一次失误把日用 `.credentials.yaml` 的多条真实密钥明文打印进对话记录（含 `DEEPSEEK_API_KEY`、`STEPFUN_API_KEY` 与 CODEARTS/TRAE/QODERCN/LOOMY 账号授权、`deepseek-account-platform`）。**用户 2026-10-17 明确决定不轮换，由我负责记录与后续纪律**；完整记录见 [security/2026-10-17-credential-exposure.md](security/2026-10-17-credential-exposure.md)（仅键名，无值）。暴露面仅限本机会话记录，未进任何仓库或沙箱文件。沙箱侧后续只做键级操作，不再输出任何值。
 
+## 2026-10-17 傍晚：阶段 1 插件冒烟的安装链路（实现阶段 R1/V1）
+
+背景：实现阶段开始（方案 A 已批准）。首次通过 `Install-Plugin.ps1` 把第三方插件包装进沙箱 desktop profile，暴露三处沙箱资产问题并修复；均在沙箱内、不进 Git、不碰日用安装。
+
+| 项目 | 证据与结果 |
+|---|---|
+| 官方 CLI 的 pnpm 依赖 | desktop CLI 的 packageManager 硬编码 `<runtime>/pnpm/bin/pnpm.mjs`，沙箱未打包开发构建的 `upstream/apps/desktop/.desktop-build/targets/win-x64/runtime` 只有 bin/office-skills/primary-runtime。复制沙箱 `tools/pnpm-11.7.0/package` 到该 `runtime/pnpm` 后 `node .../pnpm.cjs --version` → `11.7.0`，`dsh plugin --profile desktop add/list` 恢复工作 |
+| StrictMode 下 $LASTEXITCODE | `Invoke-SandboxPnpm`/`Invoke-SandboxDesktopCli`/`Get-UpstreamCommit` 在子进程未设置退出码时读 `$LASTEXITCODE` 抛错；调用前置 `$LASTEXITCODE = 0` 后正常 |
+| 调用方 ErrorActionPreference=Stop | native command 的 stderr 行会变成终止错误导致启动脚本假失败；两个 Invoke 函数内置 `Continue` 并 finally 恢复原值。修复后 `Start-Desktop.ps1` 可重复成功启动 |
+| 版本 bump 纪律 | pnpm 对相同 name@version 的 `file:` tgz 不替换已安装内容（第一次 0.1.0 重装无效）；必须 bump 版本再 pack/install。实测 0.1.1 后 profile 与 node_modules 一致 |
+| 插件安装结果 | profile `dependencies` 增加 `dsh-source-deck: file:...tgz`，`dsh.profile.bundles` 增加 `dsh-source-deck`；官方 CLI add 输出 `Packages: +1` 与 list 表格 |
+| 无密钥冒烟 | 阶段 1 验收不依赖 LLM 凭据；Desktop 启动后 guide 页出现插件入口、tab 打开、placeholder body 渲染（详见实现计划阶段 1 实测记录） |
+
 ## 尚未验证
 
-- **无密钥启动**（不带任何 LLM 凭据的 Desktop 启动与右栏 tab 冒烟）：仍未验证，属实现阶段 V1；与上面的"已配 key 启动"分开记录。
+- **不带任何 LLM 凭据的 Desktop 启动**：仍未单独验证（当前启动均带沙箱 DeepSeek 凭据）；阶段 1 的"无密钥"标准按"验收不调用模型"达成，纯无密钥启动列为阶段 5 附加验证。
 - 截图、完整图形交互流程及通过菜单正常退出。
-- 真实 SourceDeck 包的安装/移除、UI 和 Agent 接续；尚无产品 package.json、产品代码或批准架构。
 - OS 安全隔离和全系统改动审计；本沙箱仅作开发目录与进程配置隔离。
 
 ## 接手

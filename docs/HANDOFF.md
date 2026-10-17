@@ -18,15 +18,21 @@
 5. docs/research/2026-10-17-rc-interface-evidence.md；
 6. E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop/README.md、baseline.json、status.json。
 
-实现顺序按设计 §9 验收表：先做 R1 冒烟（最小 client half + 右栏空 tab 进 desktop boot graph，V0/V1），再做无模型链路（V3a）、策略配置（V7）、模型链路（V3b，沙箱 DeepSeek API 已就绪）、恢复/多会话/停用（V4–V6）、负向兼容（V2）。
+实现顺序按设计 §9 验收表。**R1 冒烟（V0/V1）已完成**（2026-10-17，证据见 implementation/2026-10-17-implementation-plan.md 阶段 1 实测记录）。下一步做无模型链路（V3a），再策略配置（V7）、模型链路（V3b，沙箱 DeepSeek API 已就绪）、恢复/多会话/停用（V4–V6）、负向兼容（V2）。
 
 硬约束：
-- 只维护 0.2.0-rc.2，peer 精确写 "0.2.0-rc.2"；不用 alpha 专有接口。
+- 只维护 0.2.0-rc.2，peer 精确写 "0.2.0-rc.2"（cordis 写沙箱 vendor 版本 4.0.4）；不用 alpha 专有接口。
 - 所有安装与集成验证只用共用沙箱的 Install-Plugin.ps1 / Start-Desktop.ps1；绝不启动或重启日用 DSH（127.0.0.1:19387）、不跑 dsh plugin --profile desktop；最终装到本 DSH 必须经用户明确批准。
 - 沙箱 Desktop 启动：powershell -NoProfile -ExecutionPolicy Bypass -File sandbox/dsh-desktop/scripts/Start-Desktop.ps1 -Project dsh-source-deck；启动日志在 sandbox/dsh-desktop/logs/，内含 dsh web URL（动态端口 + token）。
 - 沙箱 scripts 注释用 ASCII（曾因中文注释导致 PowerShell 解析器行合并）。
 - 凭据：沙箱已按用户指示配好 DeepSeek API；不要再输出任何凭据值；用户已被建议轮换 2026-10-17 泄露的 key。
 - 提交推送后核对 HEAD 与 origin；不提交沙箱、缓存、凭据；失败记录 pending 不隐瞒。
+
+阶段 1 已固化的实现事实（改插件骨架前必读，详见 DEVELOPMENT.md 与实现计划）：
+- 构建=tsdown（lib/*.js）+ tsc（lib/types）；`/client` 必须是 `window.__ModuleLoader__.load({id, factory})` lazy-CJS 格式，本地 tsdown.config.ts 复刻了该预设；外部请求=基线 PLATFORM_MODULES，非基线 @deepseek-ai/* 值导入会被纯度门拒绝（类型 import type 擦除除外）。
+- ctx 上的 `slots`/`locale`/`sidebarRightTabs` 属性来自 `import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'`、`'@deepseek-ai/dsh-client-ui-sidebar-right/client'`、`'@deepseek-ai/dsh-client-ui-slots'` 的声明合并，缺一个 tsc 就报 Property does not exist。
+- tab 类型必须带 guide 条目，否则右栏 guide 页无入口、tab 不可达（files 类型同样如此）。
+- 每次改插件都要 bump version 再 pack/install（pnpm 同版本 file: 包不更新）。
 
 保持中文沟通，先结论后理由，结论附真实命令输出。
 ~~~

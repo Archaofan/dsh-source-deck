@@ -1,17 +1,6 @@
+# Build artifacts and installed dependencies stay out of the repository.
 node_modules/
-dist/
 lib/
-coverage/
-.cache/
-artifacts/
 *.tgz
 *.log
-.env
-.env.*
-!.env.example
-*.local.json
-credentials*
-.dsh/
-desktop-user-data/
 .DS_Store
-Thumbs.db

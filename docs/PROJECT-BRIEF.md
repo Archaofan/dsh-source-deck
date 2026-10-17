@@ -23,7 +23,7 @@
 - 验收：V0–V7（见设计 §9），R1（第三方 client half 进 boot graph）为最高优先冒烟项。
 - 沙箱 LLM API 已按用户指示复用本 DSH 的 DeepSeek API（见 SETUP-VERIFICATION.md 下午记录），凭据事故与轮换提醒同在该文件。
 
-下一阶段：实现计划与开发（遵循已批准设计，不得跳过设计变更流程）。
+下一阶段：实现（遵循已批准设计，不得跳过设计变更流程）。**阶段 1（R1 冒烟）已完成**：第三方 client half 进入沙箱 desktop boot graph，右栏「资料台」tab 与 guide 入口在真实 Desktop 内可见（实测记录见 [implementation/2026-10-17-implementation-plan.md](implementation/2026-10-17-implementation-plan.md)）。后续按阶段 2→5 推进。
 
 ## 证据与局限
 
