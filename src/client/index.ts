@@ -99,15 +99,26 @@ export async function apply(ctx: ClientContext): Promise<void> {
     },
     loadPolicy: async () => await call('getScopePolicy', {}) as PolicyView,
     savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
+    newSet: async (sessionId: string) => await call('newSet', { sessionId }) as { setId: string },
     clearData: async () => { await call('clearData', {}) },
   }
 
   ctx.effect(() => ctx.sidebarRightTabs.register(deckDefinition(t)), 'dsh-source-deck: deck type')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-source-deck: dictionaries')
   const openDeck = (): void => ctx.sidebarRight.openTab(DECK_KIND)
+  const decideFromCard = (candidateId: string, verdict: Verdict): void => {
+    void deck.decide(candidateId, verdict).catch(error => {
+      console.warn('[source-deck] card decision failed', error)
+    })
+  }
   ctx.effect(() => ctx.uiConversation.events.register(deckCardDefinition), 'dsh-source-deck: deck card definition')
   ctx.slots.inject('conversation.chat.node', () => ctx.slots.register(
-    { name: 'conversation.chat.node', key: DECK_CARD_KIND, locale: NS, inject: () => ({ openDeck }) },
+    {
+      name: 'conversation.chat.node',
+      key: DECK_CARD_KIND,
+      locale: NS,
+      inject: () => ({ openDeck, decide: decideFromCard }),
+    },
     DeckCard as never,
   ))
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register(

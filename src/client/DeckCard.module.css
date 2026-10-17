@@ -96,6 +96,37 @@
   color: var(--dsw-text-secondary, currentColor);
 }
 
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action,
+.activeKeep,
+.activeExclude {
+  padding: 2px 7px;
+  font-size: 11px;
+  border-radius: 5px;
+  border: 1px solid var(--dsw-border-subtle, rgba(127, 127, 127, 0.3));
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.action:hover {
+  background: var(--dsw-surface-raised, rgba(127, 127, 127, 0.12));
+}
+
+.activeKeep {
+  border-color: var(--dsw-success, #2f9e44);
+  color: var(--dsw-success, #2f9e44);
+}
+
+.activeExclude {
+  border-color: var(--dsw-danger, #e03131);
+  color: var(--dsw-danger, #e03131);
+}
+
 .more {
   margin: 0;
   font-size: 11px;

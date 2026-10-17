@@ -88,3 +88,60 @@
   font-size: 12px;
   color: var(--dsw-danger, #e03131);
 }
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.presetLabel {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.preset {
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--dsw-border-subtle, rgba(127, 127, 127, 0.3));
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.preset:hover {
+  border-color: var(--dsw-accent, #4c6ef5);
+}
+
+.legend {
+  font-size: 12px;
+  color: var(--dsw-text-secondary, currentColor);
+}
+
+.legend summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--dsw-text-primary, currentColor);
+}
+
+.legendList {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legendList li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.legendList .preset {
+  cursor: default;
+  flex: none;
+}

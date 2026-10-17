@@ -72,6 +72,8 @@ test('normalizePolicy rejects an unknown kind and invalid numbers', () => {
   assert.throws(() => normalizePolicy({ kind: 'github', params: { minStars: -1 } }), /minStars/i)
 })
 
-test('DEFAULT_POLICY is a valid github policy', () => {
-  assert.equal(normalizePolicy(DEFAULT_POLICY).kind, 'github')
+test('DEFAULT_POLICY is a permissive llm-freeform policy', () => {
+  const policy = normalizePolicy(DEFAULT_POLICY)
+  assert.equal(policy.kind, 'llm-freeform')
+  assert.deepEqual(computeFlags(policy, { stars: 1 }, 'https://example.com/a'), [])
 })

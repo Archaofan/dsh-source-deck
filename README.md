@@ -10,8 +10,14 @@ render; the `source_deck` six-table domain, `deck_submit_sources` tool, and
 session records replay into the card; a source-scope policy (GitHub / web /
 LLM-freeform) flags candidates from Agent metadata; and restart recovery,
 session isolation, data clearing, uninstall/reinstall, and peer rejection were
-exercised. Evidence is in `docs/SETUP-VERIFICATION.md` (夜-4 and 夜-5) and the
-sandbox screenshots. The plugin is not installed into the production Desktop.
+exercised. The panel and card were then iterated for usability: a fixed
+progress/policy header, filter tabs and search, bulk decisions, inline
+exclusion reasons with undo, a collapsed add form, a sticky submit bar,
+keyboard shortcuts, and a neutral LLM-freeform default policy with one-click
+GitHub/docs presets (research in
+`docs/research/2026-10-17-right-panel-ux-research.md`). Evidence is in
+`docs/SETUP-VERIFICATION.md` (夜-4 through 夜-6) and the sandbox screenshots.
+The plugin is not installed into the production Desktop.
 
 ## Build
 

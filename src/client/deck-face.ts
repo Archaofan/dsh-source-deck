@@ -18,5 +18,6 @@ export interface DeckFace {
   prompt(sessionId: string, text: string): Promise<boolean>
   loadPolicy(): Promise<PolicyView>
   savePolicy(policy: ScopePolicy): Promise<PolicyView>
+  newSet(sessionId: string): Promise<{ setId: string }>
   clearData(): Promise<void>
 }

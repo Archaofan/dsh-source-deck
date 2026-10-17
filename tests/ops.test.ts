@@ -97,11 +97,27 @@ test('commitSelection stores the selection, marks the set submitted and builds t
   assert.equal(selection?.requestId, 'sel-request-1')
 })
 
-test('clearData removes every record in the five tables', async () => {
+test('adding a source after submission starts a fresh set', async () => {
+  const store = memoryStore()
+  const first = await addSource(store, { sessionId: 's', origin: 'user', title: 'First' })
+  await decide(store, { candidateId: first.candidateId, verdict: 'kept' })
+  await commitSelection(store, { sessionId: 's', setId: first.setId, requestId: 'r1' })
+  const second = await addSource(store, { sessionId: 's', origin: 'user', title: 'Second' })
+  assert.notEqual(second.setId, first.setId)
+  const firstView = await getSet(store, first.setId)
+  const secondView = await getSet(store, second.setId)
+  assert.equal(firstView.set.status, 'submitted')
+  assert.equal(firstView.candidates[0]?.candidate.verdict, 'kept')
+  assert.equal(secondView.set.status, 'open')
+  assert.equal(secondView.candidates.length, 1)
+  assert.equal(secondView.candidates[0]?.candidate.verdict, 'pending')
+})
+
+test('clearData removes every record in the six tables', async () => {
   const store = memoryStore()
   await addSource(store, { sessionId: 's', origin: 'user', title: 'A' })
   await clearData(store)
-  for (const name of ['sets', 'sources', 'candidates', 'selections', 'session_active']) {
+  for (const name of ['sets', 'sources', 'candidates', 'selections', 'scope_policies', 'session_active']) {
     assert.equal([...(store.tables.get(name)?.keys() ?? [])].length, 0)
   }
 })

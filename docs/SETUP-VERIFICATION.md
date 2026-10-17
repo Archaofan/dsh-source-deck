@@ -169,6 +169,45 @@
 | V2 peer 负向 | 构造 peer `@deepseek-ai/dsh@0.2.0-rc.2` 的 `0.1.12-peer-old.tgz` 安装：CLI 拒绝「dsh-source-deck@0.1.12-peer-old is incompatible with dsh 0.2.1-rc.2: requirements {@deepseek-ai/dsh:0.2.0-rc.2}」并自动回滚 `package.json`/lockfile/node_modules；profile 保持 0.1.12 |
 | 工具 | `Remove-Plugin.ps1`（沙箱脚本，加入 scripts 目录；不入项目 Git） |
 
+## 2026-10-17 夜-6：UI / 默认配置 / 可用性迭代（产品 0.1.17）
+
+背景：用户要求功能之外完善 UI、默认配置与舒适性，先调研高星项目的右侧面板实践再迭代。调研记录见 [research/2026-10-17-right-panel-ux-research.md](research/2026-10-17-right-panel-ux-research.md)（VS Code Views、Zotero 7 Item Pane、Plane side peek、Twenty side panel、Continue Chat、SiYuan/Obsidian/Logseq 右栏；星数经 GitHub API 核对）。
+
+| 项目 | 证据与结果 |
+|---|---|
+| 默认策略 | `DEFAULT_POLICY` 改为 `llm-freeform`（指导语「优先官方文档、近期活跃的高星项目；排除营销与低质内容」）；GitHub 500★/6 月改为设置页预设。理由：不预设强门槛，避免新用户被误标记 |
+| 面板结构 | 固定头部（进度条 + 策略 + 刷新）、过滤标签（全部/待处理/保留/排除 + 计数）、搜索、批量栏、可折叠添加表单、固定提交页脚、快捷键提示 |
+| 交互 | 行内保留/排除/撤销；排除理由内联保存；6 秒撤销 toast；`全选当前` + 批量保留/排除；`K` 保留、`X` 排除、`U` 撤销、`/` 聚焦搜索、`Esc` 清空选择 |
+| 空状态 | 标题 + 三步引导 + 直接可用的添加表单；加载时骨架屏 |
+| 提交后 | 提交成功横幅；`继续筛选` 新建空集合（`newSet`），已提交集合不被继续修改；提交后再添加也自动新建集合 |
+| 设置页 | 快速预设（GitHub 高星 / 官方文档优先 / LLM 自主 / 恢复默认）+ 标记图例；保存仍显式 |
+| 卡片 | 每行内联保留/排除；决策后通过 set-snapshot 立即更新计数与行状态；仍保留「在资料台打开」 |
+
+实测（0.1.17，沙箱 0.2.1-rc.2）：
+
+```text
+panel empty : 筛选 | 已处理 0 / 0 | LLM 自主… | 全部 0 待处理 0 保留 0 排除 0 |
+              资料台已就绪 | 三步引导 | 加入候选
+add x2      : 全部 2 / 待处理 2 / 保留 0 / 排除 0 | 全选当前 | 2 项
+search Beta : 仅「示例文章 Beta」一行
+K 键        : 保留 1 / 待处理 1；行显示「保留 | 撤销」
+bulk keep   : 已处理 2 / 2 | 保留 2
+exclude+reason: 示例文章 Beta | 排除 | 标题太泛 | 排除理由
+toast undo  : 已更新《示例文章 Beta》→ 撤销 → 待处理 1
+submit      : 提交给 Agent（2 条保留）→ 已提交，Agent 会收到筛选摘要。
+continue    : 已处理 0 / 0（新集合），已选清空，显示空状态引导
+settings    : 初始 kind=llm-freeform + guidance；GitHub 高星预设 → 500/6；
+              保存 → 策略记录 minStars=500；恢复默认 → llm-freeform
+card        : 「候选资料集 · 2 / 保留 0 / 待处理 2 / Gamma Docs / Delta Blog」；
+              卡片内点「保留」→「保留 1 / 待处理 1」，Gamma 行变「保留 | 撤销」
+tests       : 30 passed / 0 failed（新增 add-after-submission → 新集合）
+截图        : logs/shots/ui-iteration/（panel-empty、panel-added、panel-bulk、
+              panel-reason、panel-submitted、panel-016-*、settings-default、
+              settings-github-saved、card-actions、card-after-keep）
+```
+
+已知未做（记录为后续）：入口按钮未读数 badge（需要新的订阅通道）、历史集合标签页、紧凑/舒适密度切换、长列表虚拟滚动、命令面板集成。
+
 ## 尚未验证
 
 - **安装到生产 Desktop**：生产已升级到 `0.2.1-rc.2`，与产品 peer 匹配；但没有擅自安装，等待用户明确批准。安装走 App「设置 → 插件」或市场接口。

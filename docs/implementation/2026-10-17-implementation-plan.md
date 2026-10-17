@@ -100,6 +100,15 @@
 
 所有阶段结果与未验证项见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-5 段。生产 Desktop 已由用户升级到 `0.2.1-rc.2`，与本产品 peer 匹配；安装到生产等待用户批准。
 
+## 阶段 6：UI / 默认配置 / 可用性迭代 — 已完成（2026-10-17，产品 0.1.17）
+
+- 调研：高星项目的右侧面板/详情面板实践，记录在 [../research/2026-10-17-right-panel-ux-research.md](../research/2026-10-17-right-panel-ux-research.md)。
+- 默认：`llm-freeform` + 指导语；GitHub 高星、官方文档优先作为设置页一键预设；新增“恢复默认”。
+- 面板：固定头部/进度条/策略、过滤标签 + 搜索、批量选择 + 批量保留/排除、折叠添加表单、固定提交页脚、`K/X/U//` 快捷键、加载骨架、空状态引导。
+- 行：保留/排除/撤销、排除理由内联、6 秒撤销 toast；提交后“继续筛选”新建集合，提交后新增也自动新建集合。
+- 卡片：行内保留/排除，事件回写后计数即时更新。
+- 验证：30 个单元测试全绿；沙箱逐步操作记录见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-6 段；截图 `logs/shots/ui-iteration/`。
+
 ## 阶段间纪律
 
 - 每阶段提交推送并核对 HEAD/origin；沙箱、缓存、凭据不进 Git。

@@ -119,7 +119,8 @@ export async function setPolicy(store: DeckStore, input: unknown): Promise<Store
 }
 
 /**
- * Ensure the session has an open set.
+ * Ensure the session has an open set. A submitted set is complete; adding a
+ * source after submission starts a fresh set instead of mutating history.
  * @param store - deck store.
  * @param sessionId - owning session.
  * @param origin - who opened the set when one is created.
@@ -127,7 +128,21 @@ export async function setPolicy(store: DeckStore, input: unknown): Promise<Store
  */
 export async function ensureActiveSet(store: DeckStore, sessionId: string, origin: Origin): Promise<string> {
   const existing = activeSetId(store, sessionId)
-  if (existing !== undefined && store.get('sets', existing) !== undefined) return existing
+  if (existing !== undefined) {
+    const current = store.get('sets', existing)
+    if (isRecord(current) && (current as unknown as SetRecord).status !== 'submitted') return existing
+  }
+  return startNewSet(store, sessionId, origin)
+}
+
+/**
+ * Open a fresh set for one session, replacing the session's active pointer.
+ * @param store - deck store.
+ * @param sessionId - owning session.
+ * @param origin - who opened the set.
+ * @returns the new set id.
+ */
+export async function startNewSet(store: DeckStore, sessionId: string, origin: Origin): Promise<string> {
   const setId = newId('set')
   const set: SetRecord = { sessionId, origin, createdAt: now(), status: 'open' }
   await store.put('sets', setId, set)

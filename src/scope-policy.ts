@@ -43,10 +43,14 @@ export interface ScopePolicy {
   readonly updatedAt?: string
 }
 
-/** The first-run policy: GitHub projects with at least 500 stars updated within six months. */
+/**
+ * First-run policy: no hard thresholds, only the user's stated preference.
+ * A GitHub/star policy is one click away as a preset; making it the default
+ * would flag most sources for users who never asked for that constraint.
+ */
 export const DEFAULT_POLICY: ScopePolicy = {
-  kind: 'github',
-  params: { minStars: 500, updatedWithinMonths: 6, excludeForks: true, excludeArchived: true },
+  kind: 'llm-freeform',
+  params: { guidance: '优先官方文档、近期活跃的高星项目；排除营销与低质内容' },
 }
 
 const KINDS: readonly PolicyKind[] = ['github', 'web', 'llm-freeform']

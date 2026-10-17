@@ -16,7 +16,7 @@ import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
 import {
-  addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, setPolicy,
+  addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, setPolicy, startNewSet,
 } from './ops.ts'
 import { policySummary, type SourceMeta } from './scope-policy.ts'
 
@@ -167,6 +167,11 @@ export class SourceDeckRemote extends TypertRemoteService {
       case 'getActiveSet': {
         const view = await getActiveSet(await this.getStore(), stringField(args, 'sessionId'))
         return JSON.stringify(view ?? null)
+      }
+      case 'newSet': {
+        const sessionId = stringField(args, 'sessionId')
+        const setId = await startNewSet(await this.getStore(), sessionId, 'user')
+        return JSON.stringify({ setId })
       }
       case 'getSet': {
         const view = await getSet(await this.getStore(), stringField(args, 'setId'))

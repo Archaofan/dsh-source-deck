@@ -6,7 +6,7 @@
  */
 import { useEffect, useState, type ReactNode } from 'react'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import type { PolicyKind, ScopePolicy } from '../scope-policy.ts'
+import { DEFAULT_POLICY, type PolicyKind, type ScopePolicy } from '../scope-policy.ts'
 import type { DeckFace } from './deck-face.ts'
 import type {} from './locales.ts'
 import css from './ScopePolicySection.module.css'
@@ -132,6 +132,37 @@ export function ScopePolicySection({ t, deck }: ScopePolicySectionProps): ReactN
     <div className={css.root} data-deck-settings="scope-policy">
       <h2 className={css.title}>{t('settings.title')}</h2>
       <p className={css.note}>{t('settings.description')}</p>
+
+      <div className={css.presets}>
+        <span className={css.presetLabel}>{t('settings.presets')}</span>
+        <button type="button" className={css.preset}
+          onClick={() => setDraft(draftOf({
+            kind: 'github',
+            params: { minStars: 500, updatedWithinMonths: 6, excludeForks: true, excludeArchived: true },
+          }))}>{t('settings.preset.github')}</button>
+        <button type="button" className={css.preset}
+          onClick={() => setDraft(draftOf({ kind: 'web', params: { preferOfficialDocs: true } }))}>
+          {t('settings.preset.web')}
+        </button>
+        <button type="button" className={css.preset}
+          onClick={() => setDraft(draftOf({ kind: 'llm-freeform', params: { guidance: '' } }))}>
+          {t('settings.preset.llm')}
+        </button>
+        <button type="button" className={css.preset} onClick={() => setDraft(draftOf(DEFAULT_POLICY))}>
+          {t('settings.preset.reset')}
+        </button>
+      </div>
+
+      <details className={css.legend}>
+        <summary>{t('settings.legend')}</summary>
+        <p className={css.note}>{t('settings.legendHint')}</p>
+        <ul className={css.legendList}>
+          {(['stars-below', 'stale', 'language-not-allowed', 'license-not-allowed', 'topic-missing',
+            'fork', 'archived', 'domain-blocked', 'domain-not-allowed'] as const).map(flag => (
+            <li key={flag}><span className={css.preset}>{t(`flag.${flag}` as const)}</span>{t(`flag.${flag}.hint` as const)}</li>
+          ))}
+        </ul>
+      </details>
 
       <label className={css.field}>
         <span className={css.label}>{t('settings.kind')}</span>

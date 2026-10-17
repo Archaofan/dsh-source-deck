@@ -24,8 +24,9 @@ function memoryStore(): DeckStore & { tables: Map<string, Map<string, unknown>> 
   }
 }
 
-test('default policy flags a low-star candidate but keeps it pending', async () => {
+test('a GitHub policy flags a low-star candidate but keeps it pending', async () => {
   const store = memoryStore()
+  await setPolicy(store, { kind: 'github', params: { minStars: 500, updatedWithinMonths: 6 } })
   const added = await addSource(store, {
     sessionId: 's', origin: 'agent', title: 'Low star repo', url: 'https://github.com/a/low',
     meta: { stars: 12, pushedAt: '2026-09-01T00:00:00Z' },
