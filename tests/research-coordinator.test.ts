@@ -119,3 +119,17 @@ test('runtime creation hook scopes restrictions to assigned workers', async () =
   assert.deepEqual(mask, ['web_search', 'web_fetch', 'deck_submit_sources'])
   assert.ok(guard({ name: 'write_file' }))
 })
+
+test('runtime looks up inherited preset tools through the worker scope', async () => {
+  const { createResearchRuntime } = await import('../src/research-runtime.ts')
+  let listener: any; let mask: string[] = []
+  const ctx = { effect: (f: any) => f(), on: (_name: string, f: any) => { listener = f; return () => {} } }
+  const worker: any = { session: { id: 'worker' }, ctx: {} }
+  worker.ctx.tools = {
+    get: (name: string, scope: any) => name === 'deck_submit_sources' || scope === worker ? {} : undefined,
+    restrict: (filter: any) => { mask = filter.allow; return () => {} }, guard: () => () => {}, presentAs: () => () => {},
+  }
+  createResearchRuntime(ctx as any, async () => ({ parentSessionId: 'main', setId: 'set', roundId: 'r', workerSessionId: 'worker', requestId: 'req' }))
+  await listener({ agent: worker })
+  assert.deepEqual(mask, ['web_search', 'web_fetch', 'deck_submit_sources'])
+})

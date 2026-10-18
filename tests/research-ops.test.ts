@@ -2,7 +2,20 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { addSource, commitSelection, decide, getSet, startNewSet } from '../src/ops.ts'
 import { memoryStore } from './memory-store.ts'
-import { prepareResearchRound, finishResearchRound, requireResearchRound, interruptResearchRounds, resolveResearchTarget } from '../src/research-ops.ts'
+import { prepareResearchRound, finishResearchRound, requireResearchRound, interruptResearchRounds, resolveResearchTarget, setResearchRunning } from '../src/research-ops.ts'
+
+test('async persistence preserves the first terminal state during concurrent startup and completion', async () => {
+  for (const race of ['startup', 'completion']) {
+    const store = memoryStore(true)
+    const { target } = await prepareResearchRound(store, { sessionId: 's', request: 'Find', workerSessionId: 'w', requestId: race, mode: 'new' })
+    await Promise.all([
+      finishResearchRound(store, { target, status: 'cancelled' }),
+      race === 'startup' ? setResearchRunning(store, target) : finishResearchRound(store, { target, status: 'completed' }),
+    ])
+    assert.equal(requireResearchRound(store, target).status, 'cancelled')
+    await assert.rejects(addSource(store, { sessionId: 's', origin: 'agent', title: 'Late', target }), /closed/)
+  }
+})
 
 test('late_result_keeps_original_target', async () => {
   const store = memoryStore()
@@ -11,6 +24,19 @@ test('late_result_keeps_original_target', async () => {
   const result = await addSource(store, { sessionId: 's', origin: 'agent', title: 'A', target: { setId: a } })
   assert.equal(result.setId, a)
   assert.equal((await getSet(store, b)).candidates.length, 0)
+})
+
+test('concurrent worker and manual additions deduplicate through async persistence', async () => {
+  const store = memoryStore(true)
+  const { target } = await prepareResearchRound(store, { sessionId: 's', request: 'Find', workerSessionId: 'w', requestId: 'r', mode: 'new' })
+  const [worker, manual] = await Promise.all([
+    addSource(store, { sessionId: 's', origin: 'agent', url: 'https://github.com/a/b', target }),
+    addSource(store, { sessionId: 's', origin: 'user', url: 'https://github.com/a/b', target: { setId: target.setId } }),
+  ])
+  assert.equal(worker.sourceId, manual.sourceId)
+  assert.equal(worker.candidateId, manual.candidateId)
+  assert.equal([...store.entries('sources')].length, 1)
+  assert.equal((await getSet(store, target.setId)).candidates.length, 1)
 })
 
 test('submitted_set_is_immutable', async () => {

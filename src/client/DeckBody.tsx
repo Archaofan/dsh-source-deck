@@ -7,6 +7,7 @@ import type { DeckFace } from './deck-face.ts'
 import type { DeckKey } from './locales.ts'
 import { CandidateCard } from './CandidateCard.tsx'
 import { ComparePanel } from './ComparePanel.tsx'
+import { CandidateMutations } from './candidate-mutations.ts'
 import { safeWebUrl } from './source-presentation.ts'
 import css from './DeckBody.module.css'
 
@@ -30,6 +31,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const [notice, setNotice] = useState<string | null>(null)
   const [operations, setOperations] = useState<ReadonlySet<string>>(new Set())
   const inFlight = useRef(new Set<string>())
+  const candidateMutations = useRef(new CandidateMutations())
   const readSequence = useRef(0)
   const owner = `${sessionId}:${targetSetId ?? 'active'}`
   const currentOwner = useRef(owner); currentOwner.current = owner
@@ -80,10 +82,13 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     if (currentOwner.current !== owner) return
     setTargetSetId(created.setId); setQuery(''); setFilter('all'); setMode('deck'); setCompareOpen(false)
   })
-  const decide = (entry: CandidateView, verdict: Verdict, reason?: string) => operate(`candidate:${entry.candidateId}`, async () => {
-    await deck.decide(entry.candidateId, verdict, reason ?? currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason)
-    await refresh()
-  })
+  const decide = (entry: CandidateView, verdict: Verdict, reason?: string) => {
+    const savedReason = reason ?? currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason
+    return candidateMutations.current.run(entry.candidateId, async () => {
+      await deck.decide(entry.candidateId, verdict, savedReason)
+      await refresh()
+    }).catch(caught => { if (currentOwner.current === owner) setError(caught instanceof Error ? caught.message : String(caught)) })
+  }
   const favoriteKey = (url?: string, title?: string) => url ?? title ?? ''
   const toggleFavorite = (entry: CandidateView) => operate(`favorite:${entry.candidate.sourceId}`, async () => {
     const saved = favorites.find(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))
@@ -129,7 +134,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     reason={currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
     favorite={favorites.some(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))}
     compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly}
-    busy={operations.has(`candidate:${entry.candidateId}`) || operations.has(`favorite:${entry.candidate.sourceId}`)}
+    busy={operations.has(`favorite:${entry.candidate.sourceId}`)}
     onReason={value => patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } })}
     onDecide={verdict => void decide(entry, verdict)}
     onSaveReason={() => { const reason = currentDraft.reasons[entry.candidateId]; if (reason !== undefined && reason !== (entry.candidate.reason ?? '')) void decide(entry, entry.candidate.verdict, reason) }}

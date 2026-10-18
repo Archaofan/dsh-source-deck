@@ -1,6 +1,7 @@
 /** Durable research identity. No Agent/runtime objects enter storage. */
 import type { DeckStore, ResearchStatus, ResearchTarget, RoundRecord } from './model.ts'
 import { getActiveSet, getSet, startNewSet, startRound, type StartRoundInput, type StartRoundResult } from './ops.ts'
+import { withStoreLock } from './store-lock.ts'
 
 export interface PrepareResearchInput extends StartRoundInput {
   readonly requestId: string
@@ -53,25 +54,32 @@ export async function prepareResearchRound(store: DeckStore, input: PrepareResea
 }
 
 export async function setResearchRunning(store: DeckStore, target: ResearchTarget): Promise<void> {
-  const round = requireResearchRound(store, target)
-  if (round.status === 'starting') await store.put('rounds', target.roundId, { ...round, status: 'running' })
+  await withStoreLock(store, `round:${target.roundId}`, async () => {
+    const round = requireResearchRound(store, target)
+    if (round.status === 'starting') await store.put('rounds', target.roundId, { ...round, status: 'running' })
+  })
 }
 
 export async function finishResearchRound(store: DeckStore, input: {
   target: ResearchTarget; status: Exclude<ResearchStatus, 'starting' | 'running'>; diagnostic?: string
 }): Promise<RoundRecord> {
+  return withStoreLock(store, `round:${input.target.roundId}`, async () => {
   const round = requireResearchRound(store, input.target)
   if (round.status !== 'starting' && round.status !== 'running') return round
   const next = { ...round, status: input.status, endedAt: new Date().toISOString(), ...(input.diagnostic ? { diagnostic: input.diagnostic.slice(0, 1000) } : {}) }
   await store.put('rounds', input.target.roundId, next)
   return next
+  })
 }
 
 export async function interruptResearchRounds(store: DeckStore): Promise<void> {
   for (const [roundId, raw] of store.entries('rounds')) {
     const round = raw as RoundRecord
-    if (round.status === 'starting' || round.status === 'running') {
-      await store.put('rounds', roundId, { ...round, status: 'interrupted', endedAt: new Date().toISOString(), diagnostic: 'Host restarted; retry this research.' })
-    }
+    await withStoreLock(store, `round:${roundId}`, async () => {
+      const current = store.get('rounds', roundId) as RoundRecord | undefined
+      if (current?.status === 'starting' || current?.status === 'running') {
+        await store.put('rounds', roundId, { ...current, status: 'interrupted', endedAt: new Date().toISOString(), diagnostic: 'Host restarted; retry this research.' })
+      }
+    })
   }
 }

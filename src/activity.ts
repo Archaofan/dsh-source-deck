@@ -1,5 +1,6 @@
 import type { DeckStore, RoundRecord, SessionActiveRecord } from './model.ts'
 import { ensureActiveSet, getSet } from './ops.ts'
+import { withStoreLock } from './store-lock.ts'
 
 export interface DeckActivity {
   readonly sessionId: string
@@ -13,8 +14,11 @@ export async function requestDeckOpen(store: DeckStore, sessionId: string, setId
   const target = setId ?? await ensureActiveSet(store, sessionId, 'user')
   const view = await getSet(store, target)
   if (view.set.sessionId !== sessionId) throw new Error('deck does not belong to this session')
-  const previous = store.get('session_active', sessionId) as SessionActiveRecord | undefined
-  await store.put('session_active', sessionId, { ...previous, setId: target, ...(roundId ? { roundId } : {}), openRevision: crypto.randomUUID() })
+  await withStoreLock(store, `active:${sessionId}`, async () => {
+    const previous = store.get('session_active', sessionId) as SessionActiveRecord | undefined
+    if (previous?.setId !== target || (roundId && previous.roundId !== roundId)) return
+    await store.put('session_active', sessionId, { ...previous, openRevision: crypto.randomUUID() })
+  })
 }
 export async function getDeckActivity(store: DeckStore, sessionId: string): Promise<DeckActivity> {
   const pointer = store.get('session_active', sessionId) as SessionActiveRecord | undefined

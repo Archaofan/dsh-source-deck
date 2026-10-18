@@ -3,6 +3,19 @@ import test from 'node:test'
 import { memoryStore } from './memory-store.ts'
 import { prepareResearchRound } from '../src/research-ops.ts'
 
+test('late research opening cannot replace a newer topic or its open intent', async () => {
+  const { requestDeckOpen, getDeckActivity } = await import('../src/activity.ts')
+  const { startNewSet } = await import('../src/ops.ts')
+  const store = memoryStore(true)
+  const old = await prepareResearchRound(store, { sessionId: 's', request: 'Old', workerSessionId: 'w', requestId: 'r', mode: 'new' })
+  const current = await startNewSet(store, 's', 'user')
+  await requestDeckOpen(store, 's')
+  const before = await getDeckActivity(store, 's')
+  await requestDeckOpen(store, 's', old.target.setId, old.roundId)
+  assert.equal((await getDeckActivity(store, 's')).setId, current)
+  assert.deepEqual(await getDeckActivity(store, 's'), before)
+})
+
 test('Host deck command opens bare invocation and forwards Chinese arguments once', async () => {
   const { registerDeckCommands } = await import('../src/commands.ts')
   const { getDeckActivity } = await import('../src/activity.ts')

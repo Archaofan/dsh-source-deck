@@ -164,12 +164,14 @@ export async function setPolicy(store: DeckStore, input: unknown): Promise<Store
  * @returns the active set id.
  */
 export async function ensureActiveSet(store: DeckStore, sessionId: string, origin: Origin): Promise<string> {
+  return withStoreLock(store, `active:${sessionId}`, async () => {
   const existing = activeSetId(store, sessionId)
   if (existing !== undefined) {
     const current = store.get('sets', existing)
     if (isRecord(current) && (current as unknown as SetRecord).status !== 'submitted') return existing
   }
-  return startNewSet(store, sessionId, origin)
+  return startNewSetLocked(store, sessionId, origin)
+  })
 }
 
 /**
@@ -180,6 +182,9 @@ export async function ensureActiveSet(store: DeckStore, sessionId: string, origi
  * @returns the new set id.
  */
 export async function startNewSet(store: DeckStore, sessionId: string, origin: Origin): Promise<string> {
+  return withStoreLock(store, `active:${sessionId}`, () => startNewSetLocked(store, sessionId, origin))
+}
+async function startNewSetLocked(store: DeckStore, sessionId: string, origin: Origin): Promise<string> {
   const setId = newId('set')
   const set: SetRecord = { sessionId, origin, createdAt: now(), status: 'open' }
   await store.put('sets', setId, set)
@@ -223,7 +228,10 @@ export async function startRound(store: DeckStore, input: StartRoundInput): Prom
   }
   const roundId = newId('round')
   await store.put('rounds', roundId, round)
-  await store.put('session_active', input.sessionId, { setId, roundId })
+  await withStoreLock(store, `active:${input.sessionId}`, async () => {
+    const active = store.get('session_active', input.sessionId) as SessionActiveRecord | undefined
+    if (active?.setId === setId) await store.put('session_active', input.sessionId, { setId, roundId })
+  })
   const view = await getSet(store, setId)
   return { roundId, round, view, promptText: buildSearchPrompt({ round, view, ...(input.conversation === undefined ? {} : { conversation: input.conversation }) }) }
 }
@@ -236,6 +244,11 @@ export async function startRound(store: DeckStore, input: StartRoundInput): Prom
  */
 export async function addSource(store: DeckStore, input: AddSourceInput): Promise<AddSourceResult> {
   const key = dedupeKey({ url: input.url, title: input.title })
+  return withStoreLock(store, `source:${key}`, () => input.target?.roundId
+    ? withStoreLock(store, `round:${input.target.roundId}`, () => addSourceLocked(store, input, key))
+    : addSourceLocked(store, input, key))
+}
+async function addSourceLocked(store: DeckStore, input: AddSourceInput, key: string): Promise<AddSourceResult> {
   const policy = await getPolicy(store)
   const policyFlags = computeFlags(policy, input.meta ?? {}, input.url)
   const setId = input.target?.setId ?? await ensureActiveSet(store, input.sessionId, input.origin)

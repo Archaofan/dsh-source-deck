@@ -10,7 +10,7 @@ export function researchToolGuard(execution: { readonly name: string }): string 
   return (READ_TOOLS as readonly string[]).includes(execution.name) ? undefined : 'SourceDeck research permits only web search, web reading and source submission.'
 }
 interface ScopedTools {
-  get(name: string): unknown
+  get(name: string, scope?: ResearchParent): unknown
   restrict(filter: { allow: readonly string[] }): () => void
   guard(check: typeof researchToolGuard): () => void
   presentAs(mode: 'native'): () => void
@@ -30,11 +30,11 @@ export function createResearchRuntime(ctx: Context, targetForWorker: (workerId: 
     if (!await targetForWorker(agent.session.id) || installed.has(agent)) return
     const tools = agent.ctx.tools
     if (!tools?.restrict || !tools.guard || !tools.presentAs) throw new Error('RC research tool restrictions are unavailable')
-    // Mask globals and separately guard scoped capabilities, which restrict() cannot mask.
-    tools.restrict({ allow: READ_TOOLS.filter(name => tools.get(name) !== undefined) })
+    // Preset tools are inherited scope entries. Omitted scope reads only globals.
+    tools.restrict({ allow: READ_TOOLS.filter(name => tools.get(name, agent) !== undefined) })
     tools.guard(researchToolGuard)
     tools.presentAs('native')
-    for (const name of READ_TOOLS) if (!tools.get(name)) throw new Error(`Research requires ${name}; enable the sandbox web tools first.`)
+    for (const name of READ_TOOLS) if (!tools.get(name, agent)) throw new Error(`Research requires ${name}; enable the sandbox web tools first.`)
     installed.add(agent)
   }), 'dsh-source-deck: research tool scope')
   return {
