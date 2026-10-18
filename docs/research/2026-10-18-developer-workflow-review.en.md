@@ -77,7 +77,7 @@ Build exports, injection and bundle purity must still be checked during implemen
 
 ### Screening and comparison
 
-Use a single-column default, with a two-column wide-panel alternative. Show topic/round/state, recent searches and favorites; provide status filters and current-topic search. Render manual and round candidates through the same reusable component.
+The user confirmed one responsive layout on 2026-10-18: **two columns by default, automatically collapsing to one when the deck panel becomes too narrow, then restoring two when widened**. Do not expose these as separate design choices or require a manual toggle. Measure the panel's own content width, with an initial breakpoint around 620 CSS px to refine in the official sandbox. Cap at two columns, retain readable typography, and preserve screening/comparison/reason/round state across reflow. Show topic/round/state, recent searches and favorites; provide status filters and current-topic search. Render manual and round candidates through the same reusable component.
 
 Each candidate shows its repository/link, purpose, suitability, limits/unknowns, license/maintenance/language, auxiliary stars and provenance/time. Keep/exclude are durable decisions; comparison selection is independent. Reasons are optional and retain their draft on failure. Provide undo.
 
@@ -99,4 +99,4 @@ Proposed focused boundaries are a shared CandidateItem, SearchHeader, CompareVie
 
 Cover late/cross-topic results, empty/duplicate completion, idempotent retries, read-only submitted sets, old-record compatibility, false/thrown sends, remount and session-switch races, mixed candidate groups, and keyboard/IME exclusions. Then build/pack with exact peers and lazy-CJS, bump before sandbox installation, and use the approved installer. Verify narrow/wide panels, zoom, long bilingual text, focus, screenshots and a real two-round model workflow. Synchronize Chinese/English user documentation. Production remains unchanged.
 
-The pending decision is direction A with a single-column default, independent comparison, direct commands and correctness first. Formal design and implementation planning follow that review; implementation has not begun.
+The responsive column behavior is confirmed; the overall direction A workflow, with independent comparison, direct commands and correctness first, remains pending review. Formal design and implementation planning follow that review; implementation has not begun.

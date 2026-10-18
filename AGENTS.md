@@ -2,7 +2,7 @@
 
 同时遵守父目录 `E:/DSH-Desktop-Plugin-Dev/AGENTS.md` 和 README.md。工作目录固定为本项目文件夹。
 
-**本轮迭代（2026-10-18）**：用户要求接手调研、优化开发者工作流/UI/触发，优先选择“找开源库、比较技术方案”。已形成[调研与待评审提案](docs/research/2026-10-18-developer-workflow-review.md)（[English](docs/research/2026-10-18-developer-workflow-review.en.md)），含纯内存缺陷复现、固定 RC 命令接口证据、三种方向与推荐方案。建议可靠性先行，再做带参 `/deck`、单列筛选/独立对比及历史定位。**尚未获得本轮设计评审批准，不改产品代码/依赖/版本，不把提案当已实现功能**。既有方案 A/v2 保留；本轮变更需完成设计评审。35 例基线测试复跑通过；探针观察到迟到结果归错轮次/主题、重复提交生成多记录。当前沙箱空闲，CheckOnly 通过，本轮未启动 Desktop 或调用模型。
+**本轮迭代（2026-10-18）**：用户要求接手调研、优化开发者工作流/UI/触发，优先选择“找开源库、比较技术方案”。已形成[调研与待评审提案](docs/research/2026-10-18-developer-workflow-review.md)（[English](docs/research/2026-10-18-developer-workflow-review.en.md)），含纯内存缺陷复现、固定 RC 命令接口证据、三种方向与推荐方案。建议可靠性先行，再做带参 `/deck`、自适应卡片筛选/独立对比及历史定位。**用户已确认布局为默认双列、窄面板自动单列，以面板自身宽度判断；不再提供两种布局选项。整体工作流尚未获本轮设计评审批准，不改产品代码/依赖/版本，不把提案当已实现功能**。既有方案 A/v2 保留；本轮变更需完成设计评审。35 例基线测试复跑通过；探针观察到迟到结果归错轮次/主题、重复提交生成多记录。当前沙箱空闲，CheckOnly 通过，本轮未启动 Desktop 或调用模型。
 
 **当前状态（2026-10-18，v2 + 市场提交）**：方案 A 及其 2026-10-17 v2 修订（LLM 搜索轮次、聊天联动）已完成并通过沙箱验证。产品 `0.2.5`，peer 精确 `@deepseek-ai/dsh@0.2.1-rc.2`、cordis `4.0.5`，生产 Desktop 已由用户经 Codex 升级到 `0.2.1-rc.2`（与沙箱一致）。功能：八表域（`sets/sources/candidates/selections/scope_policies/session_active/rounds/favorites`）、`deck_submit_sources` 工具、自建 `sourceDeck` Remote、`ignorable` 会话记录；资料台首屏是一句自然语言需求，当前会话的 LLM 用自身搜索工具查找，结果按轮次渲染为 GitHub 可视化卡片（头像/简介/stars/语言/链接）；✓ 保留、✕ 排除、跳过、可选原因、补充说明驱动下一轮；收藏夹可搜索/加入资料台/移除；`/deck` 命令、Host 抽取最近对话作为搜索上下文、对话卡片展示最近轮次；字体放大、2 列卡片、5 分钟轮询。来源范围策略保留为可选高级项，不再要求首次配置。验收覆盖真实模型两轮搜索、勾叉/原因/跳过、收藏、`/deck`、对话上下文、重启恢复、多会话隔离、清除/卸载重装；35 个单元测试全绿。证据见 docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段、docs/research/2026-10-17-chat-deck-linkage.md、docs/design/2026-10-17-solution-design.md §14。**未安装到生产**，生产仍为 0.1.17；交付包由用户自行在本 DSH 安装。
 
