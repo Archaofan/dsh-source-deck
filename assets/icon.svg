@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 128 128" role="img" aria-label="SourceDeck">
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="#17243d"/>
+  <rect x="28" y="26" width="62" height="76" rx="10" transform="rotate(-10 59 64)" fill="#4d7bff"/>
+  <rect x="38" y="27" width="62" height="76" rx="10" transform="rotate(9 69 65)" fill="#39c3b6"/>
+  <rect x="30" y="27" width="62" height="76" rx="10" fill="#f3f7ff"/>
+  <rect x="41" y="41" width="40" height="9" rx="4.5" fill="#4d6fe7"/>
+  <rect x="41" y="59" width="31" height="6" rx="3" fill="#93a7cd"/>
+  <rect x="41" y="72" width="23" height="6" rx="3" fill="#93a7cd"/>
+  <circle cx="87" cy="88" r="20" fill="#37d2b5"/>
+  <path d="m77 88 7 7 13-15" fill="none" stroke="#17243d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

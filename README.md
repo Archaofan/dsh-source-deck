@@ -148,6 +148,7 @@ npm pack
 - [设计（含 §14 v2 修订）](docs/design/2026-10-17-solution-design.md)
 - [聊天 ↔ 资料台联动调研](docs/research/2026-10-17-chat-deck-linkage.md)
 - [开发者工作流调研与下一轮提案（待设计评审）](docs/research/2026-10-18-developer-workflow-review.md)
+- [v3 完整设计：后台研究、对话引用与深浅主题（待书面审阅）](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [验收记录（夜-4 至夜-7）](docs/SETUP-VERIFICATION.md)
 - [实现计划](docs/implementation/2026-10-17-implementation-plan.md)
 - [版本策略](docs/VERSION-POLICY.md)

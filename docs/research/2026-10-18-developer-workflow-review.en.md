@@ -2,6 +2,8 @@
 
 2026-10-18. **Research complete; design review pending. No product code, dependency, or version changes.** [Chinese, primary document](2026-10-18-developer-workflow-review.md).
 
+The user subsequently selected a background research child, complete light/dark support, natural-language starts and editable main-composer references. These revise earlier proposals below that used serial main-Agent searches/direct submission. The latest review entry is the [complete v3 written design](../superpowers/specs/2026-10-18-sourcedeck-v3-design.en.md). Custom icon assets are prepared; core code and the package manifest remain unchanged.
+
 ## Intent and constraints
 
 The user prioritized **finding open-source libraries and comparing technical approaches**. The intended outcome is a direct entry from the current chat, useful suitability and tradeoff information, independent comparison and screening decisions, and a clear handoff back to the same Agent conversation.
