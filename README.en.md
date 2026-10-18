@@ -6,7 +6,7 @@ SourceDeck is a developer research workbench for DeepSeek Harness Desktop. Start
 
 ## Screenshots
 
-Real Host screenshots (light / dark) showing background research results, per-source keep/exclude decisions, screening reasons, and the reference entry:
+Real Host screenshots (light / dark), using mainstream agent projects such as Hermes Agent and OpenClaw, showing background research results, per-source keep/exclude decisions, screening reasons, and the reference entry:
 
 | Light | Dark |
 |---|---|

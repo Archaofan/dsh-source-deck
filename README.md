@@ -6,7 +6,7 @@ SourceDeck 是 DeepSeek Harness Desktop 的开发资料工作台。用对话启�
 
 ## 界面预览
 
-真实 Host 截图（浅色 / 深色），展示后台研究结果、逐条保留 / 排除、筛选原因与引用入口：
+真实 Host 截图（浅色 / 深色），以 Hermes Agent、OpenClaw 等主流 Agent 项目为例，展示后台研究结果、逐条保留 / 排除、筛选原因与引用入口：
 
 | 浅色 | 深色 |
 |---|---|
