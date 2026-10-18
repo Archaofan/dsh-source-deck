@@ -1,9 +1,8 @@
 /**
  * `deck_submit_sources` tool: the Agent's path into the deck.
  *
- * The deck's search button sends a prompt to the current conversation; the
- * Agent runs its normal search tools and submits the results here. The tool
- * validates and deduplicates each candidate, tags it with the active round,
+ * Background research submits through a durable worker/round binding. The tool
+ * validates and deduplicates each candidate, tags it with the original round,
  * and appends a whole-set log record for replay.
  */
 import type { Context } from '@deepseek-ai/cordis'

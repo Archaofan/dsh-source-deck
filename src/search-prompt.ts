@@ -1,9 +1,8 @@
 /**
  * Model-facing search prompts for one deck round.
  *
- * SourceDeck does not call an LLM itself: the deck sends this instruction to
- * the current conversation, so the search uses the session's selected model,
- * its tools, and its permissions. The Agent answers by calling
+ * The coordinator sends this instruction to a managed research child that
+ * inherits the parent model policy and uses a restricted tool scope. It answers by calling
  * `deck_submit_sources`, which is what fills the round.
  */
 import type { CandidateView, SetView } from './ops.ts'
@@ -54,7 +53,7 @@ function linesOf(entries: readonly PriorDecision[], withReason: boolean): string
 }
 
 /**
- * Build the next-round instruction sent to the current conversation.
+ * Build the next-round instruction sent to the bound research worker.
  * @param input - the round, the current deck view, and the requested count.
  * @returns the Chinese prompt text.
  */

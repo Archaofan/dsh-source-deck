@@ -41,3 +41,13 @@ test('activity consumption cannot open another session or consume the same reque
   assert.deepEqual(consumeActivity(activity, 'a', seen), { sessionId: 'a', setId: 'set-a', roundId: 'round-a' })
   assert.equal(consumeActivity(activity, 'a', seen), undefined)
 })
+
+test('refresh does not replay an already opened research intent over historical navigation', async () => {
+  const { consumeActivity } = await import('../src/client/activity.ts')
+  const values = new Map<string, string>()
+  const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } }
+  const activity = { sessionId: 's', setId: 'active', revision: 'r1', openRequested: true }
+  assert.ok(consumeActivity(activity, 's', new Set(), storage))
+  assert.equal(consumeActivity(activity, 's', new Set(), storage), undefined)
+  assert.ok(consumeActivity({ ...activity, revision: 'r2' }, 's', new Set(), storage))
+})

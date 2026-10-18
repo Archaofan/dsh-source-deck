@@ -25,7 +25,7 @@ export function CandidateCard({ entry, t, reason, favorite, compared, busy, read
         console.warn('[source-deck] image failed', image)
         setImageIndex(current => current === imageIndex ? current + 1 : current)
       }} /> : <span className={css.monogram} aria-label={t('source.imageFallback')}>{source.title.slice(0, 2)}</span>}
-      <button type="button" className={css.favorite} aria-label={t(favorite ? 'favorites.remove' : 'favorites.add')} aria-pressed={favorite} disabled={busy} onClick={onFavorite}>{favorite ? '★' : '☆'}</button>
+      <button type="button" className={css.favorite} aria-label={t(favorite ? 'card.unfavorite' : 'card.favorite')} aria-pressed={favorite} disabled={busy} onClick={onFavorite}>{favorite ? '★' : '☆'}</button>
     </div>
     <div className={css.content}>
       <div className={css.eyebrow}>{repo ? 'GitHub' : t('source.web')} · {t(`card.verdict.${candidate.verdict}`)}</div>

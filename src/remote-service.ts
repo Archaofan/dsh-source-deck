@@ -294,7 +294,8 @@ export class SourceDeckRemote extends TypertRemoteService {
         return JSON.stringify(result)
       }
       case 'clearData':
-        await clearData(await this.getStore())
+        if (this.research) await this.research.clearData()
+        else await clearData(await this.getStore())
         return JSON.stringify({ ok: true })
       default:
         throw new Error(`unknown source-deck operation ${JSON.stringify(op)}`)

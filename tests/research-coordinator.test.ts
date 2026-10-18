@@ -69,6 +69,17 @@ test('timeout settles and disposes the research worker', async () => {
   await f.coordinator.dispose()
 })
 
+test('clearing data stops active research before deleting its binding and permits a fresh request', async () => {
+  const f = await fixture()
+  await f.start()
+  await f.coordinator.clearData()
+  assert.equal(f.runs[0]!.disposed, 1)
+  for (const table of ['rounds', 'sets', 'sources', 'candidates', 'session_active']) assert.equal([...f.store.entries(table)].length, 0)
+  const fresh = await f.start('fresh')
+  assert.equal((await getSet(f.store, fresh.target.setId)).rounds[0]?.round.status, 'running')
+  await f.coordinator.dispose()
+})
+
 test('research tool guard rejects write, shell, cordis and delegation', async () => {
   const { researchToolGuard } = await import('../src/research-runtime.ts')
   for (const name of ['shell', 'write_file', 'cordis', 'spawn', 'run_code']) assert.ok(researchToolGuard({ name }))

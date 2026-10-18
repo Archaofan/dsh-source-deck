@@ -13,7 +13,7 @@ export function DeckActivityObserver({ sessionId, load, open, seen }: {
       try {
         const activity = await load(sessionId)
         if (cancelled) return
-        const location = consumeActivity(activity, sessionId, seen)
+        const location = consumeActivity(activity, sessionId, seen, window.sessionStorage)
         if (location) open(location)
       } catch { /* Transient reads retry; no model requests or draft writes. */ }
       finally { reading = false }

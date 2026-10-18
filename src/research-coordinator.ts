@@ -1,5 +1,5 @@
 import type { DeckStore, ResearchTarget } from './model.ts'
-import { getSet, type StartRoundResult } from './ops.ts'
+import { clearData as clearDeckData, getSet, type StartRoundResult } from './ops.ts'
 import { prepareResearchRound, finishResearchRound, interruptResearchRounds, resolveResearchTarget, setResearchRunning } from './research-ops.ts'
 
 /** Structural public service contracts; the original Agent object is retained. */
@@ -35,6 +35,7 @@ export class ResearchCoordinator {
   private readonly active = new Map<string, ActiveResearch>()
   private readonly queues = new Map<string, Promise<unknown>>()
   private closed = false
+  private clearing?: Promise<void>
 
   constructor(getStore: () => Promise<DeckStore>, runtime: ResearchRuntime, changed: (sessionId: string, setId: string) => void, timeoutMs = 300000) {
     this.runtime = runtime; this.changed = changed; this.timeoutMs = timeoutMs
@@ -56,12 +57,14 @@ export class ResearchCoordinator {
   }
 
   private async startLocked(input: ResearchStartInput): Promise<StartRoundResult & { target: ResearchTarget }> {
-    if (this.closed) throw new Error('research service is closed')
+    if (this.closed || this.clearing) throw new Error('research service is closed or clearing data')
     const store = await this.store
     const parent = await this.runtime.resolveParent(input.sessionId)
+    if (this.closed || this.clearing) throw new Error('research service is closed or clearing data')
     if (parent.session.id !== input.sessionId) throw new Error('resolved parent does not belong to this session')
     const workerSessionId = crypto.randomUUID()
     const result = await prepareResearchRound(store, { ...input, workerSessionId, ...(parent.conversation ? { conversation: parent.conversation } : {}) })
+    if (this.closed || this.clearing) throw new Error('research service is closed or clearing data')
     if (result.target.workerSessionId !== workerSessionId) return result
     const task: ActiveResearch = { target: result.target, controller: new AbortController() }
     this.active.set(result.roundId, task)
@@ -113,5 +116,18 @@ export class ResearchCoordinator {
   async dispose(): Promise<void> {
     this.closed = true
     await Promise.allSettled([...this.active.values()].map(task => this.stop(task, 'cancelled')))
+  }
+
+  clearData(): Promise<void> {
+    if (this.clearing) return this.clearing
+    this.clearing = Promise.resolve().then(async () => {
+      await Promise.all([...this.active.values()].map(task => this.stop(task, 'cancelled')))
+      // Admissions that already passed their first check must settle before deletion.
+      await Promise.allSettled([...this.queues.values()])
+      await Promise.all([...this.active.values()].map(task => this.stop(task, 'cancelled')))
+      await clearDeckData(await this.store)
+    })
+    void this.clearing.finally(() => { this.clearing = undefined }).catch(() => {})
+    return this.clearing
   }
 }

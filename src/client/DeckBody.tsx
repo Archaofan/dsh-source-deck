@@ -75,7 +75,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     if (!request.trim()) throw new Error(t('search.empty'))
     const result = await deck.startRound(sessionId, request, currentDraft.note || undefined, { mode: continued ? 'continue' : 'new', ...(continued && view ? { setId: view.setId } : {}), requestId: crypto.randomUUID() })
     if (currentOwner.current !== owner) return
-    setTargetSetId(result.view.setId); setView(result.view); setNotice(t('v3.background'))
+    setTargetSetId(result.view.setId); setView(result.view)
   })
   const newTopic = () => operate('new', async () => {
     const created = await deck.newSet(sessionId)
