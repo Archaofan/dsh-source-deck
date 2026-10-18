@@ -51,6 +51,7 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
   const [mode, setMode] = useState<Mode>('deck')
   const [request, setRequest] = useState('')
@@ -205,14 +206,24 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
     if (view === null) return
     setBusy(true)
     try {
-      const result = await deck.commit(sessionId, view.setId)
-      await deck.prompt(sessionId, result.promptText)
+      await deck.deliverSelection(sessionId, view.setId)
       setSubmitted(true)
     } catch (caught) {
       flashError(caught instanceof Error ? caught.message : String(caught))
     } finally {
       setBusy(false)
     }
+  }
+
+  const reference = async (): Promise<void> => {
+    if (!view) return
+    setBusy(true)
+    try {
+      const outcome = await deck.reference(sessionId, view.setId)
+      if (outcome === 'inserted') setNotice(t('reference.done'))
+      else flashError(t(outcome === 'draft-changed' ? 'reference.conflict' : 'reference.unavailable'))
+    } catch (caught) { flashError(caught instanceof Error ? caught.message : String(caught)) }
+    finally { setBusy(false) }
   }
 
   const addManual = async (): Promise<void> => {
@@ -525,9 +536,12 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
                   {searchingRound === null ? t('feedback.continue') : t('search.starting')}
                 </button>
               </div>
-              <button type="button" className={css.submitButton}
+              <button type="button" className={css.submitButton} disabled={busy || keptCount === 0}
+                onClick={() => void reference()}>{t('reference.button', { count: String(keptCount) })}</button>
+              {notice ? <p role="status" className={css.hint}>{notice}</p> : null}
+              <button type="button" className={css.linkButton}
                 disabled={busy || searchingRound !== null || keptCount + excludedCount === 0}
-                onClick={() => void submit()}>{t('submit.buttonWithCount', { count: String(keptCount) })}</button>
+                onClick={() => void submit()}>{t('reference.direct')}</button>
             </>
           )}
           <p className={css.hint}>{t('footer.hint')}</p>

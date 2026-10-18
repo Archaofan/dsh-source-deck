@@ -5,6 +5,7 @@
 import { dedupeKey } from './dedupe.ts'
 import { buildPrompt } from './prompt.ts'
 import { buildSearchPrompt } from './search-prompt.ts'
+import { withStoreLock } from './store-lock.ts'
 import {
   computeFlags, DEFAULT_POLICY, normalizePolicy, policySummary,
   type ScopePolicy,
@@ -97,6 +98,8 @@ export interface CommitResult {
   readonly promptText: string
   readonly kept: readonly string[]
   readonly excluded: readonly { readonly candidateId: string; readonly reason?: string }[]
+  readonly requestId: string
+  readonly deliveryStatus: 'pending' | 'sent' | 'failed'
 }
 
 const now = (): string => new Date().toISOString()
@@ -361,8 +364,21 @@ export async function commitSelection(
   store: DeckStore,
   input: { sessionId: string; setId: string; requestId: string },
 ): Promise<CommitResult> {
+  return withStoreLock(store, `selection:${input.sessionId}:${input.setId}`, () => commitSelectionLocked(store, input))
+}
+
+async function commitSelectionLocked(store: DeckStore, input: { sessionId: string; setId: string; requestId: string }): Promise<CommitResult> {
   const set = requiredSet(store, input.setId)
   if (set.sessionId !== input.sessionId) throw new Error('deck set does not belong to this session')
+  const previous = findEntry<SelectionRecord>(store, 'selections', record => record.sessionId === input.sessionId && record.setId === input.setId
+    && record.kind !== 'reference' && (record.requestId === input.requestId || set.status === 'submitted'))
+  if (previous) {
+    const record = previous[1]
+    return { selectionId: previous[0], kept: record.kept, excluded: record.excluded, requestId: record.requestId,
+      promptText: record.promptText ?? buildPrompt({ total: record.kept.length + record.excluded.length, kept: (await getSet(store, input.setId)).candidates.filter(c => record.kept.includes(c.candidateId)).map(c => ({ title: c.source.title, url: c.source.url })), excluded: [], policy: policySummary(await getPolicy(store)) }),
+      deliveryStatus: record.deliveryStatus ?? 'sent' }
+  }
+  if (set.status === 'submitted') throw new Error('deck set is submitted')
   const view = await getSet(store, input.setId)
   const kept: string[] = []
   const excluded: { candidateId: string; reason?: string }[] = []
@@ -378,6 +394,7 @@ export async function commitSelection(
     }
   }
   const selectionId = newId('sel')
+  const promptText = buildPrompt({ total: view.candidates.length, kept: promptKept, excluded: promptExcluded, policy: policySummary(await getPolicy(store)) })
   const selection: SelectionRecord = {
     setId: input.setId,
     sessionId: input.sessionId,
@@ -385,20 +402,25 @@ export async function commitSelection(
     excluded,
     submittedAt: now(),
     requestId: input.requestId,
+    kind: 'submitted', promptText, deliveryStatus: 'pending',
   }
   await store.put('selections', selectionId, selection)
   await store.put('sets', input.setId, { ...set, status: 'submitted' } satisfies SetRecord)
   return {
     selectionId,
-    promptText: buildPrompt({
-      total: view.candidates.length,
-      kept: promptKept,
-      excluded: promptExcluded,
-      policy: policySummary(await getPolicy(store)),
-    }),
+    promptText,
     kept,
     excluded,
+    requestId: input.requestId,
+    deliveryStatus: 'pending',
   }
+}
+
+export async function acknowledgeSelection(store: DeckStore, input: { sessionId: string; selectionId: string; status: 'sent' | 'failed' }): Promise<void> {
+  const record = store.get('selections', input.selectionId) as SelectionRecord | undefined
+  if (!record || record.sessionId !== input.sessionId || record.kind === 'reference') throw new Error('selection does not belong to this session')
+  if (record.deliveryStatus === 'sent') return
+  await store.put('selections', input.selectionId, { ...record, deliveryStatus: input.status })
 }
 
 /**

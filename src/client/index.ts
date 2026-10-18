@@ -25,6 +25,10 @@ import { TYPERT_REMOTE } from '../remote-info.ts'
 import type { DeckActivity } from '../activity.ts'
 import type { DeckLocation } from './activity.ts'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { InputActions } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { ReferenceSnapshot } from '../model.ts'
+import { ReferenceBridge } from './input-bridge.ts'
+import { currentReference, registerReferenceSource } from './references.ts'
 
 export type { DeckKey } from './locales.ts'
 export type { DeckBodyProps } from './DeckBody.tsx'
@@ -64,7 +68,7 @@ declare module '@deepseek-ai/cordis' {
  * Required browser services: the tab registry, the keyed seat, copy, and the
  * Remote carrier this package mounts its contribution into.
  */
-export const inject = ['slots', 'locale', 'sidebarRightTabs', 'sidebarRight', 'uiConversation', 'remote']
+export const inject = ['slots', 'locale', 'sidebarRightTabs', 'sidebarRight', 'uiConversation', 'conversation', 'remote', 'sessions']
 
 /**
  * Client plugin body: register the tab, mount the Remote namespace, and wire
@@ -83,14 +87,20 @@ export async function apply(ctx: ClientContext): Promise<void> {
     if (!result.ok) throw new Error(result.error.message ?? result.error.code ?? 'SourceDeck Remote call failed')
     return result.value === undefined || result.value === '' ? undefined : JSON.parse(result.value)
   }
+  const bridge = new ReferenceBridge()
+  const submissionRequests = new Map<string, string>()
   const deck: DeckFace = {
     load: async (sessionId: string) => await call('getActiveSet', { sessionId }) as SetView | null,
+    loadSet: async (sessionId, setId) => await call('getSet', { sessionId, setId }) as SetView,
     add: async (sessionId: string, input) => await call('addSource', { sessionId, origin: 'user', ...input }) as AddSourceResult,
     decide: async (candidateId: string, verdict: Verdict, reason?: string) => {
       await call('decide', { candidateId, verdict, ...(reason === undefined ? {} : { reason }) })
     },
-    commit: async (sessionId: string, setId: string) =>
-      await call('commitSelection', { sessionId, setId, requestId: crypto.randomUUID() }) as CommitResult,
+    commit: async (sessionId: string, setId: string) => {
+      const key = `${sessionId}:${setId}`
+      if (!submissionRequests.has(key)) submissionRequests.set(key, crypto.randomUUID())
+      return await call('commitSelection', { sessionId, setId, requestId: submissionRequests.get(key) }) as CommitResult
+    },
     prompt: async (sessionId: string, text: string) => {
       const result = await sessionRemote.prompt({
         requestId: crypto.randomUUID(),
@@ -103,6 +113,23 @@ export async function apply(ctx: ClientContext): Promise<void> {
     startRound: async (sessionId, request, note, options) =>
       await call('startRound', { sessionId, request, requestId: options?.requestId ?? crypto.randomUUID(), mode: options?.mode ?? 'new', ...(options?.setId ? { setId: options.setId } : {}), ...(note === undefined ? {} : { note }) }) as StartRoundResult,
     activity: async sessionId => await call('getActivity', { sessionId }) as DeckActivity,
+    createReference: async (sessionId, setId, requestId) => await call('createReference', { sessionId, setId, requestId }) as ReferenceSnapshot,
+    getReference: async (sessionId, selectionId) => await call('getReference', { sessionId, selectionId }) as ReferenceSnapshot,
+    listReferences: async sessionId => await call('listReferences', { sessionId }) as ReferenceSnapshot[],
+    serializeReference: async (sessionId, selectionId) => await call('serializeReference', { sessionId, selectionId }) as string,
+    reference: async (sessionId, setId) => bridge.insert(sessionId, () => currentReference(deck, sessionId, setId)),
+    deliverSelection: async (sessionId, setId) => {
+      const committed = await deck.commit(sessionId, setId)
+      if (committed.deliveryStatus === 'sent') return
+      try {
+        const result = await sessionRemote.prompt({ requestId: committed.requestId, sessionId, mode: 'queue', content: [{ type: 'text', text: committed.promptText }] })
+        if (!result.ok) throw new Error(result.error.message ?? 'Summary delivery failed')
+      } catch (error) {
+        await call('acknowledgeSelection', { sessionId, selectionId: committed.selectionId, status: 'failed' })
+        throw error
+      }
+      await call('acknowledgeSelection', { sessionId, selectionId: committed.selectionId, status: 'sent' })
+    },
     loadPolicy: async () => await call('getScopePolicy', {}) as PolicyView,
     savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
     newSet: async (sessionId: string) => await call('newSet', { sessionId }) as { setId: string },
@@ -120,6 +147,19 @@ export async function apply(ctx: ClientContext): Promise<void> {
     else ctx.sidebarRight.openTab(DECK_KIND)
   }
   const seenActivities = new Set<string>()
+  registerReferenceSource(ctx, deck, openDeck)
+  const registerInput = (sessionId: string, actions: InputActions): (() => void) => {
+    const sessions = ctx.get('sessions') as unknown as { scope(id: string): ClientContext | undefined }
+    const actx = sessions.scope(sessionId)
+    if (!actx) return () => {}
+    const input = ctx.conversation.input.for(actx)
+    return bridge.register(sessionId, {
+      captureInsertion: () => actions.captureInsertion(),
+      insert: (reference, span) => actx.bail('slash/input-insert-reference', { reference, span }) === true,
+      persistDraft: () => actions.persistDraft(),
+      focus: () => input.focus(),
+    })
+  }
   const decideFromCard = (candidateId: string, verdict: Verdict): void => {
     void deck.decide(candidateId, verdict).catch(error => {
       console.warn('[source-deck] card decision failed', error)
@@ -136,7 +176,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     DeckCard as never,
   ))
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register(
-    { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck, activity: deck.activity, seenActivities }) },
+    { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck, activity: deck.activity, seenActivities, registerInput }) },
     DeckEntryButton as never,
   ))
   ctx.slots.inject('settings.section', () => ctx.slots.register(

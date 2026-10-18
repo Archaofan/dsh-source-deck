@@ -18,10 +18,11 @@ import { emitDeckRecord, snapshotOf } from './events.ts'
 import type { ResearchCoordinator } from './research-coordinator.ts'
 import { getDeckActivity, requestDeckOpen } from './activity.ts'
 import {
-  addFavorite, addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, listFavorites,
+  acknowledgeSelection, addFavorite, addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, listFavorites,
   removeFavorite, setPolicy, startNewSet,
 } from './ops.ts'
 import { policySummary, type SourceMeta } from './scope-policy.ts'
+import { createReference, getReference, listReferences, serializeReference } from './references.ts'
 
 /** One operation body shape; operations validate the fields they use. */
 type OperationBody = Record<string, unknown>
@@ -160,6 +161,19 @@ export class SourceDeckRemote extends TypertRemoteService {
         return JSON.stringify({ ok: true, op, message: 'source-deck remote' })
       case 'getActivity':
         return JSON.stringify(await getDeckActivity(await this.getStore(), stringField(args, 'sessionId')))
+      case 'createReference':
+        return JSON.stringify(await createReference(await this.getStore(), { sessionId: stringField(args, 'sessionId'), setId: stringField(args, 'setId'), requestId: stringField(args, 'requestId') }))
+      case 'getReference':
+        return JSON.stringify(await getReference(await this.getStore(), { sessionId: stringField(args, 'sessionId'), selectionId: stringField(args, 'selectionId') }))
+      case 'serializeReference':
+        return JSON.stringify(serializeReference(await getReference(await this.getStore(), { sessionId: stringField(args, 'sessionId'), selectionId: stringField(args, 'selectionId') })))
+      case 'listReferences':
+        return JSON.stringify(await listReferences(await this.getStore(), stringField(args, 'sessionId')))
+      case 'acknowledgeSelection': {
+        if (args.status !== 'sent' && args.status !== 'failed') throw new Error('invalid delivery status')
+        await acknowledgeSelection(await this.getStore(), { sessionId: stringField(args, 'sessionId'), selectionId: stringField(args, 'selectionId'), status: args.status })
+        return JSON.stringify({ ok: true })
+      }
       case 'addSource': {
         const sessionId = stringField(args, 'sessionId')
         const store = await this.getStore()
@@ -232,6 +246,7 @@ export class SourceDeckRemote extends TypertRemoteService {
       }
       case 'getSet': {
         const view = await getSet(await this.getStore(), stringField(args, 'setId'))
+        if (view.set.sessionId !== stringField(args, 'sessionId')) throw new Error('deck set does not belong to this session')
         return JSON.stringify(view)
       }
       case 'decide': {

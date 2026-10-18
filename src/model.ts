@@ -78,6 +78,18 @@ export interface SelectionRecord {
   readonly excluded: readonly { readonly candidateId: string; readonly reason?: string }[]
   readonly submittedAt: string
   readonly requestId: string
+  readonly kind?: 'submitted' | 'reference'
+  readonly snapshot?: ReferenceSnapshot
+  readonly promptText?: string
+  readonly deliveryStatus?: 'pending' | 'sent' | 'failed'
+}
+
+export interface ReferenceSnapshot {
+  readonly selectionId: string
+  readonly sessionId: string
+  readonly setId: string
+  readonly createdAt: string
+  readonly items: readonly { readonly candidateId: string; readonly source: SourceRecord; readonly reason?: string }[]
 }
 
 /** Session-to-active-set pointer. */

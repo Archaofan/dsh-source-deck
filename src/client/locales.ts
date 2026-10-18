@@ -16,6 +16,11 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 /** Simplified Chinese dictionary and key-set source of truth. */
 export const zh = {
+  'reference.button': '引用到对话（{count} 条）',
+  'reference.done': '已插入左侧草稿，可追加开发要求后发送。',
+  'reference.conflict': '草稿已变化，内容已保留；请重新点击引用。',
+  'reference.unavailable': '当前会话输入区尚未就绪，请回到对应对话后重试。',
+  'reference.direct': '直接发送筛选摘要',
   'type.label': '资料台',
   'guide.title': '资料筛选台',
   'guide.description': '收集候选资料，逐条筛选后交回 Agent',
@@ -183,6 +188,11 @@ export type DeckKey = keyof typeof zh
 
 /** English dictionary, checked against the Chinese key set. */
 export const en = {
+  'reference.button': 'Reference in chat ({count})',
+  'reference.done': 'Added to the conversation draft. Add your instructions, then send.',
+  'reference.conflict': 'Your draft changed and was preserved. Click reference again to retry.',
+  'reference.unavailable': 'The conversation input is not ready. Return to its chat and retry.',
+  'reference.direct': 'Send screening summary directly',
   'type.label': 'Deck',
   'guide.title': 'Source deck',
   'guide.description': 'Collect candidate sources, screen them one by one, and hand the selection back to the Agent',
