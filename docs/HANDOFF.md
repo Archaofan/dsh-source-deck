@@ -6,7 +6,7 @@
 
 ## 已有授权与交付
 
-用户已批准 v3 设计与七项计划，选择当前会话执行，要求落地并推送 Git。不要重复要求设计/计划批准。产品 0.3.0，交付分支 `feat/sourcedeck-v3`；精确 peer DSH 0.2.1-rc.2、Cordis 4.0.5。工作区唯一项目目录 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
+用户已批准 v3 设计与七项计划，选择当前会话执行，要求落地并推送 Git。不要重复要求设计/计划批准。产品 0.3.0，已按用户后续要求将交付内容快进至默认分支 `main`，原交付分支 `feat/sourcedeck-v3` 保留；精确 peer DSH 0.2.1-rc.2、Cordis 4.0.5。工作区唯一项目目录 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
 功能：后台受管研究子会话、自然语言 deck_search、带参 /deck、原主题轮次绑定与幂等/并发保护、响应式图片卡片、stars/推送时间/查询证据、筛选原因/收藏/最多四项比较、不可变 @deck 引用与草稿保护、直接摘要确认投递、深浅主题和自定义图标。八表兼容旧数据，无新增依赖。
 
@@ -19,7 +19,7 @@
 - 安装只用 Install-Plugin.ps1。相同版本同一路径可能显示 Already up to date 并复用旧包，验证时使用哈希文件名并核对安装 lib 与项目 build 的哈希。
 - 凭据由用户独立配置在沙箱；不复制生产，不输出 token。实际 Host UI 经其 loopback 页面验收，区别于独立 mock。
 - 本地截图/矩阵：`sandbox/dsh-desktop/test-workspaces/dsh-source-deck/v3-acceptance/`，不进 Git。
-- 生产 Desktop 0.2.1-rc.2，插件仍 0.1.17；0.3.0 未装生产。生产安装必须用户另行明确批准。
+- 生产 Desktop 0.2.1-rc.2；插件最后确认版本0.1.17。用户将使用给出的0.3.0绝对路径自行安装，本Agent未操作生产；安装后的实际版本需后续确认。
 
 ## 尚需人工/外部复核
 

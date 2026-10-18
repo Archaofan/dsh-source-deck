@@ -2,7 +2,7 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
-The user approved the v3 design, seven-task plan, inline execution, implementation, and Git delivery. Do not request these approvals again. Product 0.3.0 is delivered on `feat/sourcedeck-v3`; exact peers remain DSH 0.2.1-rc.2 and Cordis 4.0.5. The sole project is `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`, remote `https://github.com/Archaofan/dsh-source-deck.git`.
+The user approved the v3 design, seven-task plan, inline execution, implementation, and Git delivery. Do not request these approvals again. At the user's subsequent request, 0.3.0 delivery has been fast-forwarded to default branch `main`; `feat/sourcedeck-v3` remains available; exact peers remain DSH 0.2.1-rc.2 and Cordis 4.0.5. The sole project is `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`, remote `https://github.com/Archaofan/dsh-source-deck.git`.
 
 Implemented: managed background research, natural-language deck_search and parameterized /deck, durable topic/round/worker identity and concurrency/idempotency protection, responsive image cards with stars/push/lookup evidence, screening/reasons/favorites/comparison (four sources), immutable @deck draft references, confirmed direct-summary delivery, Host light/dark tokens, bundled icon and locale metadata. The eight-table domain preserves legacy records; no dependencies were added.
 
@@ -10,7 +10,7 @@ The final suite has 67 tests, including refresh intent replay. Actual model acce
 
 Package: `dsh-source-deck-0.3.0.tgz`; final SHA256 is recorded in night 9. Use only the shared official sandbox and Install-Plugin.ps1. Same-version local paths can be cached: QA uses an immutable hash filename and checks installed lib hashes. Evidence remains under sandbox test-workspaces/dsh-source-deck/v3-acceptance, outside Git.
 
-Production Desktop remains 0.2.1-rc.2 with plugin 0.1.17. This iteration does not install or modify production; separate explicit authorization is required. Never copy credentials or expose tokens. Check baseline/status/current lease before using the shared sandbox; manage only exact verified sandbox PIDs.
+Production Desktop is 0.2.1-rc.2; the last confirmed plugin version was 0.1.17. The user requested the absolute 0.3.0 package path to install it themselves. The agent has not operated production or verified its post-installation state. Never copy credentials or expose tokens. Check baseline/status/current lease before using the shared sandbox; manage only exact verified sandbox PIDs.
 
 Outstanding acceptance limits: native Electron 125% zoom, OS popup rendering, and real Chinese IME plus attachment combinations are not fully verified by the available browser control. Offline frozen lock validation lacked registry metadata despite an unchanged dependency graph; do not disable supply-chain policy. Marketplace PR #7739 could not be refreshed in the afternoon due to connector failure and GitHub API rate limiting. Last successful check was 10:43 Beijing (open, old age gate failure); do not claim listing, close/reopen, or force-push.
 

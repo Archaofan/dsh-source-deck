@@ -4,7 +4,7 @@
 
 ## 当前状态（2026-10-18）
 
-用户已批准 v3 设计、七项实施计划及当前会话执行，并要求落地后推送 Git；不再要求重复评审。实现位于 `feat/sourcedeck-v3`，产品 0.3.0。交付记录见 [验收](docs/SETUP-VERIFICATION.md) 夜-9、[交接](docs/HANDOFF.md)。旧版本/设计提案说明不能覆盖当前实现。
+用户已批准 v3 设计、七项实施计划及当前会话执行，并要求落地后推送 Git；不再要求重复评审。用户随后要求同步 Git 与远端并提供生产安装包，已将 0.3.0 交付快进到 `main`；原交付分支 `feat/sourcedeck-v3` 保留。交付记录见 [验收](docs/SETUP-VERIFICATION.md) 夜-9、[交接](docs/HANDOFF.md)。旧版本/设计提案说明不能覆盖当前实现。
 
 - 保留八表与旧数据。研究绑定 parent/set/round/worker/request；终态和来源去重有并发锁。
 - 官方 managed spawn 子会话后台研究，继承主模型策略，仅允许 web_search/web_fetch/deck_submit_sources。左右独立；取消只停止对应 worker，清除数据先停止研究。
@@ -20,7 +20,7 @@
 
 全部安装只用共享 `sandbox/dsh-desktop/scripts/Install-Plugin.ps1`，启动只用 Start-Desktop.ps1，隔离 DSH_HOME/userData/APPDATA/LOCALAPPDATA/缓存/临时目录。先检查 baseline/status/实时 lease，一次一个项目。测试材料限本项目 test-workspaces。停止进程前核对准确 PID、路径和隔离 userData，不按名称批量结束。
 
-生产 Desktop 为 0.2.1-rc.2，插件仍 0.1.17；本轮未安装或修改生产。生产安装须用户另行明确批准。不导入生产配置或凭据，不输出 bootstrap token/API key。
+生产 Desktop 为 0.2.1-rc.2；插件最后确认版本为 0.1.17。用户已要求提供 0.3.0 安装包绝对路径，拟自行在生产安装；本 Agent 未操作生产或验收安装后的状态。不导入生产配置或凭据，不输出 bootstrap token/API key。
 
 开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径，经官方脚本安装后核对 lib 字节。交付包仍为 dsh-source-deck-0.3.0.tgz，哈希见夜-9。
 

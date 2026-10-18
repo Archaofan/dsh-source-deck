@@ -368,3 +368,14 @@ English summary: 0.3.0 keeps exact DSH RC peers and the eight-table domain, with
 最终刷新复验：在当前 React 活动之外打开历史 Go 两仓库主题，填写需求/说明并选两项对比后刷新，仍为原主题、两项对比及原草稿。最终 tar 的 Client 与安装字节一致。额外发现重复构建时 CSS Modules 导出对象键顺序可能变化；仅排序这些映射即可证明重建与交付代码相同，其余内容无差异。该构建字节可重复性细节暂缓，不影响固定交付包哈希和已验收行为。
 
 Final refresh check passed with historical topic, drafts, verdicts and both comparison choices retained. A deferred build detail is nondeterministic CSS export-map key order; the delivered tar equals installed bytes, and canonicalizing only these maps makes the fresh rebuild identical.
+
+
+## 2026-10-18 交付补记：默认分支与生产安装包路径
+
+用户后续要求同步Git/远端，并提供最新插件包绝对路径，准备自行在生产DSH安装。默认分支main从计划提交1043686快进至0.3.0源码交付388a39c，再提交本交接记录；原feature分支保留。源码未追加改动，67测试再次通过。生产未由Agent操作，安装后的实际状态未验收。
+
+- 绝对路径：`E:\DSH-Desktop-Plugin-Dev\dsh-source-deck\dsh-source-deck-0.3.0.tgz`
+- 包内版本0.3.0，精确支持DSH 0.2.1-rc.2；159706 bytes。
+- SHA256：`216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`。保留实际沙箱验收原包。
+
+English: the user requested Git/remote synchronization and the absolute package path for their own production installation. Default main is fast-forwarded from1043686 to the tested0.3.0 source release388a39c, followed by this handoff note. The67 tests passed again; the unchanged sandbox-verified package path/version/size/hash are listed above. The agent has not modified production or confirmed post-installation state.
