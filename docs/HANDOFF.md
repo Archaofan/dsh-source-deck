@@ -10,7 +10,7 @@
 
 0.3.0 已于 2026-10-18 发布为 GitHub Release `v0.3.0`（tag `8f4b373`，资产 `dsh-source-deck-0.3.0.tgz`，SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`）；README 中英版使用真实 Host 的主界面与对话联动浅色/深色截图 `docs/assets/screenshots/source-deck-{light,dark}.png`、`source-deck-linkage-{light,dark}.png`，截图中的账号信息已脱敏。
 
-检索面：GitHub 描述与 topics 已补充（含 `source-deck`、`ai-agents`、`ai-research`）；GitMCP 返回 HTTP 200 并已写入 README；DeepWiki 状态仍为 `unknown`，触发索引需要可信浏览器里的 reCAPTCHA，本次环境被 Vercel/连接重置阻断，未完成。市场 PR #7739 仍未合并，见 [MARKETPLACE.md](MARKETPLACE.md)。
+检索面：GitHub 描述与 topics 已补充（含 `source-deck`、`ai-agents`、`ai-research`）；GitMCP 返回 HTTP 200 并已写入 README；DeepWiki 状态仍为 `unknown`，已用用户 Edge 配置打开页面，但 Google 图片验证码阻断，用户于 2026-10-18 决定先跳过，未触发索引。市场 PR #7739 仍未合并，见 [MARKETPLACE.md](MARKETPLACE.md)。
 
 功能：后台受管研究子会话、自然语言 deck_search、带参 /deck、原主题轮次绑定与幂等/并发保护、响应式图片卡片、stars/推送时间/查询证据、筛选原因/收藏/最多四项比较、不可变 @deck 引用与草稿保护、直接摘要确认投递、深浅主题和自定义图标。八表兼容旧数据，无新增依赖。
 
