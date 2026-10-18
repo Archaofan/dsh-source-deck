@@ -4,19 +4,21 @@
 
 > [English status](MARKETPLACE.en.md)
 
-**2026-10-18 下午复核：** GitHub 连接器传输失败，网页读取无缓存，公开 REST API 返回限流。未取得新的 PR/check 状态；下表是最后一次成功复核（10:43 北京时间），不能当作下午实时状态。未修改 PR 分支，未声称已合并或已上架。
+**2026-10-18 17:55 北京时间复核：** PR #7739 仍为 OPEN、merged=false，mergeable=true（mergeable_state=unstable）；`check` 为 success，`Submission gate` 仍是 2026-10-17 13:23 UTC 的年龄失败。仓库已超过 1 天（创建于 2026-10-17 03:35:45 UTC），但 gate 尚未自动重跑。市场主目录不存在该条目（`data/plugins/Archaofan__dsh-source-deck.yml` 在 `main` 上 404），当前未上架。未修改 PR 分支，未声称已合并或已上架。
 
 ## 最后确认状态
 
 | 项目 | 状态 |
 |---|---|
 | 仓库 | `Archaofan/dsh-source-deck`，已设为 **public** |
-| Topic | `dsh-plugin`、`deepseek-harness`、`dsh`、`plugin`、`ui` |
-| 市场 PR | [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)，OPEN |
-| 条目文件 | `data/plugins/Archaofan__dsh-source-deck.yml` |
+| Topic | `deepseek-harness`、`dsh`、`dsh-plugin`、`plugin`、`ui`、`source-deck`、`ai-agents`、`ai-research`、`developer-tools`、`desktop` |
+| 市场 PR | [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)，OPEN，未合并 |
+| 条目文件 | `data/plugins/Archaofan__dsh-source-deck.yml`（仅在 PR 分支） |
 | PR check | SUCCESS（2026-10-17 13:23 UTC 完成） |
-| Submission gate | FAILURE，唯一原因：仓库未满 24 小时 |
-| 满足年龄时间 | 仓库创建于 2026-10-17 03:35:45 UTC；约 **2026-10-18 03:35 UTC / 11:35 北京时间** |
+| Submission gate | FAILURE，唯一原因：仓库未满 24 小时（旧结论，未重跑） |
+| 满足年龄时间 | 仓库创建于 2026-10-17 03:35:45 UTC；已于 **2026-10-18 03:35 UTC / 11:35 北京时间** 满足 |
+| 下次自动复检 | 2026-10-18 18:19 UTC / 2026-10-19 02:19 北京时间（`19 */6 * * *`；24h cooldown 已满足） |
+| 市场主目录 | 未收录（`main` 上条目文件 404） |
 | 生产安装 | 未改动；生产仍是 0.1.17 |
 
 Submission gate 原文：
@@ -28,9 +30,7 @@ No need to resubmit, push, or close and reopen;
 the age bar is the only thing failing here.
 ```
 
-gate 由 `regate.yml` 自动重跑；不要为了绕过年龄门槛关 PR、重开 PR 或 force-push。满 24 小时后满足年龄条件，仍需观察自动重跑结果，再等待维护者审核合并。
-
-2026-10-18 约 **10:43 北京时间**，通过 GitHub API 实时复核：PR 仍 open / merged=false，check success，Submission gate 仍为此前的仓库年龄失败。准确满 24h 时间为 **11:35:45**；满足门槛不等于自动任务已重跑，不能承诺准点转绿。满时后需复核新一次 check 结果，再等待维护者合并及目录同步；本次未修改 PR 分支。
+gate 由 `regate.yml` 自动重跑，调度为 `19 */6 * * *`（UTC），并对年龄失败设置 24h cooldown。2026-10-18 06:41 UTC 的一次运行距 gate 完成不足 24h，未重跑本 PR；下一次 18:19 UTC 的调度应满足 cooldown。这只表示会重跑，不保证通过或合并。不要为了绕过年龄门槛关 PR、重开 PR 或 force-push。
 
 ## 市场条目
 

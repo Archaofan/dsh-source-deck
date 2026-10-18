@@ -8,7 +8,7 @@
 
 用户已批准 v3 设计与七项计划，选择当前会话执行，要求落地并推送 Git。不要重复要求设计/计划批准。产品 0.3.0，已按用户后续要求将交付内容快进至默认分支 `main`，原交付分支 `feat/sourcedeck-v3` 保留；精确 peer DSH 0.2.1-rc.2、Cordis 4.0.5。工作区唯一项目目录 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-0.3.0 已于 2026-10-18 发布为 GitHub Release `v0.3.0`（tag `8f4b373`，资产 `dsh-source-deck-0.3.0.tgz`，SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`）；README 中英版使用真实 Host 的浅色/深色截图 `docs/assets/screenshots/source-deck-{light,dark}.png`。
+0.3.0 已于 2026-10-18 发布为 GitHub Release `v0.3.0`（tag `8f4b373`，资产 `dsh-source-deck-0.3.0.tgz`，SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`）；README 中英版使用真实 Host 的主界面与对话联动浅色/深色截图 `docs/assets/screenshots/source-deck-{light,dark}.png`、`source-deck-linkage-{light,dark}.png`，截图中的账号信息已脱敏。
 
 功能：后台受管研究子会话、自然语言 deck_search、带参 /deck、原主题轮次绑定与幂等/并发保护、响应式图片卡片、stars/推送时间/查询证据、筛选原因/收藏/最多四项比较、不可变 @deck 引用与草稿保护、直接摘要确认投递、深浅主题和自定义图标。八表兼容旧数据，无新增依赖。
 

@@ -2,15 +2,46 @@
 
 > [中文（默认）](README.md) | English
 
-SourceDeck is a developer research workbench for DeepSeek Harness Desktop. Start background research from chat, screen and compare open-source libraries, insert the selected repositories into a chat draft, then add your development instructions.
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+
+SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
+
+## Why SourceDeck
+
+Most product designs already have open-source implementations. Instead of reinventing the wheel, the usual move is to find a mature project, read its architecture, interactions, and tradeoffs, then decide whether to reuse it, borrow from it, or deliberately avoid it.
+
+The hard part is rarely finding something. It is what happens after: how do you compare a dozen repositories quickly? Which ones did you review, and why did you reject them? How do you bring the selected ones back into the conversation so the Agent can continue against real code?
+
+SourceDeck is built for that middle step. It turns a research pass into a traceable chain:
+
+> state the need → background research → screen the cards → compare side by side → reference back into chat → keep building
+
+Good for: technology selection, competitive or analogous project research, finding reusable implementations, and giving the Agent real background sources.  
+Not for: replacing deep code audits or formal security/compliance review.
 
 ## Screenshots
 
-Real Host screenshots (light / dark), using mainstream agent projects such as Hermes Agent and OpenClaw, showing background research results, per-source keep/exclude decisions, screening reasons, and the reference entry:
+Real Host screenshots (light / dark), using mainstream agent projects such as Hermes Agent and OpenClaw. Account information in the screenshots has been redacted.
 
 | Light | Dark |
 |---|---|
 | ![SourceDeck light interface](docs/assets/screenshots/source-deck-light.png) | ![SourceDeck dark interface](docs/assets/screenshots/source-deck-dark.png) |
+
+## Chat and deck work together
+
+The deck is not a separate search page. It shares the same conversation context as the chat on the left, so research results, screening decisions, and references stay in one place.
+
+1. **Start from chat**: type `/deck find a few mainstream agent frameworks...`, or simply say “use SourceDeck to find…”. The main Agent calls `deck_search` and starts an official managed child session; the main conversation stays usable.
+2. **Results return to the same conversation**: candidates appear in the right-side deck, while the chat keeps a compact source card. “Open in deck” returns to the original topic. Internal search prompts stay in the child session and do not flood the main chat.
+3. **Decide in the deck**: keep / exclude, write a reason, favorite, and compare up to four sources. Decisions are isolated per conversation/topic and never leak into another session.
+4. **Reference back into chat**: click “Reference in chat”; kept sources enter the composer as an immutable snapshot. Existing draft text and attachments are preserved, and nothing is auto-sent. Then continue with “study these repositories and propose an improvement for our design”.
+5. **Re-decisions do not rewrite inserted references**: later changes only affect future references. The inserted snapshot stays as it was and can be removed before sending.
+
+The left side keeps the conversation going while the right-side deck stays in sync; the composer already holds a SourceDeck reference and a follow-up instruction:
+
+| Light | Dark |
+|---|---|
+| ![Chat and deck working together, light](docs/assets/screenshots/source-deck-linkage-light.png) | ![Chat and deck working together, dark](docs/assets/screenshots/source-deck-linkage-dark.png) |
 
 ## Compatibility and installation
 
@@ -20,15 +51,15 @@ Real Host screenshots (light / dark), using mainstream agent projects such as He
 | DeepSeek Harness Desktop | 0.2.1-rc.2 |
 | @deepseek-ai/cordis | 4.0.5 |
 
-Only public APIs from this RC are used. Sandbox and production Desktop share the baseline. **This iteration installs only in the sandbox; production still has plugin 0.1.17.**
+Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
 Use the Desktop plugin manager to install `dsh-source-deck-0.3.0.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) still requires merge/catalog verification; availability is not claimed. See [market status](docs/MARKETPLACE.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is still open, waiting for the automatic re-check and merge. Availability is not claimed yet. See [market status](docs/MARKETPLACE.md).
 
 ## Start from chat
 
-- Say `Use SourceDeck to find two Go logging libraries and compare maintenance and structured logging APIs`. The model starts research with `deck_search`; natural-language triggering depends on its tool choice.
+- Say `Use SourceDeck to find a few mainstream agent frameworks and compare stars and maintenance`. The model starts research with `deck_search`; natural-language triggering depends on its tool choice.
 - For a deterministic entry, use `/deck Find extensible open-source Markdown editors`. Arguments start research; bare `/deck` only opens the deck.
 - The composer button, right-sidebar `+ → Deck`, and conversation cards also open it. Historical cards target their original topic.
 
@@ -51,25 +82,42 @@ Press **Reference in chat (N sources)**. Existing draft text, attachments, and r
 
 > Study the UI designs in these repositories, consider our existing components, then propose and implement improvements.
 
-Typing `@deck` also offers the current kept sources and historical snapshots. References contain immutable titles, real URLs, descriptions, metadata, and reasons. Later verdict changes do not silently replace their contents. Preview opens the original topic; remove a reference before sending if needed.
+You can also type `@deck` in the composer and choose the current kept sources or a historical snapshot. References store an immutable snapshot of title, real URL, note, metadata, and screening reason; later verdict changes do not silently rewrite inserted sources. Click a reference to revisit its topic, or remove it before sending.
 
-If the draft changes while insertion is pending, the session switches, or the input is unavailable, the original draft remains and retry is offered. References invalidated by data clearing block sending until removed/reselected.
+If the draft changes, the session switches, or the composer becomes unavailable during insertion, the original draft is preserved and a retry is offered. References invalidated by cleared data block sending until removed and reselected.
 
-The secondary **Send screening summary directly** action immediately sends a summary and makes the set read-only. Retries reuse the same delivery identity. Prefer references when you want to append instructions.
+The secondary “Send screening summary” action delivers a summary immediately and makes the set read-only. Retries reuse the same request identity. Prefer references when you need to continue with a development instruction.
 
-## Favorites and advanced settings
+## Favorites and settings
 
-Save with ☆. The profile-wide library supports search, remove, and add back to a deck, and survives restart.
+The ☆ control saves a card to the profile-wide favorites library, with search, remove, and re-add. Favorites are shared across sessions and survive restarts.
 
-Settings → Deck provides optional GitHub, Web, and LLM-freeform scope policies and data clearing. Policies guide and flag candidates; they cannot guarantee model compliance. Uninstalling does not delete records automatically.
+The SourceDeck settings page offers optional GitHub / Web / LLM-freeform source policies and a clear-data action. Policies are hints and flags, not a guarantee that model results comply. Uninstalling does not automatically delete existing records.
 
-## Data and limitations
+## Data and limits
 
-- The local `source_deck` domain still has eight tables: sets, sources, candidates, selections, scope_policies, session_active, rounds, favorites. Legacy records remain readable; worker arrivals retain their original topic/round.
-- No credential files are read and no API keys are stored. The Host's provider policy governs model/web requests. External content is serialized as source data rather than user instructions.
-- Image availability depends on the origin, network, and Host CSP. Failed images leave all actions available. Unverified model metadata should not be treated as a live statistic.
-- Concurrency is subject to provider limits and official subagent settings. Cross-device sync, export, and version-chain diffs are not provided.
-- Actual Host checks and outstanding acceptance limits are recorded in [verification](docs/SETUP-VERIFICATION.md).
+- The local `source_deck` domain keeps eight tables: sets, sources, candidates, selections, scope_policies, session_active, rounds, and favorites. Legacy records remain readable; search results stay bound to their topic and round.
+- The plugin does not read credential files or store API keys. Search prompts and web requests go to providers under the Host configuration; external content is serialized as source data and never becomes user instructions.
+- Images depend on the origin site, network, and Host CSP; failures do not affect screening or links. Metadata that the model did not verify should not be treated as real statistics.
+- Concurrency is bounded by provider quota and official child-session settings. There is no cross-device sync, export, or version-chain diff.
+- The real-Host acceptance scope and remaining gaps are documented in the [verification record](docs/SETUP-VERIFICATION.md).
+
+## Contributing
+
+SourceDeck is still early, and many tradeoffs are worth discussing together. Fork it, open an issue, or send a PR.
+
+- **Found a problem**: open an issue with the DSH version, plugin version, reproduction steps, and relevant logs. Redact secrets first.
+- **Want to change code**: fork, branch from `main`, keep the exact peers, run `node --test tests/*.test.ts` and `npm run build`, and explain the motivation, tradeoffs, and verification in the PR.
+- **Want to add a source or scenario**: adapters and tests are welcome; please do not bring in alpha-only APIs.
+
+You do not need to finish a whole feature. A clear scenario, one test, or one paragraph of documentation is a valuable contribution.
+
+## Find the project
+
+- GitHub: <https://github.com/Archaofan/dsh-source-deck> (searchable via `dsh-plugin`, `source-deck`, `DeepSeek Harness`)
+- Latest release: <https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0>
+- GitMCP documentation index: <https://gitmcp.io/Archaofan/dsh-source-deck>
+- Plugin marketplace: awesome-dsh-plugin [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) (under review, not listed yet)
 
 ## Development
 
@@ -80,9 +128,9 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-The package contains Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, bundled icons, and Chinese/English locale metadata. Exact peers are unchanged; no dependencies were added.
+Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, icons, and Chinese/English locales. Exact peers stay unchanged; no dependencies were added.
 
-- [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.en.md)
-- [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.en.md)
-- [Workflow research](docs/research/2026-10-18-developer-workflow-review.en.md)
-- [Handoff](docs/HANDOFF.md) · [Version policy](docs/VERSION-POLICY.md)
+- [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
+- [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
+- [Developer workflow research](docs/research/2026-10-18-developer-workflow-review.md)
+- [Handoff](docs/HANDOFF.en.md) · [Version policy](docs/VERSION-POLICY.md)

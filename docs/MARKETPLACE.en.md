@@ -4,9 +4,7 @@
 
 SourceDeck was submitted to the curated awesome-dsh-plugin catalog in [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739). Its repository is public and has the dsh-plugin topic.
 
-Last successful verification was 10:43 Beijing time: PR open, ordinary check successful, Submission gate failed solely because the repository was less than one day old. It became age-eligible at 2026-10-18 11:35:45 Beijing time. Eligibility alone does not prove that the automated gate reran or that maintainers merged the PR.
-
-Afternoon rechecks failed: the connector had a transport error, web retrieval was unavailable, and the public REST API was rate-limited. No branch update or gate workaround was attempted. Merge/catalog availability remains unverified; do not claim the plugin is listed.
+**Rechecked 2026-10-18 17:55 Beijing time:** PR #7739 is still OPEN and unmerged (`merged=false`, `mergeable=true`, `mergeable_state=unstable`). The ordinary `check` is successful. The `Submission gate` is still the 2026-10-17 13:23 UTC age failure; the repository passed the one-day age bar on 2026-10-18 11:35:45 Beijing time, but the gate has not rerun. The entry file is absent from `main` (`data/plugins/Archaofan__dsh-source-deck.yml` returns 404), so the plugin is not listed. No branch update or gate workaround was attempted.
 
 Wait for or verify the scheduled regate result. If still failed after eligibility, inspect the new reason before making a normal branch update. Do not close/reopen or force-push. After merge, confirm SourceDeck appears in the actual market and verify which repository ref/version is consumed.
 
