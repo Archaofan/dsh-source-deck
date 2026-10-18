@@ -1,6 +1,6 @@
 # SourceDeck v3: background research, chat references and complete theme support
 
-2026-10-18. **The user approved the background research direction. This written design awaits review; core implementation has not started.** [Chinese, primary specification](2026-10-18-sourcedeck-v3-design.md).
+2026-10-18. **The user approved this written design and requested implementation and Git delivery. The [implementation plan](../plans/2026-10-18-sourcedeck-v3.en.md) awaits review; core implementation has not started.** [Chinese, primary specification](2026-10-18-sourcedeck-v3-design.md).
 
 ## Confirmed outcome
 
