@@ -51,3 +51,14 @@ test('refresh does not replay an already opened research intent over historical 
   assert.equal(consumeActivity(activity, 's', new Set(), storage), undefined)
   assert.ok(consumeActivity({ ...activity, revision: 'r2' }, 's', new Set(), storage))
 })
+
+test('history topic survives missing Host tab parameters on refresh without crossing sessions', async () => {
+  const { retainedDeckTarget } = await import('../src/client/activity.ts')
+  const values = new Map<string, string>()
+  const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } }
+  assert.equal(retainedDeckTarget(storage, 'a', 'history'), 'history')
+  assert.equal(retainedDeckTarget(storage, 'a'), 'history')
+  assert.equal(retainedDeckTarget(storage, 'b'), undefined)
+  assert.equal(retainedDeckTarget(storage, 'a', 'new-request'), 'new-request')
+  assert.equal(retainedDeckTarget(storage, 'a'), 'new-request')
+})

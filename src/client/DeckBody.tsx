@@ -8,6 +8,7 @@ import type { DeckKey } from './locales.ts'
 import { CandidateCard } from './CandidateCard.tsx'
 import { ComparePanel } from './ComparePanel.tsx'
 import { CandidateMutations } from './candidate-mutations.ts'
+import { retainedDeckTarget } from './activity.ts'
 import { safeWebUrl } from './source-presentation.ts'
 import css from './DeckBody.module.css'
 
@@ -18,7 +19,8 @@ const emptyDraft = (owner: string): Draft => ({ owner, request: '', note: '', re
 export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const { tab } = useTabInfo()
   const params = tab.navigation.params as { setId?: string; roundId?: string } | undefined
-  const [targetSetId, setTargetSetId] = useState<string | undefined>(params?.setId)
+  const [targetSetId, updateTargetSetId] = useState<string | undefined>(() => retainedDeckTarget(window.sessionStorage, sessionId, params?.setId))
+  const setTargetSetId = (setId?: string) => updateTargetSetId(retainedDeckTarget(window.sessionStorage, sessionId, setId))
   const [view, setView] = useState<SetView | null>(null)
   const [loading, setLoading] = useState(true)
   const [favorites, setFavorites] = useState<readonly FavoriteView[]>([])
