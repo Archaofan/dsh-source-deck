@@ -258,3 +258,33 @@ tests        : 35 passed / 0 failed
 
 已知未做（后续）：`/deck <query>` 带参命令、模型主动 `deck_open` 工具（需要 Host→Client 推送通道）、把某条对话消息作为显式上下文附件、卡片内直接继续下一轮。
 
+
+## 2026-10-18 夜-8：DSH 插件市场提交（dshmarket / awesome-dsh-plugin）
+
+目标：让 SourceDeck 出现在 DSH Desktop 的插件市场，而不是只能本地 tgz 安装。
+
+市场机制：安装的 `dshmarket`（1.66.28）读取精选目录 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 生成的 `awesome-dsh-plugin.com/plugins.json`；收录 = 向该仓库 `data/plugins/` 提一个 YAML 条目的 PR。DSH 自带的实验性 Custom plugin markets 是另一套 index JSON，不用于这里。
+
+| 项目 | 证据与结果 |
+|---|---|
+| 市场条目 | `data/plugins/Archaofan__dsh-source-deck.yml`，`url` 指向 `https://github.com/Archaofan/dsh-source-deck`，category `ui`，中英双语描述 |
+| 仓库公开 | 原为 private；市场必须能读取，已改为 **public**；`gh api repos/Archaofan/dsh-source-deck --jq '.visibility'` → `public` |
+| Topic | 添加 `dsh-plugin`、`deepseek-harness`、`dsh`、`plugin`、`ui` |
+| 收录 PR | [awesome-dsh-plugin#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)，OPEN |
+| PR check | SUCCESS（2026-10-17 13:23 UTC 完成，9m50s） |
+| Submission gate | FAILURE，唯一原因：`repository is 0.4 days old (needs 1)` |
+| 自动重跑 | gate 由 `regate.yml` 每 6 小时重跑；仓库创建于 2026-10-17 03:35:45 UTC，约 2026-10-18 11:35 北京时间满 1 天，之后自动转绿；不要关/重开或 force-push |
+| 安全 | 公开前确认 Git 无凭据；`docs/security/2026-10-17-credential-exposure.md` 已脱敏（无账号标识/值）；沙箱、node_modules、tgz、日志不进 Git |
+| 生产 | 未改动；生产 profile 仍为 0.1.17；市场收录不等于生产安装 |
+
+当前结论：**已进入市场收录流程，尚未上架**。PR 合并后市场目录生成，通常一天内可搜到 `SourceDeck`；在此之前用本地 0.2.5 tgz。
+
+复核命令：
+
+```text
+gh pr view 7739 --repo awesome-dsh-plugin/awesome-dsh-plugin --json state,statusCheckRollup
+gh api repos/awesome-dsh-plugin/awesome-dsh-plugin/check-runs/<gate-id> --jq '{conclusion,output}'
+gh api repos/Archaofan/dsh-source-deck --jq '{visibility,created_at,topics}'
+```
+
+详细记录见 [MARKETPLACE.md](MARKETPLACE.md)。

@@ -18,7 +18,7 @@ SourceDeck 是 DeepSeek Harness Desktop 的**会话内资料台**：用一句自
 
 - 只使用 `0.2.1-rc.2` 的公共接口，不依赖 alpha-only API。
 - `peerDependencies` 是**精确版本**，不会在未验证的 DSH 版本上静默加载。
-- 沙箱和生产 Desktop 都已是 `0.2.1-rc.2`；本包在沙箱完成真实模型验证，生产需由用户安装。生产里已存在的 `0.1.17` 不会被自动升级或修改。
+- 沙箱和生产 Desktop 都已是 `0.2.1-rc.2`；本包在沙箱完成真实模型验证，生产需由用户安装。生产若已装 `0.1.17`，用 0.2.5 的本地安装按插件管理器流程替换；0.2.5 不会自行升级其他版本。
 
 ## 安装
 
@@ -28,6 +28,15 @@ SourceDeck 是 DeepSeek Harness Desktop 的**会话内资料台**：用一句自
 4. 在任意会话右侧栏的 **+** 菜单里应出现「资料台」。
 
 不要通过市场 HTTP 接口安装本地包（市场只接受 curated registry），也不要用 `dsh plugin --profile desktop`。安装和卸载都应由 App 的插件管理界面完成。
+
+## 插件市场
+
+已向 DSH 插件市场（`dshmarket`）的精选目录提交收录：[awesome-dsh-plugin PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)。
+
+- 仓库已设为 public，并添加 `dsh-plugin` topic（市场拉取代码的前置条件）。
+- PR check 已通过；Submission gate 目前只差“仓库创建满 24 小时”这一项（2026-10-17 03:35 UTC 创建，约 2026-10-18 11:35 北京时间满足）。gate 会自动重跑，不需要关 PR 或重新提交。
+- 合并后可在 DSH 插件市场搜索 `SourceDeck` 安装；收录完成前请使用本地 tgz。
+- 市场条目：`data/plugins/Archaofan__dsh-source-deck.yml`；DSH 0.2.1-rc.2 的 `dshmarket` 从 `awesome-dsh-plugin.com/plugins.json` 读取该目录。
 
 ## 触发方式
 

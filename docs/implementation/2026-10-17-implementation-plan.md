@@ -124,3 +124,12 @@
 - 聊天联动：`/deck` 客户端命令；对话卡片显示最近轮次；Host 搜索 prompt 带最近对话；提交摘要回到对话。
 - 验证：35 个单元测试全绿；真实模型两轮（Go 日志库 6 条、Rust 运行时 6–7 条）；原因/跳过/收藏/`/deck`/上下文/重启恢复均实测。证据见 [../SETUP-VERIFICATION.md](../SETUP-VERIFICATION.md) 夜-7 段；调研见 [../research/2026-10-17-chat-deck-linkage.md](../research/2026-10-17-chat-deck-linkage.md)。
 
+
+## 阶段 8：DSH 插件市场提交 — 进行中（2026-10-18）
+
+- 市场：DSH Desktop 已装 `dshmarket`；收录目录为 awesome-dsh-plugin，市场读取 `awesome-dsh-plugin.com/plugins.json`。
+- 提交：仓库转为 public，添加 `dsh-plugin` topic，PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)，条目 `data/plugins/Archaofan__dsh-source-deck.yml`。
+- 结果：PR check SUCCESS；Submission gate 仅差仓库满 24 小时（约 2026-10-18 11:35 北京时间），gate 自动重跑，不重开/force-push。
+- 合并后：市场搜 `SourceDeck` 安装；未合并前仍用 0.2.5 本地 tgz。
+- 证据：[SETUP-VERIFICATION.md 夜-8](../SETUP-VERIFICATION.md)；机制与复核见 [MARKETPLACE.md](../MARKETPLACE.md)。
+

@@ -18,7 +18,7 @@ The deck is not a standalone search app and not a second model session. It belon
 
 - Only public `0.2.1-rc.2` APIs are used; no alpha-only APIs.
 - `peerDependencies` are **exact**; the plugin will not silently load on an unverified DSH version.
-- Both the sandbox and the production Desktop run `0.2.1-rc.2`. This package was verified with a real model in the sandbox; production installation is left to the user. An existing `0.1.17` installation, if present, is neither upgraded nor modified automatically.
+- Both the sandbox and the production Desktop run `0.2.1-rc.2`. This package was verified with a real model in the sandbox; production installation is left to the user. If `0.1.17` is already installed, use the same local-install flow for 0.2.5; 0.2.5 does not auto-upgrade other versions.
 
 ## Installation
 
@@ -28,6 +28,15 @@ The deck is not a standalone search app and not a second model session. It belon
 4. The **Deck** entry should appear under **+** in the right sidebar of any session.
 
 Do not install a local package through the market HTTP endpoint (the market only accepts its curated registry), and do not use `dsh plugin --profile desktop`. Install and uninstall through the App's plugin manager.
+
+## Plugin market
+
+SourceDeck has been submitted to the curated DSH plugin market (`dshmarket`): [awesome-dsh-plugin PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739).
+
+- The repository is public and carries the `dsh-plugin` topic, which the market needs to fetch the code.
+- The PR check passes; the Submission gate is waiting only for the repository to be 24 hours old (created 2026-10-17 03:35 UTC, eligible around 2026-10-18 11:35 Beijing time). The gate re-runs automatically; do not close or resubmit the PR.
+- After merge, search for `SourceDeck` in the DSH plugin market. Until then, use the local tgz.
+- Market entry: `data/plugins/Archaofan__dsh-source-deck.yml`; `dshmarket` on DSH 0.2.1-rc.2 reads it through `awesome-dsh-plugin.com/plugins.json`.
 
 ## Ways to open the deck
 

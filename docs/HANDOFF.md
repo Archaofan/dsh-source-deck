@@ -5,7 +5,7 @@
 ~~~text
 继续 SourceDeck（dsh-source-deck / 资料筛选台）项目。方案 A 已获用户批准（2026-10-17），不要重新设计，不要改动已批准的设计决策；确需变更先说明理由再改文档。
 
-当前进度（2026-10-17 最终，v2）：
+当前进度（2026-10-18：v2 完成 + 市场提交中）：
 - 阶段 1（R1 冒烟）、1.5（沙箱升级与适配，基线 0.2.1-rc.2）、1.6（产品 peer 切换）均已完成。
 - **阶段 2（V3a 无模型链路）已完成**：source_deck 域、deck_submit_sources、sourceDeck Remote、ignorable 会话记录、资料台面板、对话卡片、input.right 入口。
 - **阶段 3（V7 来源范围配置）已完成**：scope_policies 表、三种策略（GitHub/web/LLM 自主）、设置页编辑器、策略摘要与 candidate.policyFlags；现降为可选高级项。
@@ -13,14 +13,15 @@
 - **阶段 5（V4/V5/V6/V2）已完成**：重启恢复、多会话隔离、设置页清除数据、卸载/重装、peer 负向安装拒绝。
 - **阶段 6（0.1.17 UI 迭代）已完成**：固定头部/进度、过滤+搜索、批量操作、行内理由、折叠添加、快捷键等。
 - **阶段 7（0.2.x v2，用户 2026-10-17 当天修订）已完成**：八表域（新增 rounds/favorites）；首屏自然语言需求，当前会话 LLM 用自身工具搜索；结果按轮次渲染 GitHub 可视化卡片（头像/简介/stars/语言/链接）；✓/✕/跳过/可选原因、补充说明驱动下一轮；收藏夹搜索/加入资料台/移除；`/deck` 命令、Host 抽取最近对话作为搜索上下文、对话卡片显示最近轮次；字体放大、2 列卡片、5 分钟轮询。35 个单元测试全绿。
-- 生产 Desktop 已由用户经 Codex 升级到 0.2.1-rc.2，与沙箱一致；**插件尚未安装到生产**，等待用户明确批准。交付包 `dsh-source-deck-0.2.5.tgz` 由用户自行安装。
-- 证据：docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段；截图在 sandbox/dsh-desktop/logs/shots/（stage2-*、stage3-*、stage4-*、stage5-*、ui-iteration/、deck-v2/），不进 Git。
-- 聊天联动调研：docs/research/2026-10-17-chat-deck-linkage.md；设计修订：docs/design/2026-10-17-solution-design.md §14。
-- 下一步：用户验收 0.2.5；如批准，按生产安装流程安装 tgz。
+- **阶段 8（2026-10-18 市场提交）进行中**：DSH 市场 `dshmarket` 通过 awesome-dsh-plugin 精选目录收录。PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已开，条目 `data/plugins/Archaofan__dsh-source-deck.yml`；仓库已 public 并加 `dsh-plugin` topic。PR check 已通过；Submission gate 仅差仓库创建满 24 小时（约 2026-10-18 11:35 北京时间），gate 自动重跑。未合并前不算上架；合并后市场搜 `SourceDeck` 安装。详见 docs/MARKETPLACE.md。
+- 生产 Desktop 已由用户经 Codex 升级到 0.2.1-rc.2，与沙箱一致；**0.2.5 尚未安装到生产**，生产仍为 0.1.17。交付包 `dsh-source-deck-0.2.5.tgz` 由用户自行安装。
+- 证据：docs/SETUP-VERIFICATION.md 夜-4 至夜-8 段；截图在 sandbox/dsh-desktop/logs/shots/（stage2-*、stage3-*、stage4-*、stage5-*、ui-iteration/、deck-v2/），不进 Git。
+- 聊天联动调研：docs/research/2026-10-17-chat-deck-linkage.md；设计修订：docs/design/2026-10-17-solution-design.md §14；市场记录：docs/MARKETPLACE.md。
+- 下一步：等 PR #7739 的年龄 gate 自动转绿并合并；合并后确认市场可搜到；生产安装仍等用户明确批准。
 
 工作区根目录：E:/DSH-Desktop-Plugin-Dev
 项目目录：E:/DSH-Desktop-Plugin-Dev/dsh-source-deck
-私有远端：https://github.com/Archaofan/dsh-source-deck
+远端（public，市场收录需要）：https://github.com/Archaofan/dsh-source-deck
 共用官方 Desktop 沙箱：E:/DSH-Desktop-Plugin-Dev/sandbox/dsh-desktop
 git：本机有 git，位于 C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe（Hermes 自带，git 2.54.0），未加入会话 PATH。仓库由另一账号创建，需按命令加进程级 safe.directory，例如：
   & 'C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe' -c safe.directory=E:/DSH-Desktop-Plugin-Dev/dsh-source-deck -C E:/DSH-Desktop-Plugin-Dev/dsh-source-deck status
@@ -30,18 +31,20 @@ git：本机有 git，位于 C:\Users\Administrator\AppData\Local\hermes\git\cmd
 1. 工作区根 README.md 和 AGENTS.md（升级纪律与沙箱独占规则）；
 2. 项目 README.md、AGENTS.md、docs/PROJECT-BRIEF.md；
 3. docs/design/2026-10-17-solution-design.md（主设计 v1.1）、docs/design/wireframes.md；
-4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md（夜-2=rc.2，夜-3=peer 切换，夜-4=阶段 2 验收）；
+4. docs/DEVELOPMENT.md、docs/VERSION-POLICY.md、docs/SETUP-VERIFICATION.md（夜-2=rc.2，夜-3=peer 切换，夜-4=阶段 2 验收，夜-7=v2，夜-8=市场提交）；
 5. docs/research/2026-10-17-rc-interface-evidence.md（0.2.0-rc.2 基线证据）与 docs/research/2026-10-17-0.2.1-rc.2-interface-delta.md（新 RC 差异与适配结论）；
 6. docs/implementation/2026-10-17-implementation-plan.md（阶段 1 / 1.5 / 1.6 / 2 结果）；
-7. sandbox/dsh-desktop/README.md、baseline.json、status.json（开始前先跑 Get-SandboxStatus.ps1 确认占用）。
+7. docs/MARKETPLACE.md（市场收录机制、PR #7739、gate 状态）；
+8. sandbox/dsh-desktop/README.md、baseline.json、status.json（开始前先跑 Get-SandboxStatus.ps1 确认占用）。
 
 验收与后续（全部阶段已完成）：
-- 用户验收：按 docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段与截图逐项确认；可重新跑 `node --test tests/*.test.ts`（35 例）。
+- 用户验收：按 docs/SETUP-VERIFICATION.md 夜-4 至夜-8 段与截图逐项确认；可重新跑 `node --test tests/*.test.ts`（35 例）。
+- 市场收录：PR #7739 已开，PR check 通过；只需等仓库满 24h 后 gate 自动转绿，再由维护者合并；不要关/重开或 force-push。合并后用 dshmarket 搜 `SourceDeck` 确认。
 - 生产安装（需用户明确批准）：生产已是 0.2.1-rc.2，与 peer 匹配；按生产安装流程走 App「设置 → 插件」并选择本地 tgz，不要用 `dsh plugin --profile desktop`。
 - 沙箱开发构建每次都要 bump 版本再 pack/install；当前 profile 依赖指向项目目录里的 dsh-source-deck-0.2.5.tgz（产品 0.2.5，已被 Git 忽略）。
 
 已决定的基线（2026-10-17，用户）：
-- 产品 peerDependencies 已切换到最新基线：@deepseek-ai/dsh@0.2.1-rc.2、@deepseek-ai/cordis@4.0.5，精确声明；产品版本 0.1.12。
+- 产品 peerDependencies 已切换到最新基线：@deepseek-ai/dsh@0.2.1-rc.2、@deepseek-ai/cordis@4.0.5，精确声明；当前产品版本 0.2.5。
 - 生产 Desktop 已由用户经 Codex 升级到 0.2.1-rc.2，与产品 peer 匹配；安装到生产仍须用户明确批准。若以后需要同时支持多个版本，需要用户另行选择 engines.dsh 范围方案，不能自行放宽。
 - rc.2 是目前 npm next 的最新 RC；无需再升级沙箱，除非用户明确指示。
 

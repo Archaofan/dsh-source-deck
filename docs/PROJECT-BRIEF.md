@@ -4,6 +4,8 @@
 
 > 2026-10-17 v2 修订：用户验收 0.1.17 后要求首屏只问需求、由当前会话 LLM 搜索、GitHub 可视化卡片、勾叉/补充说明驱动下一轮、收藏夹，并明确“资料台必须和当前聊天联动，不能是独立窗口”。来源范围配置降为可选高级项。实现与证据见 [design/2026-10-17-solution-design.md §14](design/2026-10-17-solution-design.md)、[research/2026-10-17-chat-deck-linkage.md](research/2026-10-17-chat-deck-linkage.md) 与 [SETUP-VERIFICATION.md 夜-7](SETUP-VERIFICATION.md)。下文“五表/配置页”是首版历史设计记录。
 
+> 2026-10-18 市场：已提交 DSH 插件市场精选目录（awesome-dsh-plugin PR #7739）；仓库已 public 并加 `dsh-plugin` topic；PR check 通过，gate 仅等仓库满 24 小时。状态见 [MARKETPLACE.md](MARKETPLACE.md)。
+
 ## 已确认目标
 
 用户出于个人兴趣开发 AI / Agent 应用，已选择“让 Agent 更好用的交互与功能插件”。SourceDeck 是官方 DSH Desktop 插件，有自己的 UI 控件，同时能方便地在对话过程中使用。
