@@ -66,6 +66,7 @@ export interface SetView {
   readonly set: SetRecord
   readonly rounds: readonly RoundView[]
   readonly candidates: readonly CandidateView[]
+  readonly deliveryStatus?: 'pending' | 'sent' | 'failed'
 }
 
 /** Input for starting one search round. */
@@ -264,6 +265,12 @@ export async function addSource(store: DeckStore, input: AddSourceInput): Promis
     await store.put('sources', sourceId, source)
   } else {
     sourceId = existingSource[0]
+    const existing = existingSource[1]
+    const oldLookup = Date.parse(existing.meta?.metadataFetchedAt ?? '')
+    const newLookup = Date.parse(input.meta?.metadataFetchedAt ?? '')
+    if (input.meta && (!Number.isFinite(oldLookup) || (Number.isFinite(newLookup) && newLookup >= oldLookup))) {
+      await store.put('sources', sourceId, { ...existing, meta: { ...existing.meta, ...input.meta } })
+    }
   }
   const existingCandidate = findEntry<CandidateRecord>(store, 'candidates', candidate =>
     candidate.setId === setId && candidate.sourceId === sourceId)
@@ -315,7 +322,8 @@ export async function getSet(store: DeckStore, setId: string): Promise<SetView> 
     })
   }
   candidates.sort((left, right) => left.candidate.createdAt.localeCompare(right.candidate.createdAt))
-  return { setId, set, rounds: roundsOf(store, setId), candidates }
+  const submitted = findEntry<SelectionRecord>(store, 'selections', entry => entry.setId === setId && entry.kind !== 'reference')
+  return { setId, set, rounds: roundsOf(store, setId), candidates, ...(submitted ? { deliveryStatus: submitted[1].deliveryStatus ?? 'sent' } : {}) }
 }
 
 /**

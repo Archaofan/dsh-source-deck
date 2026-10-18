@@ -1,0 +1,11 @@
+.panel { border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; padding: 12px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); }
+.panel h3 { font-size: 15px; margin: 0 0 10px; }
+.panel p { color: var(--dsw-alias-label-secondary); font-size: 13px; }
+.scroll { overflow: auto; }
+.panel table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.panel th, .panel td { border-bottom: 1px solid var(--dsw-alias-border-l2); padding: 10px; text-align: left; vertical-align: top; min-width: 130px; max-width: 260px; overflow-wrap: anywhere; }
+.panel th:first-child { min-width: 66px; position: sticky; left: 0; background: var(--dsw-alias-bg-layer-1); }
+.panel td { color: var(--dsw-alias-label-secondary); }
+.panel a { color: var(--dsw-alias-link); }
+.panel button { margin-left: 8px; cursor: pointer; color: inherit; background: transparent; border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; }
+.panel button:focus-visible { outline: 2px solid var(--dsw-alias-link); }

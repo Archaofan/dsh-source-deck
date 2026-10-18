@@ -98,6 +98,8 @@ function metaOf(body: OperationBody): SourceMeta | undefined {
   const owner = text('owner')
   const image = text('image')
   const homepage = text('homepage')
+  const metadataFetchedAt = text('metadataFetchedAt')
+  const metadataUrl = text('metadataUrl')
   return {
     ...(stars === undefined ? {} : { stars }),
     ...(pushedAt === undefined ? {} : { pushedAt }),
@@ -112,6 +114,8 @@ function metaOf(body: OperationBody): SourceMeta | undefined {
     ...(owner === undefined ? {} : { owner }),
     ...(image === undefined ? {} : { image }),
     ...(homepage === undefined ? {} : { homepage }),
+    ...(metadataFetchedAt === undefined ? {} : { metadataFetchedAt }),
+    ...(metadataUrl === undefined ? {} : { metadataUrl }),
   }
 }
 
@@ -180,6 +184,7 @@ export class SourceDeckRemote extends TypertRemoteService {
         const result = await addSource(store, {
           sessionId,
           origin: (args.origin === 'agent' ? 'agent' : 'user'),
+          ...(optionalString(args, 'setId') ? { target: { setId: optionalString(args, 'setId')! } } : {}),
           ...(optionalString(args, 'title') === undefined ? {} : { title: optionalString(args, 'title') }),
           ...(optionalString(args, 'url') === undefined ? {} : { url: optionalString(args, 'url') }),
           ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),

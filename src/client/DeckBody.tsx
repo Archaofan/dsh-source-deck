@@ -1,552 +1,197 @@
-/**
- * The deck tab: a conversation-shaped screening surface driven by the current
- * session's model.
- *
- * A round starts with a plain-language request; the deck asks the Agent to
- * search with its normal tools and submit candidates. Each round renders as a
- * card grid. The user's checks/crosses and an optional note become the next
- * round's brief, so no site configuration or regex is required.
- */
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import type {} from '@deepseek-ai/dsh-client-ui-session/client'
+import type { UseSidebarRightTabInfo } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { CandidateView, FavoriteView, SetView } from '../ops.ts'
 import type { Verdict } from '../model.ts'
 import type { DeckFace } from './deck-face.ts'
 import type { DeckKey } from './locales.ts'
+import { CandidateCard } from './CandidateCard.tsx'
+import { ComparePanel } from './ComparePanel.tsx'
+import { safeWebUrl } from './source-presentation.ts'
 import css from './DeckBody.module.css'
 
-/** The body's composed props: runtime shares, copy, and the injected face. */
-export type DeckBodyProps =
-  & PropsRuntime<'sidebar.right.pane.tab'>
-  & PropsLocale<'sourceDeck'>
-  & { readonly deck: DeckFace }
+export type DeckBodyProps = PropsRuntime<'sidebar.right.pane.tab'> & PropsLocale<'sourceDeck'> & { readonly deck: DeckFace; readonly useTabInfo: UseSidebarRightTabInfo }
+interface Draft { owner: string; request: string; note: string; reasons: Record<string, string>; compare: string[] }
+const emptyDraft = (owner: string): Draft => ({ owner, request: '', note: '', reasons: {}, compare: [] })
 
-type Mode = 'deck' | 'favorites'
-
-const EXAMPLES = ['search.example.one', 'search.example.two', 'search.example.three'] as const
-
-function formatStars(stars: number | undefined): string | undefined {
-  if (stars === undefined) return undefined
-  if (stars >= 1000) return `${(stars / 1000).toFixed(stars >= 10000 ? 0 : 1)}k`
-  return String(stars)
-}
-
-function avatarOf(entry: CandidateView, image?: string): string | undefined {
-  if (image !== undefined) return image
-  const meta = entry.source.meta
-  if (meta?.image !== undefined) return meta.image
-  const owner = meta?.owner
-  return owner === undefined ? undefined : `https://github.com/${owner}.png?size=80`
-}
-
-/**
- * The deck panel.
- * @param props - session-bound tab shares, copy, and the Remote face.
- * @returns the panel.
- */
-export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
+export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
+  const { tab } = useTabInfo()
+  const params = tab.navigation.params as { setId?: string; roundId?: string } | undefined
+  const [targetSetId, setTargetSetId] = useState<string | undefined>(params?.setId)
   const [view, setView] = useState<SetView | null>(null)
-  const [favorites, setFavorites] = useState<readonly FavoriteView[]>([])
   const [loading, setLoading] = useState(true)
-  const [busy, setBusy] = useState(false)
+  const [favorites, setFavorites] = useState<readonly FavoriteView[]>([])
+  const [mode, setMode] = useState<'deck' | 'favorites'>('deck')
+  const [filter, setFilter] = useState<'all' | Verdict>('all')
+  const [query, setQuery] = useState('')
+  const [manual, setManual] = useState('')
+  const [compareOpen, setCompareOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
-  const [submitted, setSubmitted] = useState(false)
-  const [mode, setMode] = useState<Mode>('deck')
-  const [request, setRequest] = useState('')
-  const [note, setNote] = useState('')
-  const [manualOpen, setManualOpen] = useState(false)
-  const [manual, setManual] = useState('')
-  const [favoriteQuery, setFavoriteQuery] = useState('')
-  const [reasons, setReasons] = useState<Record<string, string>>({})
-  const [searchingRound, setSearchingRound] = useState<string | null>(null)
-  const [searchStartedAt, setSearchStartedAt] = useState<number>(0)
-  const errorTimer = useRef<number | undefined>(undefined)
+  const [operations, setOperations] = useState<ReadonlySet<string>>(new Set())
+  const inFlight = useRef(new Set<string>())
+  const readSequence = useRef(0)
+  const owner = `${sessionId}:${targetSetId ?? 'active'}`
+  const currentOwner = useRef(owner); currentOwner.current = owner
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft(owner))
+  const currentDraft = draft.owner === owner ? draft : emptyDraft(owner)
+  const patchDraft = (patch: Partial<Draft>) => setDraft(previous => ({ ...(previous.owner === owner ? previous : emptyDraft(owner)), ...patch }))
 
-  const refresh = async (): Promise<void> => {
+  useEffect(() => { setTargetSetId(params?.setId); setMode('deck') }, [sessionId, tab.navigation.revision])
+  useEffect(() => {
     try {
-      const [nextView, nextFavorites] = await Promise.all([deck.load(sessionId), deck.listFavorites()])
-      setView(nextView)
-      setFavorites(nextFavorites)
-      setError(null)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : String(caught))
-    } finally {
-      setLoading(false)
-    }
-  }
-
+      const saved = JSON.parse(sessionStorage.getItem(`source-deck:${owner}`) ?? 'null') as Partial<Draft> | null
+      setDraft({ ...emptyDraft(owner), ...(saved && typeof saved.request === 'string' && typeof saved.note === 'string' && saved.reasons && typeof saved.reasons === 'object' && Array.isArray(saved.compare) ? saved : {}), owner })
+    } catch { setDraft(emptyDraft(owner)) }
+  }, [owner])
+  useEffect(() => { try { sessionStorage.setItem(`source-deck:${draft.owner}`, JSON.stringify(draft)) } catch { /* Editing remains available if storage is full. */ } }, [draft])
+  const refresh = useCallback(async () => {
+    const sequence = ++readSequence.current
+    const next = targetSetId ? await deck.loadSet(sessionId, targetSetId) : await deck.load(sessionId)
+    if (sequence !== readSequence.current || currentOwner.current !== owner) return
+    setView(next); setLoading(false)
+  }, [deck, sessionId, targetSetId, owner])
   useEffect(() => {
-    setLoading(true)
-    setView(null)
-    setSubmitted(false)
-    setMode('deck')
-    setRequest('')
-    setNote('')
-    setReasons({})
-    setSearchingRound(null)
-    void refresh()
-    // Reload when the panel is bound to a different session.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId])
-
-  useEffect(() => {
-    if (searchingRound === null) return
+    setLoading(true); setView(null); setError(null); setNotice(null)
     let cancelled = false
-    const tick = async (): Promise<void> => {
-      try {
-        const next = await deck.load(sessionId)
-        if (cancelled) return
-        setView(next)
-        const arrived = next?.candidates.some(entry => entry.candidate.roundId === searchingRound) ?? false
-        if (arrived) {
-          setSearchingRound(null)
-          setNote('')
-          setBusy(false)
-        } else if (Date.now() - searchStartedAt > 300_000) {
-          setSearchingRound(null)
-          setBusy(false)
-          setError(t('search.timeout'))
-        }
-      } catch {
-        // A transient read failure is retried on the next tick.
-      }
-    }
-    const interval = window.setInterval(() => void tick(), 2000)
-    void tick()
-    return () => {
-      cancelled = true
-      window.clearInterval(interval)
-    }
-    // The polling lifetime is one search.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchingRound, searchStartedAt, sessionId])
+    const read = () => { void refresh().catch(caught => { if (!cancelled) { setError(caught instanceof Error ? caught.message : String(caught)); setLoading(false) } }) }
+    read(); const timer = window.setInterval(read, 2000)
+    return () => { cancelled = true; readSequence.current++; window.clearInterval(timer) }
+  }, [refresh])
+  useEffect(() => { let cancelled = false; void deck.listFavorites().then(value => { if (!cancelled) setFavorites(value) }).catch(caught => { if (!cancelled) setError(String(caught)) }); return () => { cancelled = true } }, [deck, mode, sessionId])
+  useEffect(() => { if (params?.roundId && view) document.getElementById(`deck-${params.roundId}`)?.scrollIntoView({ block: 'nearest' }) }, [params?.roundId, view?.setId])
 
-  useEffect(() => () => {
-    if (errorTimer.current !== undefined) window.clearTimeout(errorTimer.current)
-  }, [])
-
-  const flashError = (message: string): void => {
-    setError(message)
-    if (errorTimer.current !== undefined) window.clearTimeout(errorTimer.current)
-    errorTimer.current = window.setTimeout(() => setError(null), 8000)
+  const operate = async (key: string, job: () => Promise<void>) => {
+    if (inFlight.current.has(key)) return
+    const boundOwner = owner
+    inFlight.current.add(key); setOperations(new Set(inFlight.current)); setError(null)
+    try { await job() } catch (caught) { if (currentOwner.current === boundOwner) setError(caught instanceof Error ? caught.message : String(caught)) }
+    finally { inFlight.current.delete(key); setOperations(new Set(inFlight.current)) }
   }
-
-  const runRound = async (text: string, continueSetId?: string): Promise<void> => {
-    const trimmed = text.trim()
-    if (trimmed === '') {
-      flashError(t('search.empty'))
-      return
-    }
-    setBusy(true)
-    setError(null)
-    try {
-      const result = await deck.startRound(sessionId, trimmed, note.trim() === '' ? undefined : note.trim(), { mode: continueSetId ? 'continue' : 'new', ...(continueSetId ? { setId: continueSetId } : {}) })
-      setView(result.view)
-      setSearchingRound(result.roundId)
-      setSearchStartedAt(Date.now())
-      setBusy(false)
-    } catch (caught) {
-      setSearchingRound(null)
-      setBusy(false)
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    }
+  const start = (continued: boolean) => operate('start', async () => {
+    const request = continued ? view?.rounds.at(-1)?.round.request ?? currentDraft.request : currentDraft.request
+    if (!request.trim()) throw new Error(t('search.empty'))
+    const result = await deck.startRound(sessionId, request, currentDraft.note || undefined, { mode: continued ? 'continue' : 'new', ...(continued && view ? { setId: view.setId } : {}), requestId: crypto.randomUUID() })
+    if (currentOwner.current !== owner) return
+    setTargetSetId(result.view.setId); setView(result.view); setNotice(t('v3.background'))
+  })
+  const newTopic = () => operate('new', async () => {
+    const created = await deck.newSet(sessionId)
+    if (currentOwner.current !== owner) return
+    setTargetSetId(created.setId); setQuery(''); setFilter('all'); setMode('deck'); setCompareOpen(false)
+  })
+  const decide = (entry: CandidateView, verdict: Verdict, reason?: string) => operate(`candidate:${entry.candidateId}`, async () => {
+    await deck.decide(entry.candidateId, verdict, reason ?? currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason)
+    await refresh()
+  })
+  const favoriteKey = (url?: string, title?: string) => url ?? title ?? ''
+  const toggleFavorite = (entry: CandidateView) => operate(`favorite:${entry.candidate.sourceId}`, async () => {
+    const saved = favorites.find(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))
+    if (saved) await deck.removeFavorite(saved.favoriteId)
+    else await deck.addFavorite(entry.source)
+    setFavorites(await deck.listFavorites())
+  })
+  const toggleCompare = (sourceId: string) => {
+    const selected = currentDraft.compare
+    if (selected.includes(sourceId)) patchDraft({ compare: selected.filter(id => id !== sourceId) })
+    else if (selected.length < 4) patchDraft({ compare: [...selected, sourceId] })
+    else setError(t('compare.limit'))
   }
-
-  const continueRound = async (): Promise<void> => {
-    const last = view?.rounds[view.rounds.length - 1]
-    if (last === undefined) {
-      await runRound(request)
-      return
-    }
-    await runRound(last.round.request, view?.setId)
-  }
-
-  const decide = async (entry: CandidateView, verdict: Verdict, reason?: string): Promise<void> => {
-    setBusy(true)
-    try {
-      await deck.decide(entry.candidateId, verdict, reason)
-      await refresh()
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const saveReason = async (entry: CandidateView): Promise<void> => {
-    const value = reasons[entry.candidateId]
-    if (value === undefined) return
-    await decide(entry, 'excluded', value)
-  }
-
-  const toggleFavorite = async (entry: CandidateView): Promise<void> => {
-    try {
-      const existing = favorites.find(favorite =>
-        (entry.source.url !== undefined && favorite.favorite.url === entry.source.url)
-        || (entry.source.url === undefined && favorite.favorite.title === entry.source.title))
-      if (existing !== undefined) {
-        await deck.removeFavorite(existing.favoriteId)
-      } else {
-        await deck.addFavorite({
-          title: entry.source.title,
-          ...(entry.source.url === undefined ? {} : { url: entry.source.url }),
-          ...(entry.source.note === undefined ? {} : { note: entry.source.note }),
-          ...(entry.source.snippet === undefined ? {} : { snippet: entry.source.snippet }),
-        })
-      }
-      setFavorites(await deck.listFavorites())
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    }
-  }
-
-  const submit = async (): Promise<void> => {
-    if (view === null) return
-    setBusy(true)
-    try {
-      await deck.deliverSelection(sessionId, view.setId)
-      setSubmitted(true)
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const reference = async (): Promise<void> => {
+  const reference = () => operate('reference', async () => {
     if (!view) return
-    setBusy(true)
-    try {
-      const outcome = await deck.reference(sessionId, view.setId)
-      if (outcome === 'inserted') setNotice(t('reference.done'))
-      else flashError(t(outcome === 'draft-changed' ? 'reference.conflict' : 'reference.unavailable'))
-    } catch (caught) { flashError(caught instanceof Error ? caught.message : String(caught)) }
-    finally { setBusy(false) }
-  }
-
-  const addManual = async (): Promise<void> => {
-    const text = manual.trim()
-    if (text === '') return
-    setBusy(true)
-    try {
-      const looksUrl = /^https?:\/\//i.test(text)
-      await deck.add(sessionId, looksUrl ? { url: text } : { title: text })
-      setManual('')
-      setManualOpen(false)
-      await refresh()
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const startFresh = async (): Promise<void> => {
-    setBusy(true)
-    try {
-      await deck.newSet(sessionId)
-      setSubmitted(false)
-      setRequest('')
-      setNote('')
-      setReasons({})
-      setSearchingRound(null)
-      await refresh()
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const addFromFavorite = async (favorite: FavoriteView): Promise<void> => {
-    try {
-      await deck.add(sessionId, {
-        title: favorite.favorite.title,
-        ...(favorite.favorite.url === undefined ? {} : { url: favorite.favorite.url }),
-        ...(favorite.favorite.note === undefined ? {} : { note: favorite.favorite.note }),
-      })
-      setMode('deck')
-      await refresh()
-    } catch (caught) {
-      flashError(caught instanceof Error ? caught.message : String(caught))
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className={css.root} data-deck-state="loading" data-deck-tab="deck">
-        <div className={css.skeletonHeader} />
-        <div className={css.skeletonCard} />
-        <div className={css.skeletonCard} />
-      </div>
-    )
-  }
-
-  const rounds = view?.rounds ?? []
-  const candidates = view?.candidates ?? []
-  const keptCount = candidates.filter(entry => entry.candidate.verdict === 'kept').length
-  const excludedCount = candidates.filter(entry => entry.candidate.verdict === 'excluded').length
-  const hasThread = rounds.length > 0 || candidates.length > 0
-  const byRound = new Map<string, CandidateView[]>()
-  for (const entry of candidates) {
-    const key = entry.candidate.roundId ?? ''
-    const list = byRound.get(key) ?? []
-    list.push(entry)
-    byRound.set(key, list)
-  }
-  const favoriteKeys = new Set(favorites.map(favorite =>
-    favorite.favorite.url ?? `title:${favorite.favorite.title}`))
-  const visibleFavorites = favorites.filter(favorite => {
-    const needle = favoriteQuery.trim().toLowerCase()
-    if (needle === '') return true
-    return favorite.favorite.title.toLowerCase().includes(needle)
-      || (favorite.favorite.url ?? '').toLowerCase().includes(needle)
-      || (favorite.favorite.note ?? '').toLowerCase().includes(needle)
+    const outcome = await deck.reference(sessionId, view.setId)
+    if (outcome !== 'inserted') throw new Error(t(outcome === 'draft-changed' ? 'reference.conflict' : 'reference.unavailable'))
+    if (currentOwner.current === owner) setNotice(t('reference.done'))
+  })
+  const sendSummary = () => operate('send', async () => { if (view) { await deck.deliverSelection(sessionId, view.setId); await refresh(); if (currentOwner.current === owner) setNotice(t('submit.done')) } })
+  const add = () => operate('add', async () => {
+    if (!manual.trim()) return
+    await deck.add(sessionId, { ...(safeWebUrl(manual.trim()) ? { url: manual.trim() } : { title: manual.trim() }), ...(view ? { setId: view.setId } : {}) })
+    setManual(''); await refresh()
+  })
+  const addFavorite = (item: FavoriteView) => operate(`library:${item.favoriteId}`, async () => {
+    const added = await deck.add(sessionId, { ...item.favorite, ...(view?.set.status === 'open' ? { setId: view.setId } : {}) })
+    if (currentOwner.current !== owner) return
+    setTargetSetId(added.setId); setMode('deck'); await refresh()
   })
 
-  return (
-    <div className={css.root} data-deck-state={hasThread ? 'ready' : 'empty'} data-deck-tab="deck">
-      <header className={css.header}>
-        <div className={css.headerTop}>
-          <div className={css.titleGroup}>
-            <span className={css.title}>{mode === 'favorites' ? t('favorites.title') : t('panel.title')}</span>
-            {hasThread && mode === 'deck'
-              ? <span className={css.progressText}>{t('progress.summary', {
-                kept: String(keptCount), excluded: String(excludedCount), total: String(candidates.length),
-              })}</span>
-              : null}
-          </div>
-          <div className={css.headerActions}>
-            <button type="button" className={css.linkButton}
-              onClick={() => { setError(null); setMode(mode === 'favorites' ? 'deck' : 'favorites') }}>
-              {mode === 'favorites' ? t('favorites.back') : t('favorites.open')}
-            </button>
-            {hasThread && mode === 'deck' ? (
-              <button type="button" className={css.linkButton} onClick={() => void startFresh()}>{t('action.newSearch')}</button>
-            ) : null}
-            <button type="button" className={css.iconButton} aria-label={t('action.refresh')} title={t('action.refresh')}
-              onClick={() => void refresh()}>↻</button>
-          </div>
-        </div>
-      </header>
+  const candidates = view?.candidates ?? []
+  const keptCount = candidates.filter(item => item.candidate.verdict === 'kept').length
+  const excludedCount = candidates.filter(item => item.candidate.verdict === 'excluded').length
+  const running = view?.rounds.find(item => item.round.status === 'starting' || item.round.status === 'running')
+  const readOnly = view?.set.status === 'submitted'
+  const shown = candidates.filter(item => (filter === 'all' || item.candidate.verdict === filter) && `${item.source.title} ${item.source.note ?? ''} ${item.source.meta?.description ?? ''}`.toLowerCase().includes(query.toLowerCase()))
+  const rounds = view?.rounds ?? []
+  const groups = [...rounds.map(item => ({ id: item.roundId, index: item.round.index, request: item.round.request, status: item.round.status, diagnostic: item.round.diagnostic, note: item.round.note })),
+    ...(candidates.some(item => !item.candidate.roundId) ? [{ id: 'manual', index: 0, request: t('v3.manual'), status: undefined, diagnostic: undefined, note: undefined }] : [])]
+  const compareEntries = candidates.filter(item => currentDraft.compare.includes(item.candidate.sourceId))
+  const card = (entry: CandidateView) => <CandidateCard key={entry.candidateId} entry={entry} t={t}
+    reason={currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
+    favorite={favorites.some(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))}
+    compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly}
+    busy={operations.has(`candidate:${entry.candidateId}`) || operations.has(`favorite:${entry.candidate.sourceId}`)}
+    onReason={value => patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } })}
+    onDecide={verdict => void decide(entry, verdict)}
+    onSaveReason={() => { const reason = currentDraft.reasons[entry.candidateId]; if (reason !== undefined && reason !== (entry.candidate.reason ?? '')) void decide(entry, entry.candidate.verdict, reason) }}
+    onFavorite={() => void toggleFavorite(entry)} onCompare={() => toggleCompare(entry.candidate.sourceId)} />
 
-      {error === null ? null : <p className={css.error}>{error}</p>}
-
-      {mode === 'favorites' ? (
-        <section className={css.favoritePane}>
-          <input className={css.search} type="search" value={favoriteQuery} aria-label={t('favorites.search')}
-            placeholder={t('favorites.searchPlaceholder')} onChange={event => setFavoriteQuery(event.target.value)} />
-          {visibleFavorites.length === 0 ? (
-            <div className={css.empty}>
-              <p className={css.emptyTitle}>{t('favorites.empty')}</p>
-              <p className={css.note}>{t('favorites.emptyHint')}</p>
-            </div>
-          ) : (
-            <ul className={css.favoriteList}>
-              {visibleFavorites.map(favorite => {
-                const url = favorite.favorite.url
-                return (
-                  <li key={favorite.favoriteId} className={css.favoriteItem}>
-                    <div className={css.favoriteBody}>
-                      <a className={css.favoriteTitle} href={url} target="_blank" rel="noreferrer">{favorite.favorite.title}</a>
-                      {favorite.favorite.note === undefined ? null : <p className={css.cardText}>{favorite.favorite.note}</p>}
-                    </div>
-                    <div className={css.cardActions}>
-                      <button type="button" className={css.button} disabled={busy}
-                        onClick={() => void addFromFavorite(favorite)}>{t('favorites.add')}</button>
-                      <button type="button" className={css.linkButton} disabled={busy}
-                        onClick={() => { void deck.removeFavorite(favorite.favoriteId).then(() => setFavorites(favorites.filter(item => item.favoriteId !== favorite.favoriteId))) }}>
-                        {t('favorites.remove')}
-                      </button>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
+  return <div className={css.root} data-deck-state={mode}>
+    <header className={css.header}>
+      <div><span className={css.eyebrow}>SOURCEDECK</span><h2>{t('type.label')}</h2><p>{t('v3.subtitle')}</p></div>
+      <button type="button" className={css.button} disabled={operations.has('new')} onClick={() => void newTopic()}>＋ {t('action.newSearch')}</button>
+    </header>
+    <nav className={css.tabs} aria-label={t('type.label')}>
+      <button type="button" aria-pressed={mode === 'deck'} onClick={() => setMode('deck')}>{t('v3.sources')} {candidates.length || ''}</button>
+      <button type="button" aria-pressed={mode === 'favorites'} onClick={() => setMode('favorites')}>{t('favorites.title')} {favorites.length || ''}</button>
+      <button type="button" aria-pressed={compareOpen} onClick={() => { setCompareOpen(!compareOpen); setMode('deck') }}>{t('compare.title')} {currentDraft.compare.length || ''}</button>
+      <button type="button" onClick={() => void operate('refresh', refresh)} aria-label={t('v3.refresh')}>↻</button>
+    </nav>
+    {error ? <div role="alert" className={css.error}>{error}<button type="button" onClick={() => setError(null)} aria-label={t('v3.dismiss')}>×</button></div> : null}
+    {notice ? <p role="status" className={css.notice}>{notice}</p> : null}
+    <div className={css.scroll}>
+      {mode === 'favorites' ? <section className={css.section}>
+        <input className={css.input} type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t('favorites.search')} aria-label={t('favorites.search')} />
+        {favorites.filter(item => `${item.favorite.title} ${item.favorite.note ?? ''}`.toLowerCase().includes(query.toLowerCase())).map(item => <article key={item.favoriteId} className={css.favoriteRow}>
+          <strong>{safeWebUrl(item.favorite.url) ? <a href={safeWebUrl(item.favorite.url)} target="_blank" rel="noreferrer">{item.favorite.title}</a> : item.favorite.title}</strong>
+          <p>{item.favorite.note ?? item.favorite.meta?.description}</p>
+          <button type="button" className={css.button} disabled={operations.has(`library:${item.favoriteId}`)} onClick={() => void addFavorite(item)}>{t('favorites.add')}</button>
+          <button type="button" className={css.linkButton} onClick={() => void operate(`library:${item.favoriteId}`, async () => { await deck.removeFavorite(item.favoriteId); setFavorites(await deck.listFavorites()) })}>{t('favorites.remove')}</button>
+        </article>)}
+        {!favorites.length ? <p className={css.empty}>{t('favorites.empty')}</p> : null}
+      </section> : <>
+        {compareOpen ? <div className={css.section}><ComparePanel entries={compareEntries} t={t} remove={toggleCompare} /></div> : null}
+        <section className={css.searchBox}>
+          <label className={css.label} htmlFor={`deck-request-${tab.id}`}>{candidates.length || rounds.length ? t('v3.newRequest') : t('v3.findTitle')}</label>
+          <textarea id={`deck-request-${tab.id}`} className={css.textarea} rows={candidates.length || rounds.length ? 2 : 3} value={currentDraft.request} onChange={event => patchDraft({ request: event.target.value })} placeholder={t('search.placeholder')} />
+          <div className={css.searchActions}><span>{t('v3.triggerHint')}</span><button type="button" className={css.primary} disabled={operations.has('start')} onClick={() => void start(false)}>{operations.has('start') ? t('search.starting') : t('search.start')}</button></div>
+          {!rounds.length && !candidates.length ? <div className={css.examples}>{(['search.example.one', 'search.example.two', 'search.example.three'] as const).map(key => <button type="button" key={key} onClick={() => patchDraft({ request: t(key) })}>{t(key)}</button>)}</div> : null}
         </section>
-      ) : null}
-
-      {mode === 'deck' && !hasThread ? (
-        <section className={css.landing}>
-          <h2 className={css.landingTitle}>{t('search.title')}</h2>
-          <p className={css.landingHint}>{t('search.hint')}</p>
-          <textarea className={css.requestBox} value={request} rows={3} aria-label={t('search.label')}
-            placeholder={t('search.placeholder')} disabled={busy}
-            onChange={event => setRequest(event.target.value)} />
-          <div className={css.examples}>
-            {EXAMPLES.map(key => (
-              <button key={key} type="button" className={css.example} onClick={() => setRequest(t(key))}>
-                {t(key)}
-              </button>
-            ))}
-          </div>
-          <button type="button" className={css.primary} disabled={busy} onClick={() => void runRound(request)}>
-            {busy ? t('search.starting') : t('search.start')}
-          </button>
-          <button type="button" className={css.manualToggle} onClick={() => setManualOpen(!manualOpen)}>
-            {t('search.manual')}
-          </button>
-          {manualOpen ? (
-            <div className={css.manualRow}>
-              <input className={css.input} value={manual} aria-label={t('add.primary')}
-                placeholder={t('add.primaryPlaceholder')} onChange={event => setManual(event.target.value)}
-                onKeyDown={event => { if (event.key === 'Enter') void addManual() }} />
-              <button type="button" className={css.button} disabled={busy} onClick={() => void addManual()}>{t('add.submit')}</button>
-            </div>
-          ) : null}
-        </section>
-      ) : null}
-
-      {mode === 'deck' && hasThread ? (
-        <div className={css.feed}>
-          {rounds.map(({ roundId, round }) => {
-            const entries = byRound.get(roundId) ?? []
-            return (
-              <section key={roundId} className={css.round}>
-                <div className={css.roundHeader}>
-                  <span className={css.roundBadge}>{t('round.title', { index: String(round.index) })}</span>
-                  <p className={css.roundRequest}>{round.request}</p>
-                </div>
-                {round.note === undefined ? null : <p className={css.roundNote}>{t('round.note', { note: round.note })}</p>}
-                {entries.length === 0 ? (
-                  <p className={css.waiting}>
-                    {searchingRound === roundId ? t('round.searching') : t('round.empty')}
-                  </p>
-                ) : (
-                  <ul className={css.cardGrid}>
-                    {entries.map(entry => {
-                      const meta = entry.source.meta ?? {}
-                      const image = avatarOf(entry, meta.image)
-                      const favKey = entry.source.url ?? `title:${entry.source.title}`
-                      const favorited = favoriteKeys.has(favKey)
-                      const stars = formatStars(meta.stars)
-                      return (
-                        <li key={entry.candidateId} className={css.card}
-                          data-verdict={entry.candidate.verdict} data-candidate={entry.candidateId}>
-                          <div className={css.cardHead}>
-                            <span className={css.avatarWrap}>
-                              <span className={css.avatarFallback} aria-hidden="true">{entry.source.title.slice(0, 1)}</span>
-                              {image === undefined ? null : (
-                                <img className={css.avatar} src={image} alt="" loading="lazy" referrerPolicy="no-referrer"
-                                  onError={event => { (event.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                              )}
-                            </span>
-                            <div className={css.cardTitleGroup}>
-                              {entry.source.url === undefined
-                                ? <span className={css.cardTitle}>{entry.source.title}</span>
-                                : <a className={css.cardTitle} href={entry.source.url} target="_blank" rel="noreferrer">{entry.source.title}</a>}
-                              {meta.repo === undefined || meta.repo === entry.source.title ? null : <span className={css.repo}>{meta.repo}</span>}
-                            </div>
-                            <button type="button" className={favorited ? css.starActive : css.star}
-                              aria-label={favorited ? t('card.unfavorite') : t('card.favorite')}
-                              title={favorited ? t('card.unfavorite') : t('card.favorite')}
-                              onClick={() => void toggleFavorite(entry)}>{favorited ? '★' : '☆'}</button>
-                          </div>
-                          {entry.source.note === undefined && meta.description === undefined ? null : (
-                            <p className={css.cardText}>{entry.source.note ?? meta.description}</p>
-                          )}
-                          <div className={css.metaRow}>
-                            {stars === undefined ? null : <span className={css.metaChip}>★ {stars}</span>}
-                            {meta.language === undefined ? null : <span className={css.metaChip}>{meta.language}</span>}
-                            {entry.source.url === undefined ? null : (
-                              <a className={css.metaLink} href={entry.source.url} target="_blank" rel="noreferrer">{t('link.open')} ↗</a>
-                            )}
-                          </div>
-                          {entry.candidate.policyFlags === undefined || entry.candidate.policyFlags.length === 0 ? null : (
-                            <div className={css.flags}>
-                              {entry.candidate.policyFlags.map(flag => (
-                                <span key={flag} className={css.flag}>{t(`flag.${flag}` as DeckKey)}</span>
-                              ))}
-                            </div>
-                          )}
-                          <div className={css.cardActions}>
-                            <button type="button"
-                              className={entry.candidate.verdict === 'kept' ? css.keepActive : css.action}
-                              aria-pressed={entry.candidate.verdict === 'kept'} disabled={busy || submitted}
-                              title={t('card.undo')}
-                              onClick={() => void decide(entry, entry.candidate.verdict === 'kept' ? 'pending' : 'kept')}>
-                              ✓ {entry.candidate.verdict === 'kept' ? t('card.kept') : t('card.keep')}
-                            </button>
-                            <button type="button"
-                              className={entry.candidate.verdict === 'excluded' ? css.excludeActive : css.action}
-                              aria-pressed={entry.candidate.verdict === 'excluded'} disabled={busy || submitted}
-                              title={t('card.undo')}
-                              onClick={() => void decide(entry, entry.candidate.verdict === 'excluded' ? 'pending' : 'excluded')}>
-                              ✕ {entry.candidate.verdict === 'excluded' ? t('card.excluded') : t('card.exclude')}
-                            </button>
-                            {entry.candidate.verdict === 'pending' ? null : (
-                              <button type="button" className={css.linkButton} disabled={busy || submitted}
-                                onClick={() => void decide(entry, 'pending')}>{t('card.skip')}</button>
-                            )}
-                          </div>
-                          {entry.candidate.verdict === 'excluded' ? (
-                            <div className={css.reasonRow}>
-                              <input className={css.reasonInput} value={reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
-                                placeholder={t('card.reasonPlaceholder')} aria-label={t('card.reason')}
-                                onBlur={() => void saveReason(entry)}
-                                onKeyDown={event => { if (event.key === 'Enter') void saveReason(entry) }}
-                                onChange={event => setReasons({ ...reasons, [entry.candidateId]: event.target.value })} />
-                              <button type="button" className={css.linkButton} disabled={busy || submitted}
-                                onClick={() => void saveReason(entry)}>{t('card.saveReason')}</button>
-                            </div>
-                          ) : null}
-                        </li>
-                      )
-                    })}
-                  </ul>
-                )}
-              </section>
-            )
-          })}
-          {view !== null && rounds.length === 0 && candidates.length > 0 ? (
-            <section className={css.round}>
-              <ul className={css.cardGrid}>
-                {candidates.map(entry => (
-                  <li key={entry.candidateId} className={css.card} data-verdict={entry.candidate.verdict}>
-                    <a className={css.cardTitle} href={entry.source.url} target="_blank" rel="noreferrer">{entry.source.title}</a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
-      ) : null}
-
-      {mode === 'deck' && hasThread ? (
-        <footer className={css.footer}>
-          {submitted ? (
-            <div className={css.successRow}>
-              <span>{t('submit.done')}</span>
-              <button type="button" className={css.button} onClick={() => void startFresh()}>{t('action.newSearch')}</button>
-            </div>
-          ) : (
-            <>
-              <textarea className={css.feedbackBox} value={note} rows={2} aria-label={t('feedback.label')}
-                placeholder={t('feedback.placeholder')} disabled={busy || searchingRound !== null}
-                onChange={event => setNote(event.target.value)} />
-              <div className={css.feedbackRow}>
-                <span className={css.feedbackSummary}>
-                  {t('feedback.reference', { kept: String(keptCount), excluded: String(excludedCount) })}
-                </span>
-                <button type="button" className={css.primary}
-                  disabled={busy || searchingRound !== null} onClick={() => void continueRound()}>
-                  {searchingRound === null ? t('feedback.continue') : t('search.starting')}
-                </button>
-              </div>
-              <button type="button" className={css.submitButton} disabled={busy || keptCount === 0}
-                onClick={() => void reference()}>{t('reference.button', { count: String(keptCount) })}</button>
-              {notice ? <p role="status" className={css.hint}>{notice}</p> : null}
-              <button type="button" className={css.linkButton}
-                disabled={busy || searchingRound !== null || keptCount + excludedCount === 0}
-                onClick={() => void submit()}>{t('reference.direct')}</button>
-            </>
-          )}
-          <p className={css.hint}>{t('footer.hint')}</p>
-        </footer>
-      ) : null}
+        {loading ? <p className={css.empty} role="status">{t('v3.loading')}</p> : null}
+        {candidates.length ? <div className={css.filterBar}>
+          <div className={css.filters}>{(['all', 'pending', 'kept', 'excluded'] as const).map(value => <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{t(`v3.filter.${value}` as DeckKey)}</button>)}</div>
+          <input className={css.input} type="search" aria-label={t('v3.filterSearch')} placeholder={t('v3.filterSearch')} value={query} onChange={event => setQuery(event.target.value)} />
+        </div> : null}
+        {groups.map(group => {
+          const entries = shown.filter(item => (item.candidate.roundId ?? 'manual') === group.id)
+          return <section key={group.id} id={`deck-${group.id}`} className={css.section}>
+            <div className={css.roundHeading}><span>{group.index ? t('round.title', { index: String(group.index) }) : t('v3.manual')}</span><span className={css.status}>{group.status ? t(`v3.status.${group.status}` as DeckKey) : ''}</span></div>
+            {group.index ? <p className={css.roundRequest}>{group.request}</p> : null}
+            {group.note ? <p className={css.muted}>{group.note}</p> : null}
+            {group.diagnostic ? <p className={css.error} role="status">{group.diagnostic}</p> : null}
+            <div className={css.grid}>{entries.map(card)}</div>
+            {!entries.length ? <p className={css.empty}>{group.status === 'running' || group.status === 'starting' ? t('round.searching') : t('v3.noNewResults')}</p> : null}
+          </section>
+        })}
+        {!readOnly ? <details className={css.manual}><summary>{t('v3.manual')}</summary><div><input className={css.input} aria-label={t('add.primary')} placeholder={t('add.primary')} value={manual} onChange={event => setManual(event.target.value)} /><button type="button" className={css.button} disabled={operations.has('add') || !manual.trim()} onClick={() => void add()}>{t('add.submit')}</button></div></details> : null}
+      </>}
     </div>
-  )
+    {mode === 'deck' && view && (rounds.length > 0 || candidates.length > 0) ? <footer className={css.footer}>
+      <div className={css.summary}><span>✓ {keptCount} · ✕ {excludedCount} · {t('v3.pending')} {candidates.length - keptCount - excludedCount}</span>{running ? <button type="button" className={css.linkButton} disabled={operations.has('cancel')} onClick={() => void operate('cancel', async () => { await deck.cancelRound(sessionId, running.roundId); await refresh() })}>{t('v3.stop')}</button> : null}</div>
+      {!readOnly ? <><textarea className={css.textarea} rows={2} aria-label={t('feedback.label')} placeholder={t('feedback.placeholder')} value={currentDraft.note} onChange={event => patchDraft({ note: event.target.value })} />
+        <button type="button" className={css.button} disabled={Boolean(running) || operations.has('start')} onClick={() => void start(true)}>{running ? t('v3.background') : t('feedback.continue')}</button></> : <p className={css.muted}>{t('v3.historyReadOnly')}</p>}
+      <button type="button" className={css.primary} disabled={!keptCount || operations.has('reference')} onClick={() => void reference()}>{t('reference.button', { count: String(keptCount) })}</button>
+      <button type="button" className={css.linkButton} disabled={Boolean(running) || operations.has('send') || !candidates.length || view.deliveryStatus === 'sent'} onClick={() => void sendSummary()}>{view.deliveryStatus === 'sent' ? t('submit.done') : t('reference.direct')}</button>
+      <p className={css.footerHint}>{t('v3.referenceHint')}</p>
+    </footer> : null}
+  </div>
 }

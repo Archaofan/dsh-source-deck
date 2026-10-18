@@ -29,6 +29,8 @@ export interface SourceMeta {
   readonly image?: string
   /** Project homepage or docs site. */
   readonly homepage?: string
+  readonly metadataFetchedAt?: string
+  readonly metadataUrl?: string
 }
 
 /** One policy's parameters. Only fields for the selected kind are meaningful. */

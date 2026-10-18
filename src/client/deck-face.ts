@@ -15,12 +15,13 @@ export interface PolicyView {
 export interface DeckFace {
   load(sessionId: string): Promise<SetView | null>
   loadSet(sessionId: string, setId: string): Promise<SetView>
-  add(sessionId: string, input: { title?: string; url?: string; note?: string }): Promise<AddSourceResult>
+  add(sessionId: string, input: { title?: string; url?: string; note?: string; snippet?: string; meta?: import('../scope-policy.ts').SourceMeta; setId?: string }): Promise<AddSourceResult>
   decide(candidateId: string, verdict: Verdict, reason?: string): Promise<void>
   commit(sessionId: string, setId: string): Promise<CommitResult>
   prompt(sessionId: string, text: string): Promise<boolean>
   startRound(sessionId: string, request: string, note?: string, options?: { mode: 'new' | 'continue'; setId?: string; requestId?: string }): Promise<StartRoundResult>
   activity(sessionId: string): Promise<DeckActivity>
+  cancelRound(sessionId: string, roundId: string): Promise<void>
   createReference(sessionId: string, setId: string, requestId: string): Promise<ReferenceSnapshot>
   getReference(sessionId: string, selectionId: string): Promise<ReferenceSnapshot>
   listReferences(sessionId: string): Promise<readonly ReferenceSnapshot[]>
@@ -31,7 +32,7 @@ export interface DeckFace {
   savePolicy(policy: ScopePolicy): Promise<PolicyView>
   newSet(sessionId: string): Promise<{ setId: string }>
   listFavorites(): Promise<FavoriteView[]>
-  addFavorite(input: { title: string; url?: string; note?: string; snippet?: string }): Promise<FavoriteView>
+  addFavorite(input: { title: string; url?: string; note?: string; snippet?: string; meta?: import('../scope-policy.ts').SourceMeta }): Promise<FavoriteView>
   removeFavorite(favoriteId: string): Promise<void>
   clearData(): Promise<void>
 }

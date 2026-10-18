@@ -78,6 +78,8 @@ function metaOf(value: Record<string, unknown>, index: number): SourceMeta | und
   const owner = text('owner')
   const image = text('image')
   const homepage = text('homepage')
+  const metadataFetchedAt = text('metadataFetchedAt')
+  const metadataUrl = text('metadataUrl')
   return {
     ...(stars === undefined ? {} : { stars }),
     ...(pushedAt === undefined ? {} : { pushedAt }),
@@ -92,6 +94,8 @@ function metaOf(value: Record<string, unknown>, index: number): SourceMeta | und
     ...(owner === undefined ? {} : { owner }),
     ...(image === undefined ? {} : { image }),
     ...(homepage === undefined ? {} : { homepage }),
+    ...(metadataFetchedAt === undefined ? {} : { metadataFetchedAt }),
+    ...(metadataUrl === undefined ? {} : { metadataUrl }),
   }
 }
 
@@ -135,6 +139,8 @@ const META_SCHEMA = {
     owner: { type: 'string', description: 'GitHub owner login, used for the avatar.' },
     image: { type: 'string', description: 'Explicit card image URL.' },
     homepage: { type: 'string', description: 'Project homepage or docs URL.' },
+    metadataFetchedAt: { type: 'string', description: 'Actual metadata lookup time, ISO timestamp.' },
+    metadataUrl: { type: 'string', description: 'Verified metadata source URL, preferably the GitHub repository API.' },
   },
   additionalProperties: false,
 }

@@ -113,6 +113,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     startRound: async (sessionId, request, note, options) =>
       await call('startRound', { sessionId, request, requestId: options?.requestId ?? crypto.randomUUID(), mode: options?.mode ?? 'new', ...(options?.setId ? { setId: options.setId } : {}), ...(note === undefined ? {} : { note }) }) as StartRoundResult,
     activity: async sessionId => await call('getActivity', { sessionId }) as DeckActivity,
+    cancelRound: async (sessionId, roundId) => { await call('cancelRound', { sessionId, roundId }) },
     createReference: async (sessionId, setId, requestId) => await call('createReference', { sessionId, setId, requestId }) as ReferenceSnapshot,
     getReference: async (sessionId, selectionId) => await call('getReference', { sessionId, selectionId }) as ReferenceSnapshot,
     listReferences: async sessionId => await call('listReferences', { sessionId }) as ReferenceSnapshot[],
@@ -134,7 +135,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
     newSet: async (sessionId: string) => await call('newSet', { sessionId }) as { setId: string },
     listFavorites: async () => await call('listFavorites', {}) as FavoriteView[],
-    addFavorite: async (input: { title: string; url?: string; note?: string; snippet?: string }) =>
+    addFavorite: async input =>
       await call('addFavorite', { ...input }) as FavoriteView,
     removeFavorite: async (favoriteId: string) => { await call('removeFavorite', { favoriteId }) },
     clearData: async () => { await call('clearData', {}) },
