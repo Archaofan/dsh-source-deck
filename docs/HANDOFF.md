@@ -1,5 +1,7 @@
 # 新对话接手提示词
 
+> **2026-10-18 最新补充（优先于下方旧提示中的“不要重新设计”）**：用户已要求调研并优化开发者工作流、UI 与触发方式，明确优先“找开源库、比较技术方案”。[调研与评审提案](research/2026-10-18-developer-workflow-review.md)（[English](research/2026-10-18-developer-workflow-review.en.md)）已完成，推荐同一会话内的选型工作台方向。产品仍 0.2.5，无产品代码/版本/依赖改动；当前停在设计评审，不能把候选方案当批准决定。后续先查看用户对本轮提案的反馈，再完成正式 spec 和实施计划。基线 35 测试通过；运行 `node docs/research/probes/2026-10-18-workflow-probe.mjs` 可复现现有轮次归属与提交幂等问题，输出 true 表示仍观察到问题。沙箱 baseline/CheckOnly 已复核且空闲，本轮未启动 Desktop/调用模型。市场约 10:43 北京时间仍 open/年龄 gate failure，满 24h 的准确时间为 11:35:45，之后需重新检查；生产未改。
+
 将下面整段发送到新对话。建议让新对话的工作目录直接指向 E:/DSH-Desktop-Plugin-Dev/dsh-source-deck。
 
 ~~~text

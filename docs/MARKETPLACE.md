@@ -24,7 +24,9 @@ No need to resubmit, push, or close and reopen;
 the age bar is the only thing failing here.
 ```
 
-gate 由 `regate.yml` 自动重跑；不要为了绕过年龄门槛关 PR、重开 PR 或 force-push。满 24 小时后 gate 会自动转绿，然后等待维护者审核合并。
+gate 由 `regate.yml` 自动重跑；不要为了绕过年龄门槛关 PR、重开 PR 或 force-push。满 24 小时后满足年龄条件，仍需观察自动重跑结果，再等待维护者审核合并。
+
+2026-10-18 约 **10:43 北京时间**，通过 GitHub API 实时复核：PR 仍 open / merged=false，check success，Submission gate 仍为此前的仓库年龄失败。准确满 24h 时间为 **11:35:45**；满足门槛不等于自动任务已重跑，不能承诺准点转绿。满时后需复核新一次 check 结果，再等待维护者合并及目录同步；本次未修改 PR 分支。
 
 ## 市场条目
 

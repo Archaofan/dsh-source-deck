@@ -98,7 +98,7 @@ When screening is done, press **Submit to Agent (N kept)** at the bottom:
 - Press ☆ on a card to save it.
 - Open **Saved** in the header; search by title, URL, or note.
 - **Add to deck** turns a saved item back into a candidate in the current set; **Remove** deletes it.
-- Favorites are stored with the deck and survive a Desktop restart.
+- Favorites are shared within the current DSH profile, rather than isolated by set or project, and survive a Desktop restart.
 
 ### 6. Stop and timeouts
 
@@ -145,6 +145,7 @@ Artifacts: `lib/index.js` (Host half) and `lib/client.js` (browser lazy-CJS fact
 
 - [Design, including §14 v2 revision](docs/design/2026-10-17-solution-design.md)
 - [Chat ↔ deck linkage research](docs/research/2026-10-17-chat-deck-linkage.md)
+- [Developer workflow research and next-iteration proposal (design review pending)](docs/research/2026-10-18-developer-workflow-review.en.md)
 - [Verification record (nights 4–7)](docs/SETUP-VERIFICATION.md)
 - [Implementation plan](docs/implementation/2026-10-17-implementation-plan.md)
 - [Version policy](docs/VERSION-POLICY.md)

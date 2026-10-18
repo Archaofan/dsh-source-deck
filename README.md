@@ -100,7 +100,7 @@ SourceDeck 是 DeepSeek Harness Desktop 的**会话内资料台**：用一句自
 - 卡片右上角 ☆ 收藏。
 - 点顶部「收藏夹」查看；支持按标题、链接、备注搜索。
 - 「加入资料台」把收藏重新变成当前集合的候选；「移除」删除收藏。
-- 收藏按资料集独立保存，重启 Desktop 后仍在。
+- 收藏由当前 DSH profile 共享，不按资料集或项目隔离；重启 Desktop 后仍在。
 
 ### 6. 停止/超时
 
@@ -147,6 +147,7 @@ npm pack
 
 - [设计（含 §14 v2 修订）](docs/design/2026-10-17-solution-design.md)
 - [聊天 ↔ 资料台联动调研](docs/research/2026-10-17-chat-deck-linkage.md)
+- [开发者工作流调研与下一轮提案（待设计评审）](docs/research/2026-10-18-developer-workflow-review.md)
 - [验收记录（夜-4 至夜-7）](docs/SETUP-VERIFICATION.md)
 - [实现计划](docs/implementation/2026-10-17-implementation-plan.md)
 - [版本策略](docs/VERSION-POLICY.md)
