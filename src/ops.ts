@@ -34,6 +34,7 @@ export interface AddSourceInput {
   readonly snippet?: string
   readonly contentRef?: unknown
   readonly meta?: SourceRecord['meta']
+  readonly target?: { readonly setId: string; readonly roundId?: string }
 }
 
 /** Result of adding a source. */
@@ -73,6 +74,7 @@ export interface StartRoundInput {
   readonly note?: string
   /** Compact recap of the current conversation. */
   readonly conversation?: string
+  readonly setId?: string
 }
 
 /** Result of starting one search round. */
@@ -202,7 +204,10 @@ function roundsOf(store: DeckStore, setId: string): RoundView[] {
 export async function startRound(store: DeckStore, input: StartRoundInput): Promise<StartRoundResult> {
   const request = input.request.trim()
   if (request === '') throw new Error('search request must not be empty')
-  const setId = await ensureActiveSet(store, input.sessionId, 'agent')
+  const setId = input.setId ?? await ensureActiveSet(store, input.sessionId, 'agent')
+  const set = requiredSet(store, setId)
+  if (set.sessionId !== input.sessionId) throw new Error('deck set does not belong to this session')
+  if (set.status === 'submitted') throw new Error('deck set is submitted')
   const previous = roundsOf(store, setId)
   const round: RoundRecord = {
     setId,
@@ -229,7 +234,15 @@ export async function addSource(store: DeckStore, input: AddSourceInput): Promis
   const key = dedupeKey({ url: input.url, title: input.title })
   const policy = await getPolicy(store)
   const policyFlags = computeFlags(policy, input.meta ?? {}, input.url)
-  const setId = await ensureActiveSet(store, input.sessionId, input.origin)
+  const setId = input.target?.setId ?? await ensureActiveSet(store, input.sessionId, input.origin)
+  const set = requiredSet(store, setId)
+  if (set.sessionId !== input.sessionId) throw new Error('deck set does not belong to this session')
+  if (set.status === 'submitted') throw new Error('deck set is submitted')
+  if (input.target?.roundId !== undefined) {
+    const round = store.get('rounds', input.target.roundId) as RoundRecord | undefined
+    if (!round || round.setId !== setId || round.sessionId !== input.sessionId) throw new Error('round does not belong to this set')
+    if (round.status !== undefined && round.status !== 'starting' && round.status !== 'running') throw new Error('research round is closed')
+  }
   const existingSource = findEntry<SourceRecord>(store, 'sources', source => source.dedupeKey === key)
   let sourceId: string
   if (existingSource === undefined) {
@@ -262,7 +275,9 @@ export async function addSource(store: DeckStore, input: AddSourceInput): Promis
   }
   const candidateId = newId('cand')
   const active = store.get('session_active', input.sessionId)
-  const roundId = isRecord(active) && typeof active.roundId === 'string' ? active.roundId : undefined
+  const legacyRoundId = isRecord(active) && typeof active.roundId === 'string' ? active.roundId : undefined
+  const legacyRound = legacyRoundId === undefined ? undefined : store.get('rounds', legacyRoundId) as RoundRecord | undefined
+  const roundId = input.target?.roundId ?? (input.target === undefined && legacyRound?.workerSessionId === undefined ? legacyRoundId : undefined)
   const candidate: CandidateRecord = {
     setId,
     sourceId,
@@ -325,6 +340,7 @@ export async function decide(
   const value = store.get('candidates', input.candidateId)
   if (!isRecord(value)) throw new Error(`deck candidate ${input.candidateId} was not found`)
   const candidate = value as unknown as CandidateRecord
+  if (requiredSet(store, candidate.setId).status === 'submitted') throw new Error('deck set is submitted')
   const next: CandidateRecord = {
     ...candidate,
     verdict: input.verdict,

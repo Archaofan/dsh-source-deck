@@ -41,6 +41,21 @@ export interface RoundRecord {
   readonly keptCount?: number
   readonly excludedCount?: number
   readonly createdAt: string
+  readonly workerSessionId?: string
+  readonly requestId?: string
+  readonly status?: ResearchStatus
+  readonly endedAt?: string
+  readonly diagnostic?: string
+}
+
+export type ResearchStatus = 'starting' | 'running' | 'completed' | 'failed' | 'cancelled' | 'interrupted'
+
+export interface ResearchTarget {
+  readonly parentSessionId: string
+  readonly setId: string
+  readonly roundId: string
+  readonly workerSessionId: string
+  readonly requestId: string
 }
 
 /** One candidate inside a set. */

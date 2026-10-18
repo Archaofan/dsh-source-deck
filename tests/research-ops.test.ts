@@ -1,0 +1,58 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { addSource, commitSelection, decide, getSet, startNewSet } from '../src/ops.ts'
+import { memoryStore } from './memory-store.ts'
+import { prepareResearchRound, finishResearchRound, requireResearchRound, interruptResearchRounds, resolveResearchTarget } from '../src/research-ops.ts'
+
+test('late_result_keeps_original_target', async () => {
+  const store = memoryStore()
+  const a = await startNewSet(store, 's', 'agent')
+  const b = await startNewSet(store, 's', 'agent')
+  const result = await addSource(store, { sessionId: 's', origin: 'agent', title: 'A', target: { setId: a } })
+  assert.equal(result.setId, a)
+  assert.equal((await getSet(store, b)).candidates.length, 0)
+})
+
+test('submitted_set_is_immutable', async () => {
+  const store = memoryStore()
+  const source = await addSource(store, { sessionId: 's', origin: 'user', title: 'A' })
+  await commitSelection(store, { sessionId: 's', setId: source.setId, requestId: 'submit' })
+  await assert.rejects(decide(store, { candidateId: source.candidateId, verdict: 'kept' }), /submitted/)
+  await assert.rejects(addSource(store, { sessionId: 's', origin: 'agent', title: 'B', target: { setId: source.setId } }), /submitted/)
+})
+
+test('explicit target cannot cross session ownership', async () => {
+  const store = memoryStore()
+  const a = await startNewSet(store, 'a', 'agent')
+  await assert.rejects(addSource(store, { sessionId: 'b', origin: 'agent', title: 'Bad', target: { setId: a } }), /belong/)
+})
+
+test('repeated_request_reuses_round', async () => {
+  const store = memoryStore()
+  const input = { sessionId: 's', request: 'Find libraries', workerSessionId: 'w', requestId: 'r', mode: 'new' as const }
+  const first = await prepareResearchRound(store, input)
+  const retry = await prepareResearchRound(store, { ...input, workerSessionId: 'other' })
+  assert.equal(first.roundId, retry.roundId)
+  assert.equal([...store.entries('rounds')].length, 1)
+  assert.equal(retry.target.workerSessionId, 'w')
+})
+
+test('wrong_worker_is_rejected', async () => {
+  const store = memoryStore()
+  const first = await prepareResearchRound(store, { sessionId: 's', request: 'Find', workerSessionId: 'w', requestId: 'r', mode: 'new' })
+  assert.throws(() => requireResearchRound(store, { ...first.target, workerSessionId: 'wrong' }), /worker/)
+  assert.equal(resolveResearchTarget(store, 'wrong'), undefined)
+  assert.deepEqual(resolveResearchTarget(store, 'w'), first.target)
+})
+
+test('interrupt_preserves_candidates and terminal state rejects late writes', async () => {
+  const store = memoryStore()
+  const first = await prepareResearchRound(store, { sessionId: 's', request: 'Find', workerSessionId: 'w', requestId: 'r', mode: 'new' })
+  await addSource(store, { sessionId: 's', origin: 'agent', title: 'A', target: first.target })
+  await interruptResearchRounds(store)
+  assert.equal((await getSet(store, first.target.setId)).rounds[0]?.round.status, 'interrupted')
+  assert.equal((await getSet(store, first.target.setId)).candidates.length, 1)
+  await finishResearchRound(store, { target: first.target, status: 'completed' })
+  assert.equal((await getSet(store, first.target.setId)).rounds[0]?.round.status, 'interrupted')
+  await assert.rejects(addSource(store, { sessionId: 's', origin: 'agent', title: 'Late', target: first.target }), /closed/)
+})
