@@ -79,7 +79,11 @@ Build exports, injection and bundle purity must still be checked during implemen
 
 The user confirmed one responsive layout on 2026-10-18: **two columns by default, automatically collapsing to one when the deck panel becomes too narrow, then restoring two when widened**. Do not expose these as separate design choices or require a manual toggle. Measure the panel's own content width, with an initial breakpoint around 620 CSS px to refine in the official sandbox. Cap at two columns, retain readable typography, and preserve screening/comparison/reason/round state across reflow. Show topic/round/state, recent searches and favorites; provide status filters and current-topic search. Render manual and round candidates through the same reusable component.
 
-Each candidate shows its repository/link, purpose, suitability, limits/unknowns, license/maintenance/language, auxiliary stars and provenance/time. Keep/exclude are durable decisions; comparison selection is independent. Reasons are optional and retain their draft on failure. Provide undo.
+Repository imagery is a confirmed requirement: show the repository's cover/thumbnail or project logo, falling back to its icon/owner avatar and finally initials. Do not replace this with plain text cards or unrelated artwork. Preserve image proportions, do not crop logos, reserve image space, load on demand and retain screening actions if an image fails.
+
+GitHub cards must visibly show stars and the latest code-update date near the repository name. Stars may be abbreviated with the exact number available; the date comes from the last code push (`pushed_at`, existing `meta.pushedAt`) in the user's time zone. Distinguish it from the metadata lookup time. Missing values remain unknown rather than becoming zero or today's date. Preserve imagery/stars/update metadata through favorites, re-import, remount and comparison. Obtain metadata/images through the existing model's search/web tools without adding credentials or a background crawler.
+
+Each candidate also shows its link, purpose, suitability, limits/unknowns, license/language and provenance/lookup time. Keep/exclude are durable decisions; comparison selection is independent. Reasons are optional and retain their draft on failure. Provide undo.
 
 Compare 2–4 items on shared dimensions, stacking by dimension in narrow panels. Unknown values remain unknown; do not invent scores/rankings. The primary action hands kept sources back to the current conversation, with compare/recommend/read intent; continue-search is secondary. Exclusions-only submission uses an explicit feedback label.
 
@@ -93,10 +97,12 @@ Persist dispatching/waiting/completed/timed-out/failed state. Without reliable e
 
 Persist a selection snapshot and pending-delivery state keyed by a stable requestId. Show success and lock only after prompt admission. Uncertain delivery can retry with the same ID and recover across remounts. Enforce submitted-state guards on both Host and UI; guard stale async callbacks after session changes.
 
+At approximately **10:57 China time on 2026-10-18**, GitHub API snapshots showed `uber-go/zap` at **24,670 stars**, last code push `2026-09-16T19:17:34Z` (**2026-09-17 03:17 China time**), and `rs/zerolog` at **12,519 stars**, last code push `2026-10-14T12:05:57Z` (**2026-10-14 20:05 China time**). These are lookup snapshots, not a continuously live feed. Preview images are the [zap project logo](https://github.com/uber-go/zap/blob/4892335e05f14bce8a98a69a577fcf3844a42623/assets/logo.png) and [zerolog's output screenshot](https://github.com/rs/zerolog/blob/20ca4734f29c37a6781c3c502442c349b306dee3/pretty.png), displayed from pinned commits through an allowed CDN without downloading assets into the plugin repository. Repository facts and illustrative selection advice are labeled separately.
+
 Proposed focused boundaries are a shared CandidateItem, SearchHeader, CompareView, session-bound data hook and centralized round/ownership/delivery operations. These are review candidates, not scaffolding already created. No additional GitHub token or background enrichment service is proposed for the first iteration.
 
 ## Validation and next gate
 
 Cover late/cross-topic results, empty/duplicate completion, idempotent retries, read-only submitted sets, old-record compatibility, false/thrown sends, remount and session-switch races, mixed candidate groups, and keyboard/IME exclusions. Then build/pack with exact peers and lazy-CJS, bump before sandbox installation, and use the approved installer. Verify narrow/wide panels, zoom, long bilingual text, focus, screenshots and a real two-round model workflow. Synchronize Chinese/English user documentation. Production remains unchanged.
 
-The responsive column behavior is confirmed; the overall direction A workflow, with independent comparison, direct commands and correctness first, remains pending review. Formal design and implementation planning follow that review; implementation has not begun.
+Responsive columns, repository imagery and visible GitHub stars/latest-code-update metadata are confirmed; the overall direction A workflow, with independent comparison, direct commands and correctness first, remains pending review. Formal design and implementation planning follow that review; implementation has not begun.
