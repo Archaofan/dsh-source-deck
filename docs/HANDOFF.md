@@ -10,6 +10,8 @@
 
 0.3.0 已于 2026-10-18 发布为 GitHub Release `v0.3.0`（tag `8f4b373`，资产 `dsh-source-deck-0.3.0.tgz`，SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`）；README 中英版使用真实 Host 的主界面与对话联动浅色/深色截图 `docs/assets/screenshots/source-deck-{light,dark}.png`、`source-deck-linkage-{light,dark}.png`，截图中的账号信息已脱敏。
 
+检索面：GitHub 描述与 topics 已补充（含 `source-deck`、`ai-agents`、`ai-research`）；GitMCP 返回 HTTP 200 并已写入 README；DeepWiki 状态仍为 `unknown`，触发索引需要可信浏览器里的 reCAPTCHA，本次环境被 Vercel/连接重置阻断，未完成。市场 PR #7739 仍未合并，见 [MARKETPLACE.md](MARKETPLACE.md)。
+
 功能：后台受管研究子会话、自然语言 deck_search、带参 /deck、原主题轮次绑定与幂等/并发保护、响应式图片卡片、stars/推送时间/查询证据、筛选原因/收藏/最多四项比较、不可变 @deck 引用与草稿保护、直接摘要确认投递、深浅主题和自定义图标。八表兼容旧数据，无新增依赖。
 
 最终共 67 项测试，包含刷新活动重放及历史主题参数缺失的定位恢复回归。真实模型已完成 zap/zerolog 检索；左侧独立任务在研究期间完成，取消补搜时左侧仍运行；模型收到引用中的两个真实 URL。自然语言 React 组件库任务成功启动，重启后标为 interrupted。独立审查四个 Important 均有回归，之后 Host 发现的工具作用域、图像遮挡、刷新重放也已修复。详见夜-9，不把旧 35 项状态当当前结果。
