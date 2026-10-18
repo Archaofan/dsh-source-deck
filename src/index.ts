@@ -8,12 +8,14 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { SourceDeckRemote } from './remote-service.ts'
 import { registerDeckTool } from './tools.ts'
+import { ResearchCoordinator } from './research-coordinator.ts'
+import { createResearchRuntime } from './research-runtime.ts'
 
 /** Plugin identity, matching the bundle patch row id. */
 export const name = 'dsh-source-deck'
 
 /** Host services this half waits on; the tools registration injects its own. */
-export const inject: readonly string[] = []
+export const inject: readonly string[] = ['storageDomain']
 
 /**
  * Host plugin body: mount the SourceDeck Remote service and its deck tool.
@@ -21,5 +23,12 @@ export const inject: readonly string[] = []
  */
 export function apply(ctx: Context): void {
   const remote = new SourceDeckRemote(ctx)
-  registerDeckTool(ctx, () => remote.getStore())
+  let research: ResearchCoordinator
+  const runtime = createResearchRuntime(ctx, workerId => research.targetForWorker(workerId))
+  research = new ResearchCoordinator(() => remote.getStore(), runtime, (sessionId, setId) => {
+    void remote.publish(sessionId, setId).catch(() => {})
+  })
+  remote.research = research
+  ctx.effect(() => () => research.dispose(), 'dsh-source-deck: research cleanup')
+  registerDeckTool(ctx, () => remote.getStore(), research)
 }

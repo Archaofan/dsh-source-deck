@@ -15,21 +15,15 @@ import type { Context } from '@deepseek-ai/cordis'
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
-import { recentConversation } from './conversation-context.ts'
-import type { Session } from '@deepseek-ai/dsh-session'
+import type { ResearchCoordinator } from './research-coordinator.ts'
 import {
   addFavorite, addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, listFavorites,
-  removeFavorite, setPolicy, startNewSet, startRound,
+  removeFavorite, setPolicy, startNewSet,
 } from './ops.ts'
 import { policySummary, type SourceMeta } from './scope-policy.ts'
 
 /** One operation body shape; operations validate the fields they use. */
 type OperationBody = Record<string, unknown>
-
-/** The owner slice of the agent registry needed for conversation context. */
-interface AgentLookup {
-  get(id: string): { readonly session: Session } | undefined
-}
 
 function bodyOf(raw: string): OperationBody {
   if (raw.trim() === '') return {}
@@ -121,6 +115,7 @@ function metaOf(body: OperationBody): SourceMeta | undefined {
 
 /** SourceDeck Host Remote service. */
 export class SourceDeckRemote extends TypertRemoteService {
+  research?: ResearchCoordinator
   private deck: Promise<OpenDeck> | undefined
   private closed = false
 
@@ -144,6 +139,11 @@ export class SourceDeckRemote extends TypertRemoteService {
     if (this.closed) throw new Error('source-deck storage domain is closed')
     this.deck ??= openDeck(this.ctx)
     return (await this.deck).store
+  }
+
+  async publish(sessionId: string, setId: string): Promise<void> {
+    const store = await this.getStore()
+    emitDeckRecord(this.ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot', snapshotOf(setId, await getSet(store, setId), policySummary(await getPolicy(store))))
   }
 
   /**
@@ -175,17 +175,21 @@ export class SourceDeckRemote extends TypertRemoteService {
       }
       case 'startRound': {
         const sessionId = stringField(args, 'sessionId')
-        const agents = this.ctx.get('agents') as unknown as AgentLookup | undefined
-        const conversation = agents?.get(sessionId) === undefined
-          ? undefined
-          : recentConversation(agents.get(sessionId)!.session)
-        const result = await startRound(await this.getStore(), {
+        if (!this.research) throw new Error('Background research service unavailable')
+        const result = await this.research.start({
           sessionId,
           request: stringField(args, 'request'),
+          requestId: stringField(args, 'requestId'),
+          mode: args.mode === 'continue' ? 'continue' : 'new',
+          ...(optionalString(args, 'setId') ? { setId: optionalString(args, 'setId') } : {}),
           ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
-          ...(conversation === undefined ? {} : { conversation }),
         })
         return JSON.stringify(result)
+      }
+      case 'cancelRound': {
+        if (!this.research) throw new Error('Background research service unavailable')
+        await this.research.cancel(stringField(args, 'sessionId'), stringField(args, 'roundId'))
+        return JSON.stringify({ ok: true })
       }
       case 'listFavorites':
         return JSON.stringify(listFavorites(await this.getStore()))

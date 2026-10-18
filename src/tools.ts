@@ -11,6 +11,7 @@ import type { DeckStore } from './model.ts'
 import { addSource, getSet } from './ops.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
 import type { SourceMeta } from './scope-policy.ts'
+import type { ResearchCoordinator } from './research-coordinator.ts'
 
 /** The tool-registry slice this module needs. */
 interface ToolService {
@@ -19,7 +20,7 @@ interface ToolService {
 
 /** The execution identity fields this tool reads. */
 interface DeckToolExec {
-  readonly agent?: { readonly session: { readonly id: string } }
+  readonly agent?: { readonly session: { readonly id: string; readonly header?: { readonly origin?: string } } }
 }
 
 /** One candidate as the model may submit it. */
@@ -141,7 +142,7 @@ const META_SCHEMA = {
  * @param ctx - Host context.
  * @param getStore - opens the shared deck store.
  */
-export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore>): void {
+export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore>, research?: ResearchCoordinator): void {
   ctx.inject(['tools'], (scoped) => {
     const tools = scoped.get('tools') as unknown as ToolService | undefined
     if (tools === undefined) return
@@ -204,20 +205,22 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
         }],
       },
       async execute(args: unknown, exec: DeckToolExec) {
-        const sessionId = exec.agent?.session.id
-        if (sessionId === undefined) throw new Error('deck_submit_sources requires an owning agent session')
+        const callerId = exec.agent?.session.id
+        if (callerId === undefined) throw new Error('deck_submit_sources requires an owning agent session')
+        const target = await research?.targetForWorker(callerId)
+        if (!target && exec.agent?.session.header?.origin === 'subagent') throw new Error('research worker is not assigned to a SourceDeck round')
+        const sessionId = target?.parentSessionId ?? callerId
         const store = await getStore()
         const submitted = sourcesOf(args)
         const results = []
         for (const source of submitted) {
-          const added = await addSource(store, { sessionId, origin: 'agent', ...source })
-          emitDeckRecord(ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot',
-            snapshotOf(added.setId, await getSet(store, added.setId)))
+          const added = await addSource(store, { sessionId, origin: 'agent', ...source, ...(target ? { target } : {}) })
           results.push(added)
         }
-        const setId = results[0]?.setId
+        const setId = results[0]?.setId ?? target?.setId
         if (setId === undefined) return { count: 0, setId: '', candidates: [] }
         const view = await getSet(store, setId)
+        emitDeckRecord(ctx, sessionId, 'plugin:dsh-source-deck/set-snapshot', snapshotOf(setId, view))
         return {
           count: view.candidates.length,
           setId,
