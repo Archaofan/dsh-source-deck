@@ -4,6 +4,8 @@
 
 The user approved the v3 design, seven-task plan, inline execution, implementation, and Git delivery. Do not request these approvals again. At the user's subsequent request, 0.3.0 delivery has been fast-forwarded to default branch `main`; `feat/sourcedeck-v3` remains available; exact peers remain DSH 0.2.1-rc.2 and Cordis 4.0.5. The sole project is `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`, remote `https://github.com/Archaofan/dsh-source-deck.git`.
 
+0.3.0 was published as GitHub Release `v0.3.0` on 2026-10-18 (tag `8f4b373`; asset `dsh-source-deck-0.3.0.tgz`, SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`). Both READMEs use real Host light/dark screenshots at `docs/assets/screenshots/source-deck-{light,dark}.png`.
+
 Implemented: managed background research, natural-language deck_search and parameterized /deck, durable topic/round/worker identity and concurrency/idempotency protection, responsive image cards with stars/push/lookup evidence, screening/reasons/favorites/comparison (four sources), immutable @deck draft references, confirmed direct-summary delivery, Host light/dark tokens, bundled icon and locale metadata. The eight-table domain preserves legacy records; no dependencies were added.
 
 The final suite has 67 tests, including refresh intent replay. Actual model acceptance covered zap/zerolog research, concurrent independent parent work, worker-only cancellation, both real URLs delivered in a reference, natural-language React research startup, and interruption after restart. Four Important review findings plus Host-discovered tool scope, image overflow, and stale activity replay defects were fixed with regressions or direct visual measurements. See [verification, night 9](SETUP-VERIFICATION.md).

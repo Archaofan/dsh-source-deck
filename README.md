@@ -4,6 +4,14 @@
 
 SourceDeck 是 DeepSeek Harness Desktop 的开发资料工作台。用对话启动后台研究，筛选和对比开源库，把选好的仓库引用到聊天草稿，再续写开发要求。
 
+## 界面预览
+
+真实 Host 截图（浅色 / 深色），展示后台研究结果、逐条保留 / 排除、筛选原因与引用入口：
+
+| 浅色 | 深色 |
+|---|---|
+| ![资料台浅色界面](docs/assets/screenshots/source-deck-light.png) | ![资料台深色界面](docs/assets/screenshots/source-deck-dark.png) |
+
 ## 适配与安装
 
 | 项目 | 精确版本 |

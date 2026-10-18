@@ -4,6 +4,14 @@
 
 SourceDeck is a developer research workbench for DeepSeek Harness Desktop. Start background research from chat, screen and compare open-source libraries, insert the selected repositories into a chat draft, then add your development instructions.
 
+## Screenshots
+
+Real Host screenshots (light / dark) showing background research results, per-source keep/exclude decisions, screening reasons, and the reference entry:
+
+| Light | Dark |
+|---|---|
+| ![SourceDeck light interface](docs/assets/screenshots/source-deck-light.png) | ![SourceDeck dark interface](docs/assets/screenshots/source-deck-dark.png) |
+
 ## Compatibility and installation
 
 | Item | Exact version |
