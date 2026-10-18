@@ -1,128 +1,69 @@
-# dsh-source-deck / SourceDeck
+# SourceDeck
 
 > [中文（默认）](README.md) | English
 
-SourceDeck is an **in-conversation source deck** for DeepSeek Harness Desktop. Describe what you are looking for in plain language; the current conversation's LLM searches with its own tools and turns the results into cards you can keep, exclude, skip, and favorite. Your checks and the optional note drive the next round, and the final selection is handed back to the same chat.
+SourceDeck is a developer research workbench for DeepSeek Harness Desktop. Start background research from chat, screen and compare open-source libraries, insert the selected repositories into a chat draft, then add your development instructions.
 
-The deck is not a standalone search app and not a second model session. It belongs to the current chat: it reads recent turns as context, `/deck` opens it from chat, result cards appear in the conversation, and the submission returns to the same session.
+## Compatibility and installation
 
-## Compatibility
-
-| Item | Version |
+| Item | Exact version |
 |---|---|
-| DeepSeek Harness Desktop | **0.2.1-rc.2** (exact peer) |
-| `@deepseek-ai/cordis` | **4.0.5** (exact peer) |
-| `@deepseek-ai/dsh-typert-protocol` | 0.2.1-rc.2 |
-| `@deepseek-ai/dsh-session` | 0.2.1-rc.2 |
-| This plugin | 0.2.5 |
+| SourceDeck | 0.3.0 |
+| DeepSeek Harness Desktop | 0.2.1-rc.2 |
+| @deepseek-ai/cordis | 4.0.5 |
 
-- Only public `0.2.1-rc.2` APIs are used; no alpha-only APIs.
-- `peerDependencies` are **exact**; the plugin will not silently load on an unverified DSH version.
-- Both the sandbox and the production Desktop run `0.2.1-rc.2`. This package was verified with a real model in the sandbox; production installation is left to the user. If `0.1.17` is already installed, use the same local-install flow for 0.2.5; 0.2.5 does not auto-upgrade other versions.
+Only public APIs from this RC are used. Sandbox and production Desktop share the baseline. **This iteration installs only in the sandbox; production still has plugin 0.1.17.**
 
-## Installation
+Use the Desktop plugin manager to install `dsh-source-deck-0.3.0.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-1. Open DSH Desktop → **Settings → Plugins**.
-2. Choose **Install from file** and select `dsh-source-deck-0.2.5.tgz` (or build the tarball from this repo).
-3. Reload/restart Desktop when prompted.
-4. The **Deck** entry should appear under **+** in the right sidebar of any session.
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) still requires merge/catalog verification; availability is not claimed. See [market status](docs/MARKETPLACE.md).
 
-Do not install a local package through the market HTTP endpoint (the market only accepts its curated registry), and do not use `dsh plugin --profile desktop`. Install and uninstall through the App's plugin manager.
+## Start from chat
 
-## Plugin market
+- Say `Use SourceDeck to find two Go logging libraries and compare maintenance and structured logging APIs`. The model starts research with `deck_search`; natural-language triggering depends on its tool choice.
+- For a deterministic entry, use `/deck Find extensible open-source Markdown editors`. Arguments start research; bare `/deck` only opens the deck.
+- The composer button, right-sidebar `+ → Deck`, and conversation cards also open it. Historical cards target their original topic.
 
-SourceDeck has been submitted to the curated DSH plugin market (`dshmarket`): [awesome-dsh-plugin PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739).
+Research runs in an official managed child session, inheriting the parent's model configuration and credential policy. It creates extra concurrent model requests. The Host samples recent parent messages as context. Internal search/follow-up prompts remain in the child; the parent can continue development, with concise command/tool status and source cards.
 
-- The repository is public and carries the `dsh-plugin` topic, which the market needs to fetch the code.
-- The PR check passes; the Submission gate is waiting only for the repository to be 24 hours old (created 2026-10-17 03:35 UTC, eligible around 2026-10-18 11:35 Beijing time). The gate re-runs automatically; do not close or resubmit the PR.
-- After merge, search for `SourceDeck` in the DSH plugin market. Until then, use the local tgz.
-- Market entry: `data/plugins/Archaofan__dsh-source-deck.yml`; `dshmarket` on DSH 0.2.1-rc.2 reads it through `awesome-dsh-plugin.com/plugins.json`.
+Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Official web tools and the spawn provider must be available. Startup failure is explicit; the plugin does not change configuration or upgrade the baseline.
 
-## Ways to open the deck
+## Screen and compare
 
-There are four explicit entry points plus one automatic Agent path:
+1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
+2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.
+3. Add up to four sources to the comparison panel for descriptions, stars, dates, languages, licenses, reasons, and URLs.
+4. Cards default to two columns, automatically becoming one below 620px of panel content width. Light/dark modes follow the Host, including settings select options. Request/note/reason drafts and comparison choices are stored per session/topic in browser sessionStorage.
+5. Add a note and continue the same topic: the next round receives kept/excluded sources and reasons. New topic creates a separate set; previous results remain accessible through conversation cards.
+6. Screening, favorites, comparison, and references remain available during research. Stop affects only that worker. A five-minute timeout ends the task and keeps partial results. Unrestored work is marked interrupted after Host restart and can be retried.
 
-1. **Right-sidebar tab**: session right sidebar `+` → **Deck**.
-2. **Composer button**: the **Deck** button at the bottom-right of the chat composer.
-3. **Slash command**: type `/deck` in the chat composer and press Enter. The menu shows “打开资料台 / Open deck”.
-4. **Conversation card**: after the Agent submits candidates, click **Open in deck** on the “Candidate sources” card.
-5. **Agent submission**: when a search round starts, the Agent calls `deck_submit_sources`; candidates appear in the current round automatically.
+## Reference and continue development
 
-> `/deck` currently only opens the deck. `/deck <query>` is not implemented yet.
+Press **Reference in chat (N sources)**. Existing draft text, attachments, and references remain; nothing is auto-sent. Append an instruction such as:
 
-## Usage
+> Study the UI designs in these repositories, consider our existing components, then propose and implement improvements.
 
-### 1. Start a search round
+Typing `@deck` also offers the current kept sources and historical snapshots. References contain immutable titles, real URLs, descriptions, metadata, and reasons. Later verdict changes do not silently replace their contents. Preview opens the original topic; remove a reference before sending if needed.
 
-1. Open the deck in the target conversation.
-2. The first screen only asks “What are you looking for?”. Enter a natural-language request, for example:
-   - `Find four high-star Go logging libraries active in the last six months, GitHub repos`
-   - `Continue with three more Rust async runtimes suitable for production`
-   - `RAG evaluation methods and practical articles`
-3. Press **Search**. The request is sent as a structured prompt into the **current conversation**, and the current model uses its own search/web tools.
-4. Wait for the Agent. The deck shows “The Agent is searching and submitting candidates…”; usually 10–30 seconds, but complex rounds can take more than two minutes.
+If the draft changes while insertion is pending, the session switches, or the input is unavailable, the original draft remains and retry is offered. References invalidated by data clearing block sending until removed/reselected.
 
-No site URL, regex, or seed title is required. The old source-scope policy remains available under Settings as an optional advanced surface, not a first-run prerequisite.
+The secondary **Send screening summary directly** action immediately sends a summary and makes the set read-only. Retries reuse the same delivery identity. Prefer references when you want to append instructions.
 
-### 2. Screen the cards
+## Favorites and advanced settings
 
-- GitHub repositories show an avatar, repository name, description, ★ stars, language, and an open link.
-- Other sources show a title, description, and link.
-- **✓ Keep** — a positive example for the next round.
-- **✕ Exclude** — a negative example for the next round; an optional reason can be saved.
-- **Skip** — leave it undecided; it counts as neither kept nor excluded. After a decision, “Skip” clears it back to pending.
-- **☆ Save** — add to favorites without changing this round's decision.
-- **Open link** — open the original page in the browser.
+Save with ☆. The profile-wide library supports search, remove, and add back to a deck, and survives restart.
 
-An exclusion reason is persisted on the candidate and included in the next round's prompt, so the Agent can avoid similar results.
+Settings → Deck provides optional GitHub, Web, and LLM-freeform scope policies and data clearing. Policies guide and flag candidates; they cannot guarantee model compliance. Uninstalling does not delete records automatically.
 
-### 3. Continue with a note
+## Data and limitations
 
-The footer has an optional **Note for the next round**:
+- The local `source_deck` domain still has eight tables: sets, sources, candidates, selections, scope_policies, session_active, rounds, favorites. Legacy records remain readable; worker arrivals retain their original topic/round.
+- No credential files are read and no API keys are stored. The Host's provider policy governs model/web requests. External content is serialized as source data rather than user instructions.
+- Image availability depends on the origin, network, and Host CSP. Failed images leave all actions available. Unverified model metadata should not be treated as a live statistic.
+- Concurrency is subject to provider limits and official subagent settings. Cross-device sync, export, and version-chain diffs are not provided.
+- Actual Host checks and outstanding acceptance limits are recorded in [verification](docs/SETUP-VERIFICATION.md).
 
-- Examples: `MIT/BSD licenses only`, `prefer the smol ecosystem, avoid low-maintenance projects`, `no tutorials`.
-- Press **Continue searching**. The Host writes the previous kept items, excluded items and reasons, and the note into the next prompt. Follow-up rounds are usually capped at about four candidates: quality over quantity.
-- New cards appear under **Round 2**, **Round 3**, and so on, next to earlier rounds for comparison.
-- To start a completely new topic, use **New search**; it creates a new set instead of overwriting the old one.
-
-### 4. Submit the selection to the Agent
-
-When screening is done, press **Submit to Agent (N kept)** at the bottom:
-
-- The Host sends the kept/excluded/policy summary back to the current conversation through `session.prompt`.
-- The Agent can then tell exactly what you kept, what you excluded, and why.
-- The set becomes submitted. To keep screening, use **New search** or **Continue searching** to create a new set.
-
-### 5. Favorites
-
-- Press ☆ on a card to save it.
-- Open **Saved** in the header; search by title, URL, or note.
-- **Add to deck** turns a saved item back into a candidate in the current set; **Remove** deletes it.
-- Favorites are shared within the current DSH profile, rather than isolated by set or project, and survive a Desktop restart.
-
-### 6. Stop and timeouts
-
-- You can keep chatting with the Agent while a round runs. If the Agent asks a question in chat, answer it, then return to the deck and press **Continue searching**.
-- Polling stops after five minutes. The timeout is only a notice; already-arrived candidates are not deleted. Press **Refresh** to read again.
-
-## Conversation linkage
-
-This is the core change in 0.2.x. The detailed research is in [docs/research/2026-10-17-chat-deck-linkage.md](docs/research/2026-10-17-chat-deck-linkage.md).
-
-- **Same session**: the deck is bound to the current `sessionId`; it does not create a child session or copy models/credentials.
-- **Context**: when a round starts, the Host reads up to five recent user/assistant messages from the Session log (filtering runtime noise and the deck's own prompts) and puts them into the search prompt, so “continue”, “these”, and “similar” have referents.
-- **Chat triggers**: `/deck`, the composer button, the right-sidebar tab, and the conversation card all open the same set.
-- **Results back in chat**: every round updates `plugin:dsh-source-deck/set-snapshot`; the conversation card shows the latest round and candidate state. The final submission returns through `session.prompt`.
-- **No duplicate model**: search uses the current session's model and tools; it does not choose another model or create another credential.
-
-## Data and privacy
-
-- The `source_deck` domain has eight tables: `sets`, `sources`, `candidates`, `selections`, `scope_policies`, `session_active`, `rounds`, `favorites`.
-- Data is stored locally in the current DSH profile; it is not uploaded to a third-party service. Search content is still sent to the configured model provider under the current session's model/tool policy.
-- Settings → Deck can clear this plugin's data; uninstalling the plugin does not automatically delete existing data.
-- The deck does not read credential files or store API keys.
-
-## Build from source
+## Development
 
 ```sh
 pnpm install
@@ -131,23 +72,9 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-Artifacts: `lib/index.js` (Host half) and `lib/client.js` (browser lazy-CJS factory). `npm pack` produces `dsh-source-deck-<version>.tgz`.
+The package contains Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, bundled icons, and Chinese/English locale metadata. Exact peers are unchanged; no dependencies were added.
 
-## Known limitations
-
-- `/deck` only opens the deck; `/deck <query>` and a model-facing `deck_open` tool are not implemented yet (the latter needs a Host→Client push channel).
-- Whether a follow-up round strictly follows the note depends on the model. The Host strengthens the prompt (continuation, positive/negative examples, reasons, fewer but better results), but cannot guarantee model output. Exclude unsuitable cards and continue.
-- Complex searches can take more than two minutes; the deck keeps polling for five minutes.
-- If a GitHub avatar fails to load, the deck shows the first letter as a fallback; title, description, and link are unaffected.
-- Cross-device sync, export, and version-chain diffs are not provided.
-
-## Documentation
-
-- [Design, including §14 v2 revision](docs/design/2026-10-17-solution-design.md)
-- [Chat ↔ deck linkage research](docs/research/2026-10-17-chat-deck-linkage.md)
-- [Developer workflow research and next-iteration proposal (design review pending)](docs/research/2026-10-18-developer-workflow-review.en.md)
-- [Complete v3 design: background research, chat references and light/dark themes (approved)](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.en.md)
-- [v3 implementation plan: seven tasks and pinned RC acceptance (plan review pending)](docs/superpowers/plans/2026-10-18-sourcedeck-v3.en.md)
-- [Verification record (nights 4–7)](docs/SETUP-VERIFICATION.md)
-- [Implementation plan](docs/implementation/2026-10-17-implementation-plan.md)
-- [Version policy](docs/VERSION-POLICY.md)
+- [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.en.md)
+- [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.en.md)
+- [Workflow research](docs/research/2026-10-18-developer-workflow-review.en.md)
+- [Handoff](docs/HANDOFF.md) · [Version policy](docs/VERSION-POLICY.md)

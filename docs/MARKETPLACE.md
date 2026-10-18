@@ -2,7 +2,11 @@
 
 本文记录 SourceDeck 在 DSH Desktop 插件市场（`dshmarket`）的注册状态。市场应用本身不接收插件条目；它读取精选目录 [`awesome-dsh-plugin`](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 生成的 `plugins.json`，所以“注册”= 向该目录提交一个 YAML 条目并合并。
 
-## 当前状态
+> [English status](MARKETPLACE.en.md)
+
+**2026-10-18 下午复核：** GitHub 连接器传输失败，网页读取无缓存，公开 REST API 返回限流。未取得新的 PR/check 状态；下表是最后一次成功复核（10:43 北京时间），不能当作下午实时状态。未修改 PR 分支，未声称已合并或已上架。
+
+## 最后确认状态
 
 | 项目 | 状态 |
 |---|---|
@@ -42,7 +46,7 @@ description:
 条目要求（来自 `contributing.md`）：
 
 - 仓库 `package.json` 声明 `dsh.bundle`，且仓库含真实可运行代码；本仓库满足。
-- 仓库创建至少 1 天；当前只差这一项。
+- 仓库创建至少 1 天；最后确认时只差这一项。
 - 仓库添加 `dsh-plugin` topic；已完成。
 - 描述只陈述功能，不带营销词；已核对。
 - 每个 PR 只加一个 YAML 文件；本 PR 满足。
@@ -50,10 +54,10 @@ description:
 ## 收录后的安装路径
 
 1. DSH Desktop → 插件市场（`dshmarket`）→ 搜索 `SourceDeck`。
-2. 打开卡片 → 选择版本 0.2.5 → Install。
+2. 打开卡片 → 选择市场实际可用版本（目标 0.3.0；须确认交付分支已被市场获取） → Install。
 3. 安装后按提示重载 Desktop；右侧栏 `+` 出现「资料台」。
 
-合并后市场目录需要一次生成/同步，通常一天内生效。未收录前用本地包：
+合并后市场目录需要一次生成/同步，通常一天内生效。当前交付仍用本地 0.3.0 包，SHA256 见 [夜-9 验收记录](SETUP-VERIFICATION.md)。以下为上一版历史产物：
 
 - `dsh-source-deck-0.2.5.tgz`
 - SHA256 `BADA485796D6C1FACF99AE25E9830719358D3A660078B1535E3F26ADB9FEC9C6`

@@ -288,3 +288,83 @@ gh api repos/Archaofan/dsh-source-deck --jq '{visibility,created_at,topics}'
 ```
 
 详细记录见 [MARKETPLACE.md](MARKETPLACE.md)。
+
+
+## 2026-10-18 夜-9：SourceDeck 0.3.0 开发者研究工作流
+
+本节覆盖用户批准的 v3 设计、七项计划与当前会话执行。实现/交付分支 `feat/sourcedeck-v3`。先前夜-7 的“主会话执行搜索”和带参命令未实现等限制，已由本节替代。生产 Desktop/插件本轮未修改。
+
+### 构建与交付
+
+| 项目 | 证据 |
+|---|---|
+| 产品 | 0.3.0 |
+| 精确基线 | DSH 0.2.1-rc.2、Cordis 4.0.5；上游 687f282e8625c6b8d11ff58211a90524be2e4317 |
+| 自动测试 | `node --test tests/*.test.ts`：67 pass，0 fail |
+| 构建 | `npm run build`：tsdown Host/Client + tsc 通过 |
+| 静态差异 | `git diff --check` 通过 |
+| 包内容 | npm dry-run + tar 核对 50 文件；含 Host/Client/types、自包含 SVG/PNG、zh/en locale；不含沙箱、缓存、node_modules、凭据 |
+| Client 运行时 require | 仅 react、react/jsx-runtime、zod（固定 RC shell baseline） |
+| 依赖 | 无新增依赖，无 pnpm-lock.yaml 图变化；离线 frozen 检查缺 registry metadata（binding-android-arm64），未关闭供应链策略，不能说该离线检查通过 |
+| 产物 | `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.0.tgz`（忽略，不进 Git） |
+| SHA256 | `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5` |
+| 安装 | 仅官方沙箱 Install-Plugin.ps1；QA 同内容路径 `dsh-source-deck-0.3.0-verify-216aad73.tgz`，安装后 lib/index.js、lib/client.js、icon.svg、package.json 哈希与打包时构建相等 |
+| 生产 | Desktop 0.2.1-rc.2、插件仍 0.1.17；0.3.0 未装生产 |
+
+首次同版本安装回显 Already up to date，实际未更新。定位为本地同版本同路径缓存，改用内容哈希路径后逐文件核对成功。安装命令 exit 0 不单独作为产物更新证据。
+
+### 真实 Host / 模型链路
+
+官方开发 Desktop 启动成功，隔离 DSH_HOME/userData/APPDATA/LOCALAPPDATA/缓存/临时目录；仅启用 SourceDeck 外部插件及官方预设（团队/语音/自动授权/开发工具实验项关闭）。使用沙箱用户独立配置的 DeepSeek-V4.1-Flash High。原生窗口控制不可用时，通过该固定 RC 的实际 loopback Host 前端验收，**不是独立前端 mock**；不把这些结果表述为所有 Electron 原生系统行为已验收。
+
+| 操作 | 观察结果 |
+|---|---|
+| `/deck <中文需求>` | 返回简短启动状态，打开对应资料集；裸 `/deck` 由 Host 命令路径处理，不调用研究模型（自动测试覆盖） |
+| 普通中文“用资料台找适合 React 桌面应用的开源组件库，放到右侧比较…” | 模型调用 deck_search，新主题进入后台研究；主对话约5秒结束确认，可继续开发 |
+| 真实仓库轮次 | 受管子会话提交 uber-go/zap、rs/zerolog；轮次 completed，候选2条；主对话没有内部搜索 user prompt |
+| 图片 | zap 项目 Logo naturalWidth=290；zerolog owner 头像 naturalWidth=460；均加载成功。GitHub owner .png 路径此前有失败日志，因此“暂不可用”并非只能归因于模拟或没有实际调用 |
+| metadata | 卡片显式展示 stars、代码推送、查询时间、GitHub API 来源。此次是模型查证后提交的快照，非 UI 自行刷新统计，不承诺永远实时 |
+| 左右并行 | worker 运行期间，主模型约7秒完成独立 Go 日志接口/注入说明；已有候选可操作 |
+| 停止隔离 | 第二轮启动后点击停止研究，主聊天停止生成按钮仍存在；右侧最终 cancelled，主模型继续完成约43秒的开发建议 |
+| 补搜提示 | 需求/说明仅留子会话，左侧仅看到自己的开发提问与最终引用内容；没有新增内部补搜 user prompt |
+| 筛选原因 | 原因输入后鼠标直接点排除，最终 reason 与 excluded 同时保留；改回 kept 正常；收藏/对比不改变 verdict |
+| 引用 | 在已有中文开发草稿中插入 SourceDeck·2 标签，不自动发送；序列化含两真实URL、说明、metadata、筛选原因；主模型回答明确列出两URL并给建议 |
+| @deck | 历史两条快照进入候选；点选后能续写开发说明，刷新后标签与续写均保留 |
+| 历史定位 | 从第2轮对话卡打开原两仓库主题，未打开当前 React 新主题 |
+| 冷恢复 | 重启后恢复原主会话，未恢复 worker 显示 interrupted / Host restarted，可继续查找；旧资料和筛选仍在 |
+| 重复/空结果/超时/权限 | 运行中首批提交不判完成、全重复/0条完成、五分钟超时、错 worker/跨会话/迟到结果拒绝由自动测试覆盖；未将这些全部声称为新增真实模型场景 |
+| 清除与投递 | 自动测试覆盖先停止研究再清除、可重新开始、不可变/失效引用、投递失败重试幂等；本轮未在 Host 删除整套历史数据 |
+
+### 主题、布局与图标
+
+| 场景 | 结果 |
+|---|---|
+| 深色与浅色，面板宽度约319/419px | 单列，根容器无横向溢出 |
+| 深色与浅色，约639/899px | 双列，根容器无横向溢出；阈值按面板内容620px |
+| 仓库头图 | 初测400px高图片超出112px头图区并拦截点击；修复后图片80px高，完整落在112px头图区，鼠标原因/收藏/对比恢复 |
+| 状态保留 | 切宽/切主题不清除需求、说明、原因或对比选择；已提交 verdict 持久化；浏览器 sessionStorage 随 origin/生命周期而定，不承诺跨端口重启保留纯草稿 |
+| 浅色设置 | select/option 前景 rgb(15,17,21)、背景 rgb(255,255,255)、color-scheme light |
+| 深色设置 | 前景 rgb(249,250,251)、背景 rgb(35,35,36)、color-scheme dark；选中/禁用/焦点继承本地 Host token |
+| 插件身份 | 安装列表显示自定义蓝青资料卡图标、SourceDeck·资料台及短中文描述；禁用后仍读取图标/名称，随后已恢复启用 |
+| SVG/PNG | SVG自包含848 bytes，PNG256×256；真实安装页使用内嵌SVG，显示36px（原生Host控制），无远程图标请求 |
+
+本地证据：`sandbox/dsh-desktop/test-workspaces/dsh-source-deck/v3-acceptance/`，含 width-matrix.json、deck-dark-900.jpg、deck-light-900.jpg、settings-light.jpg、settings-dark.jpg、installed-icon-light.jpg。截图/运行日志不进 Git。
+
+### 独立审查与修复
+
+一次完整独立审查发现四项 Important、无 Critical/Minor：终态竞态、迟到启动回包抢新主题、原因 blur 吞掉显式判定、并发 URL 去重。均先复现，再用逐 round/active/source 锁或候选队列修复。最终67测试全绿。最强审查席位遇额度限制，由可用模型完成独立审查，不冒称前者已审过。
+
+真实 Host 另发现 scope-less tools.get 读不到继承 preset web 工具（补回归）；真实图片固有尺寸遮挡（以400px→80px测量验收）；历史浏览刷新时旧打开意图重放及 Host 丢失 tab 参数（补持久化消费与会话内定位回归）。没有改固定上游以适配。
+
+### 明确未完成的原生验收与外部状态
+
+- 当前浏览器控制未能改变真实 Electron 125% 缩放；快捷键未产生缩放，不能把等价 CSS 宽度当作原生125%已验收。
+- 浏览器截图不包含 OS 的 select 弹出窗口；已确认真实 Host select/option 的深浅样式及键盘可用，但原生展开窗口仍需人工复核。
+- 中文文本填写通过；真实 IME 正在组字、附件组合仅有抽象 draft/CAS 测试，未完成原生组合验收。
+- 下午市场复核遇连接器传输失败、网页读取失败和 GitHub公开API限流；最后成功状态仍为10:43 open/旧年龄失败。不能声称已合并或已上架，未修改/关闭/重开 PR。
+
+English summary: 0.3.0 keeps exact DSH RC peers and the eight-table domain, with 67 passing tests and a successful build/package check. Actual pinned Host checks covered command and natural-language background startup, real repository imagery/facts, concurrent parent work, worker-only cancellation, immutable references delivered with both URLs, history navigation, interruption recovery, and light/dark 320/420/640/900 width behavior. Native 125% zoom, OS popup rendering, real IME/attachment combinations, offline frozen policy metadata, and the afternoon marketplace state remain explicitly unverified. Production was untouched. The package SHA256 above is authoritative.
+
+最终刷新复验：在当前 React 活动之外打开历史 Go 两仓库主题，填写需求/说明并选两项对比后刷新，仍为原主题、两项对比及原草稿。最终 tar 的 Client 与安装字节一致。额外发现重复构建时 CSS Modules 导出对象键顺序可能变化；仅排序这些映射即可证明重建与交付代码相同，其余内容无差异。该构建字节可重复性细节暂缓，不影响固定交付包哈希和已验收行为。
+
+Final refresh check passed with historical topic, drafts, verdicts and both comparison choices retained. A deferred build detail is nondeterministic CSS export-map key order; the delivered tar equals installed bytes, and canonicalizing only these maps makes the fresh rebuild identical.

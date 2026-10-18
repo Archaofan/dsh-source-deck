@@ -1,23 +1,34 @@
 # SourceDeck 项目约定
 
-**当前授权与下一步（2026-10-18，优先于下方历史状态）**：用户已明确“设计方面没什么问题，按要求落地，然后推送git”，v3 书面设计已获批准。中英[实施计划](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)已写，包含轮次身份、后台执行、聊天入口、草稿引用、响应式/图片/对比、主题图标、固定 RC 验收及 0.3.0 交付七项。writing-plans 技能要求计划书面评审与执行方式确认后进入实现；建议当前会话 Native 执行。当前仅更新计划与状态文档，产品仍 0.2.5，尚无功能代码、依赖、版本或安装变化。不得重新把已批准设计当成未批准，也不得把计划当成已实现。
+同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-**最新设计入口（2026-10-18）**：用户已明确选择**后台研究子会话**，以便右侧补搜不反复向主聊天发提问、左侧继续开发；这修订旧版同一 Agent 串行搜索的决定。新增要求：全部深浅色状态（含设置下拉框展开选项）、自然语言直接启动、结果引用到左侧草稿再续写开发要求、自定义插件图标。以 [v3 完整书面设计](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)（[English](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.en.md)）为后续审阅入口；其余旧说明描述 0.2.5 实现或早期提案，不能覆盖最新用户决定。书面设计待审阅，核心实现/依赖/package.json 未改。图标资产已制作 `assets/icon.svg` 与 `assets/icon.png`，深浅底 32/64px 栅格检查完成，但尚未接入清单或重打包/安装。
+## 当前状态（2026-10-18）
 
-**视觉要求已重申（2026-10-18）**：仓库必须展示对应头图/缩略图、项目 Logo 或图标/头像，不能退化为全是无图文字卡片；GitHub 必须在卡片显眼处显示 stars 与最近代码更新时间，查询时间另标注，未知不伪造。保留已确认的默认双列/窄面板自动单列。最新预览使用已核对的 zap/zerolog 数据与真实项目素材；仍处设计评审，未改产品代码。
+用户已批准 v3 设计、七项实施计划及当前会话执行，并要求落地后推送 Git；不再要求重复评审。实现位于 `feat/sourcedeck-v3`，产品 0.3.0。交付记录见 [验收](docs/SETUP-VERIFICATION.md) 夜-9、[交接](docs/HANDOFF.md)。旧版本/设计提案说明不能覆盖当前实现。
 
-同时遵守父目录 `E:/DSH-Desktop-Plugin-Dev/AGENTS.md` 和 README.md。工作目录固定为本项目文件夹。
+- 保留八表与旧数据。研究绑定 parent/set/round/worker/request；终态和来源去重有并发锁。
+- 官方 managed spawn 子会话后台研究，继承主模型策略，仅允许 web_search/web_fetch/deck_submit_sources。左右独立；取消只停止对应 worker，清除数据先停止研究。
+- `/deck query` 启动，裸 `/deck` 打开；自然语言通过 deck_search。活动定向打开且避免旧回包抢主题和刷新重放。
+- 双列卡片按面板宽度 <620px 自动单列；真实图/Logo→owner 头像→字标；stars、代码推送、查询时间和来源分列。最多四项对比，支持收藏、原因和筛选。
+- 主按钮插入不可变资料引用，保留正文/附件，不自动发送；支持 @deck。次要直接摘要采用幂等投递确认。提交集合只读。
+- 完整局部主题 token、设置 select/option、自包含图标和中英 metadata。
+- 自动测试现为 67 项；最终命令结果及真实 Host 范围以夜-9记录为准。独立审查四项 Important 已复现修复；实际 Host 又发现并修复工具作用域、图片遮挡和活动重放。
 
-**本轮迭代（2026-10-18）**：用户要求接手调研、优化开发者工作流/UI/触发，优先选择“找开源库、比较技术方案”。已形成[调研与待评审提案](docs/research/2026-10-18-developer-workflow-review.md)（[English](docs/research/2026-10-18-developer-workflow-review.en.md)），含纯内存缺陷复现、固定 RC 命令接口证据、三种方向与推荐方案。建议可靠性先行，再做带参 `/deck`、自适应卡片筛选/独立对比及历史定位。**用户已确认布局为默认双列、窄面板自动单列，以面板自身宽度判断；不再提供两种布局选项。整体工作流尚未获本轮设计评审批准，不改产品代码/依赖/版本，不把提案当已实现功能**。既有方案 A/v2 保留；本轮变更需完成设计评审。35 例基线测试复跑通过；探针观察到迟到结果归错轮次/主题、重复提交生成多记录。当前沙箱空闲，CheckOnly 通过，本轮未启动 Desktop 或调用模型。
+## 固定环境与权限
 
-**当前状态（2026-10-18，v2 + 市场提交）**：方案 A 及其 2026-10-17 v2 修订（LLM 搜索轮次、聊天联动）已完成并通过沙箱验证。产品 `0.2.5`，peer 精确 `@deepseek-ai/dsh@0.2.1-rc.2`、cordis `4.0.5`，生产 Desktop 已由用户经 Codex 升级到 `0.2.1-rc.2`（与沙箱一致）。功能：八表域（`sets/sources/candidates/selections/scope_policies/session_active/rounds/favorites`）、`deck_submit_sources` 工具、自建 `sourceDeck` Remote、`ignorable` 会话记录；资料台首屏是一句自然语言需求，当前会话的 LLM 用自身搜索工具查找，结果按轮次渲染为 GitHub 可视化卡片（头像/简介/stars/语言/链接）；✓ 保留、✕ 排除、跳过、可选原因、补充说明驱动下一轮；收藏夹可搜索/加入资料台/移除；`/deck` 命令、Host 抽取最近对话作为搜索上下文、对话卡片展示最近轮次；字体放大、2 列卡片、5 分钟轮询。来源范围策略保留为可选高级项，不再要求首次配置。验收覆盖真实模型两轮搜索、勾叉/原因/跳过、收藏、`/deck`、对话上下文、重启恢复、多会话隔离、清除/卸载重装；35 个单元测试全绿。证据见 docs/SETUP-VERIFICATION.md 夜-4 至夜-7 段、docs/research/2026-10-17-chat-deck-linkage.md、docs/design/2026-10-17-solution-design.md §14。**未安装到生产**，生产仍为 0.1.17；交付包由用户自行在本 DSH 安装。
+产品 peer 精确 `@deepseek-ai/dsh@0.2.1-rc.2`、Cordis `4.0.5`；上游 commit `687f282e8625c6b8d11ff58211a90524be2e4317`。不得升级基线、使用 alpha API 或改上游产品源码。
 
-**市场收录（2026-10-18）**：`dshmarket` 通过 awesome-dsh-plugin 精选目录收录，PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已开；仓库已设为 public 并加 `dsh-plugin` topic；PR check 通过，Submission gate 仅差仓库创建满 24 小时（约 2026-10-18 11:35 北京时间），gate 自动重跑，不要关/重开或 force-push。合并后才算上架，之后在市场搜 `SourceDeck`。详见 [docs/MARKETPLACE.md](docs/MARKETPLACE.md)。
+全部安装只用共享 `sandbox/dsh-desktop/scripts/Install-Plugin.ps1`，启动只用 Start-Desktop.ps1，隔离 DSH_HOME/userData/APPDATA/LOCALAPPDATA/缓存/临时目录。先检查 baseline/status/实时 lease，一次一个项目。测试材料限本项目 test-workspaces。停止进程前核对准确 PID、路径和隔离 userData，不按名称批量结束。
 
-产品目标见 `docs/PROJECT-BRIEF.md`。关注 AI / Agent 日常交互，提供自己的 UI 控件及对话内便捷入口。视频、控制、协议、嵌入式等旧选题不属于本项目。
+生产 Desktop 为 0.2.1-rc.2，插件仍 0.1.17；本轮未安装或修改生产。生产安装须用户另行明确批准。不导入生产配置或凭据，不输出 bootstrap token/API key。
 
-所有安装和集成试验使用父目录共用 `sandbox/dsh-desktop/`。不得改日用 DSH、复制日用凭据或自行再装一个共享环境。独立前端模拟不能代替官方 Desktop 内的验证。
+开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径，经官方脚本安装后核对 lib 字节。交付包仍为 dsh-source-deck-0.3.0.tgz，哈希见夜-9。
 
-当前产品支持基线为 `0.2.1-rc.2`（用户 2026-10-17 明确选择，精确 peer + cordis 4.0.5）。生产 Desktop 已由用户经 Codex 升级到 `0.2.1-rc.2`，与本产品 peer 匹配；安装到生产仍须用户明确批准，不要擅自安装。方案只依赖该 RC 的真实公共接口；遇到 alpha 才有的功能，改方案或明确列为暂不支持，不能要求用户升级 alpha。版本策略详见 docs/VERSION-POLICY.md。
+## 验证与同步
 
-不把上游、node_modules、沙箱数据和早期 Hindsight 摘录提交到本仓库。阶段性修改检查后提交并同步 `origin`；记录失败和未完成的验证。
+- 真实 Host 已覆盖带参命令、自然语言、模型并行、停止隔离、仓库结果、引用发送、重启中断与深浅宽度矩阵。
+- 当前控制端无法完成 Electron 原生 125% 缩放、OS 原生展开菜单截图及真实中文 IME/附件组合的完整验收；不能把 DOM/抽象草稿测试说成这些都已通过。
+- 没有新增依赖或 lock 图变化；离线 frozen 校验缺少 registry metadata，明确记录，不能禁用供应链策略绕过。
+- [市场 PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 最新确认仍停留在10:43 open/年龄 gate 失败；下午复核受连接器和 API 限流阻断。不能声称已上架，不关/重开/force-push。见 docs/MARKETPLACE.md。
+- 中文默认、英文同步。检查后提交并推送本项目交付分支，核对 HEAD 与 origin 一致；失败记 pending。
+- Git 使用进程级 safe.directory；不改全局配置或关闭 TLS。沙箱、node_modules、tgz、日志、缓存、凭据和个人记忆摘录不提交。
