@@ -9,6 +9,12 @@ import type { TranslateNS } from '@deepseek-ai/dsh-client-locale/client'
 import type { SidebarRightTabDefinition } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {} from './locales.ts'
 
+declare module '@deepseek-ai/dsh-client-ui-sidebar-right/client' {
+  interface SidebarRightTabParamsMap {
+    sourcedeck: { readonly setId?: string; readonly roundId?: string }
+  }
+}
+
 /** Type discriminator: what tabs of this type are, and what `openTab` names. */
 export const DECK_KIND = 'sourcedeck'
 

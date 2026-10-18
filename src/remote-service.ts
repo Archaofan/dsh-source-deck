@@ -16,6 +16,7 @@ import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { openDeck, type OpenDeck } from './domain.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
 import type { ResearchCoordinator } from './research-coordinator.ts'
+import { getDeckActivity, requestDeckOpen } from './activity.ts'
 import {
   addFavorite, addSource, clearData, commitSelection, decide, getActiveSet, getPolicy, getSet, listFavorites,
   removeFavorite, setPolicy, startNewSet,
@@ -157,6 +158,8 @@ export class SourceDeckRemote extends TypertRemoteService {
     switch (op) {
       case 'ping':
         return JSON.stringify({ ok: true, op, message: 'source-deck remote' })
+      case 'getActivity':
+        return JSON.stringify(await getDeckActivity(await this.getStore(), stringField(args, 'sessionId')))
       case 'addSource': {
         const sessionId = stringField(args, 'sessionId')
         const store = await this.getStore()
@@ -184,6 +187,7 @@ export class SourceDeckRemote extends TypertRemoteService {
           ...(optionalString(args, 'setId') ? { setId: optionalString(args, 'setId') } : {}),
           ...(optionalString(args, 'note') === undefined ? {} : { note: optionalString(args, 'note') }),
         })
+        await requestDeckOpen(await this.getStore(), sessionId, result.target.setId, result.roundId)
         return JSON.stringify(result)
       }
       case 'cancelRound': {

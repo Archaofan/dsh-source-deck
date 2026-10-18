@@ -132,7 +132,7 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
     errorTimer.current = window.setTimeout(() => setError(null), 8000)
   }
 
-  const runRound = async (text: string): Promise<void> => {
+  const runRound = async (text: string, continueSetId?: string): Promise<void> => {
     const trimmed = text.trim()
     if (trimmed === '') {
       flashError(t('search.empty'))
@@ -141,12 +141,11 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
     setBusy(true)
     setError(null)
     try {
-      const result = await deck.startRound(sessionId, trimmed, note.trim() === '' ? undefined : note.trim())
+      const result = await deck.startRound(sessionId, trimmed, note.trim() === '' ? undefined : note.trim(), { mode: continueSetId ? 'continue' : 'new', ...(continueSetId ? { setId: continueSetId } : {}) })
       setView(result.view)
       setSearchingRound(result.roundId)
       setSearchStartedAt(Date.now())
-      const sent = await deck.prompt(sessionId, result.promptText)
-      if (!sent) throw new Error(t('search.promptFailed'))
+      setBusy(false)
     } catch (caught) {
       setSearchingRound(null)
       setBusy(false)
@@ -160,7 +159,7 @@ export function DeckBody({ sessionId, t, deck }: DeckBodyProps): ReactNode {
       await runRound(request)
       return
     }
-    await runRound(last.round.request)
+    await runRound(last.round.request, view?.setId)
   }
 
   const decide = async (entry: CandidateView, verdict: Verdict, reason?: string): Promise<void> => {

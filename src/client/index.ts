@@ -22,6 +22,9 @@ import { DECK_ID, DECK_KIND, deckDefinition } from './definition.ts'
 import type { DeckFace, PolicyView } from './deck-face.ts'
 import { en, zh } from './locales.ts'
 import { TYPERT_REMOTE } from '../remote-info.ts'
+import type { DeckActivity } from '../activity.ts'
+import type { DeckLocation } from './activity.ts'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 
 export type { DeckKey } from './locales.ts'
 export type { DeckBodyProps } from './DeckBody.tsx'
@@ -97,8 +100,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       })
       return result.ok
     },
-    startRound: async (sessionId: string, request: string, note?: string) =>
-      await call('startRound', { sessionId, request, ...(note === undefined ? {} : { note }) }) as StartRoundResult,
+    startRound: async (sessionId, request, note, options) =>
+      await call('startRound', { sessionId, request, requestId: options?.requestId ?? crypto.randomUUID(), mode: options?.mode ?? 'new', ...(options?.setId ? { setId: options.setId } : {}), ...(note === undefined ? {} : { note }) }) as StartRoundResult,
+    activity: async sessionId => await call('getActivity', { sessionId }) as DeckActivity,
     loadPolicy: async () => await call('getScopePolicy', {}) as PolicyView,
     savePolicy: async (policy: ScopePolicy) => await call('setScopePolicy', { policy }) as PolicyView,
     newSet: async (sessionId: string) => await call('newSet', { sessionId }) as { setId: string },
@@ -111,7 +115,11 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   ctx.effect(() => ctx.sidebarRightTabs.register(deckDefinition(t)), 'dsh-source-deck: deck type')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-source-deck: dictionaries')
-  const openDeck = (): void => ctx.sidebarRight.openTab(DECK_KIND)
+  const openDeck = (location?: DeckLocation): void => {
+    if (location) ctx.sidebarRight.openTabIn(location.sessionId as SessionId, DECK_KIND, { params: { setId: location.setId, roundId: location.roundId } })
+    else ctx.sidebarRight.openTab(DECK_KIND)
+  }
+  const seenActivities = new Set<string>()
   const decideFromCard = (candidateId: string, verdict: Verdict): void => {
     void deck.decide(candidateId, verdict).catch(error => {
       console.warn('[source-deck] card decision failed', error)
@@ -128,7 +136,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     DeckCard as never,
   ))
   ctx.slots.inject('conversation.input.right', () => ctx.slots.register(
-    { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck }) },
+    { name: 'conversation.input.right', id: 'source-deck', order: 10, locale: NS, inject: () => ({ openDeck, activity: deck.activity, seenActivities }) },
     DeckEntryButton as never,
   ))
   ctx.slots.inject('settings.section', () => ctx.slots.register(
@@ -142,28 +150,6 @@ export async function apply(ctx: ClientContext): Promise<void> {
     },
     ScopePolicySection as never,
   ))
-  ctx.inject(['commandUi'], (scope) => {
-    const commands = scope.get('commandUi') as unknown as {
-      register(contribution: {
-        name: string
-        label?(): string
-        description?(): string
-        available(session: unknown): boolean
-        ui: { kind: 'action'; run(session: unknown): void }
-      }): () => void
-    } | undefined
-    if (commands === undefined) return
-    scope.effect(() => commands.register({
-      name: 'deck',
-      label: () => t('command.open'),
-      description: () => t('command.hint'),
-      available: () => true,
-      ui: {
-        kind: 'action',
-        run: () => { openDeck() },
-      },
-    }), 'dsh-source-deck: /deck command')
-  })
   ctx.effect(() => ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register(
     { name: 'sidebar.right.pane.tab', key: DECK_ID, locale: NS, inject: () => ({ deck }) },
     DeckBody as never,

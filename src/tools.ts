@@ -12,6 +12,7 @@ import { addSource, getSet } from './ops.ts'
 import { emitDeckRecord, snapshotOf } from './events.ts'
 import type { SourceMeta } from './scope-policy.ts'
 import type { ResearchCoordinator } from './research-coordinator.ts'
+import { requestDeckOpen } from './activity.ts'
 
 /** The tool-registry slice this module needs. */
 interface ToolService {
@@ -20,6 +21,7 @@ interface ToolService {
 
 /** The execution identity fields this tool reads. */
 interface DeckToolExec {
+  readonly callId?: string
   readonly agent?: { readonly session: { readonly id: string; readonly header?: { readonly origin?: string } } }
 }
 
@@ -146,6 +148,21 @@ export function registerDeckTool(ctx: Context, getStore: () => Promise<DeckStore
   ctx.inject(['tools'], (scoped) => {
     const tools = scoped.get('tools') as unknown as ToolService | undefined
     if (tools === undefined) return
+    if (research) scoped.effect(() => tools.register({
+      name: 'deck_search',
+      description: 'Start SourceDeck background research and open the screening deck. 当用户说“用资料台找…”、“把这些技术方案放到资料台比较”时调用。Find open-source libraries or technical sources using an independent worker while the main conversation continues. Returns immediately after startup; do not wait or duplicate this search in the main chat.',
+      parameters: { type: 'object', properties: { request: { type: 'string', description: 'The user research requirement.' }, note: { type: 'string', description: 'Optional constraints.' } }, required: ['request'], additionalProperties: false },
+      output: { schema: { type: 'object', properties: { roundId: { type: 'string' }, status: { type: 'string' } }, required: ['roundId', 'status'], additionalProperties: false },
+        render: () => [{ type: 'text', text: '资料台正在后台研究，可继续当前开发对话。' }] },
+      async execute(args: unknown, exec: DeckToolExec) {
+        const sessionId = exec.agent?.session.id
+        if (!sessionId || exec.agent?.session.header?.origin === 'subagent') throw new Error('deck_search requires the main conversation')
+        if (!isObject(args) || typeof args.request !== 'string' || !args.request.trim()) throw new Error('research request is required')
+        const result = await research.start({ sessionId, request: args.request, requestId: `deck-search:${sessionId}:${exec.callId ?? crypto.randomUUID()}`, mode: 'new', ...(typeof args.note === 'string' ? { note: args.note } : {}) })
+        await requestDeckOpen(await getStore(), sessionId, result.target.setId, result.roundId)
+        return { roundId: result.roundId, status: 'started' }
+      },
+    }), 'dsh-source-deck: natural language research tool')
     scoped.effect(() => tools.register({
       name: 'deck_submit_sources',
       description: 'Submit the results of a SourceDeck search round. '

@@ -2,6 +2,7 @@
 import type { AddSourceResult, CommitResult, FavoriteView, SetView, StartRoundResult } from '../ops.ts'
 import type { Verdict } from '../model.ts'
 import type { ScopePolicy } from '../scope-policy.ts'
+import type { DeckActivity } from '../activity.ts'
 
 /** The Remote envelope for one policy read or write. */
 export interface PolicyView {
@@ -16,7 +17,8 @@ export interface DeckFace {
   decide(candidateId: string, verdict: Verdict, reason?: string): Promise<void>
   commit(sessionId: string, setId: string): Promise<CommitResult>
   prompt(sessionId: string, text: string): Promise<boolean>
-  startRound(sessionId: string, request: string, note?: string): Promise<StartRoundResult>
+  startRound(sessionId: string, request: string, note?: string, options?: { mode: 'new' | 'continue'; setId?: string; requestId?: string }): Promise<StartRoundResult>
+  activity(sessionId: string): Promise<DeckActivity>
   loadPolicy(): Promise<PolicyView>
   savePolicy(policy: ScopePolicy): Promise<PolicyView>
   newSet(sessionId: string): Promise<{ setId: string }>

@@ -10,6 +10,7 @@ import { SourceDeckRemote } from './remote-service.ts'
 import { registerDeckTool } from './tools.ts'
 import { ResearchCoordinator } from './research-coordinator.ts'
 import { createResearchRuntime } from './research-runtime.ts'
+import { registerDeckCommands } from './commands.ts'
 
 /** Plugin identity, matching the bundle patch row id. */
 export const name = 'dsh-source-deck'
@@ -31,4 +32,5 @@ export function apply(ctx: Context): void {
   remote.research = research
   ctx.effect(() => () => research.dispose(), 'dsh-source-deck: research cleanup')
   registerDeckTool(ctx, () => remote.getStore(), research)
+  registerDeckCommands(ctx, research, () => remote.getStore())
 }

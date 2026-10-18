@@ -6,22 +6,28 @@ import type { ReactNode } from 'react'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from './locales.ts'
 import css from './DeckEntryButton.module.css'
+import { DeckActivityObserver } from './DeckActivityObserver.tsx'
+import type { DeckActivity } from '../activity.ts'
+import type { DeckLocation } from './activity.ts'
 
 /** Entry props: the composer runtime share, copy, and the open callback. */
 export type DeckEntryButtonProps =
   & PropsRuntime<'conversation.input.right'>
   & PropsLocale<'sourceDeck'>
-  & { readonly openDeck: () => void }
+  & { readonly openDeck: (location?: DeckLocation) => void; readonly activity: (sessionId: string) => Promise<DeckActivity>; readonly seenActivities: Set<string> }
 
 /**
  * Render the composer's deck entry.
  * @param props - copy and the open callback.
  * @returns the button.
  */
-export function DeckEntryButton({ t, openDeck }: DeckEntryButtonProps): ReactNode {
+export function DeckEntryButton({ t, openDeck, sessionId, activity, seenActivities }: DeckEntryButtonProps): ReactNode {
   return (
-    <button type="button" className={css.entry} aria-label={t('guide.title')} title={t('guide.title')} onClick={openDeck}>
+    <>
+    {sessionId ? <DeckActivityObserver sessionId={sessionId} load={activity} open={openDeck} seen={seenActivities} /> : null}
+    <button type="button" className={css.entry} aria-label={t('guide.title')} title={t('guide.title')} onClick={() => openDeck(sessionId ? { sessionId } : undefined)}>
       {t('type.label')}
     </button>
+    </>
   )
 }

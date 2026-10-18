@@ -9,13 +9,14 @@ import type { Verdict } from '../model.ts'
 import type {} from './locales.ts'
 import type { DeckKey } from './locales.ts'
 import css from './DeckCard.module.css'
+import type { DeckLocation } from './activity.ts'
 
 /** Card props: owner data, copy, the panel entry, and inline decisions. */
 export type DeckCardProps =
   & ChatNodeViewProps<'source-deck-set'>
   & PropsLocale<'sourceDeck'>
   & {
-    readonly openDeck: () => void
+    readonly openDeck: (location?: DeckLocation) => void
     readonly decide: (candidateId: string, verdict: Verdict) => void
   }
 
@@ -79,7 +80,7 @@ export function DeckCard({ node, t, openDeck, decide }: DeckCardProps): ReactNod
       {data.candidates.length > shown.length
         ? <p className={css.more}>{t('card.more', { count: String(data.candidates.length - shown.length) })}</p>
         : null}
-      <button type="button" className={css.open} onClick={openDeck}>{t('card.open')}</button>
+      <button type="button" className={css.open} onClick={() => openDeck({ sessionId: data.sessionId, setId: data.setId })}>{t('card.open')}</button>
     </div>
   )
 }

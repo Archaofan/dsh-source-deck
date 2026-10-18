@@ -18,6 +18,7 @@ export const DECK_CARD_KIND = 'source-deck-set'
 /** Renderer payload derived from the latest snapshot. */
 export interface DeckCardData {
   readonly setId: string
+  readonly sessionId: string
   readonly policySummary?: string
   readonly roundCount: number
   readonly latestRoundIndex?: number
@@ -56,6 +57,7 @@ function dataOf(event: ConversationMatch['event']): DeckCardData {
   const latest = rounds[rounds.length - 1]
   return {
     setId: snapshot.setId,
+    sessionId: snapshot.sessionId,
     ...(snapshot.policySummary === undefined ? {} : { policySummary: snapshot.policySummary }),
     roundCount: rounds.length,
     ...(latest === undefined ? {} : { latestRoundIndex: latest.index, latestRequest: latest.request }),

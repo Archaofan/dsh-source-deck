@@ -85,6 +85,7 @@ export interface SessionActiveRecord {
   readonly setId: string
   readonly policyId?: string
   readonly roundId?: string
+  readonly openRevision?: string
 }
 
 /** One saved source, independent of any screening thread. */
