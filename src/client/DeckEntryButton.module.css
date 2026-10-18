@@ -2,7 +2,7 @@
   padding: 4px 10px;
   font-size: 12px;
   border-radius: 6px;
-  border: 1px solid var(--dsw-border-subtle, rgba(127, 127, 127, 0.3));
+  border: 1px solid var(--dsw-alias-border-l2);
   background: transparent;
   color: inherit;
   cursor: pointer;
@@ -10,5 +10,7 @@
 }
 
 .entry:hover {
-  background: var(--dsw-surface-raised, rgba(127, 127, 127, 0.12));
+  background: var(--dsw-alias-bg-layer-1);
 }
+
+.entry:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
