@@ -1,4 +1,14 @@
 import type { SourceRecord } from '../model.ts'
+const formatters = new Map<string, { date: Intl.DateTimeFormat; number: Intl.NumberFormat }>()
+function localeFormatters(locale: string) {
+  let cached = formatters.get(locale)
+  if (!cached) {
+    cached = { date: new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric' }), number: new Intl.NumberFormat(locale) }
+    if (formatters.size >= 8) formatters.delete(formatters.keys().next().value!)
+    formatters.set(locale, cached)
+  }
+  return cached
+}
 export function safeWebUrl(value: string | undefined): string | undefined {
   if (!value) return undefined
   try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : undefined } catch { return undefined }
@@ -21,11 +31,12 @@ export function sourceImages(source: SourceRecord): readonly string[] {
 }
 export function formatSourceFacts(source: SourceRecord, locale: string): { stars: string; updated: string; checked: string } {
   const unknown = locale.startsWith('zh') ? '未知' : 'Unknown'
+  const formatter = localeFormatters(locale)
   const date = (value?: string) => {
     if (!value || !Number.isFinite(Date.parse(value))) return unknown
-    return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(value))
+    return formatter.date.format(new Date(value))
   }
   const stars = source.meta?.stars
-  return { stars: typeof stars === 'number' && Number.isFinite(stars) && stars >= 0 ? new Intl.NumberFormat(locale).format(stars) : unknown,
+  return { stars: typeof stars === 'number' && Number.isFinite(stars) && stars >= 0 ? formatter.number.format(stars) : unknown,
     updated: date(source.meta?.pushedAt), checked: date(source.meta?.metadataFetchedAt) }
 }

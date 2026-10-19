@@ -28,6 +28,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InputActions } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { ReferenceSnapshot } from '../model.ts'
 import { ReferenceBridge } from './input-bridge.ts'
+import { StableJson } from './stable-json.ts'
 import { currentReference, registerReferenceSource } from './references.ts'
 
 export type { DeckKey } from './locales.ts'
@@ -82,10 +83,12 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   const wire = ctx.get('remote.sourceDeck') as unknown as SourceDeckWire
   const sessionRemote = ctx.get('remote.session') as unknown as SessionPromptRemote
+  const setResponses = new StableJson<SetView | null>()
   const call = async (op: string, body: object): Promise<unknown> => {
     const result = await wire.request(op, JSON.stringify(body))
     if (!result.ok) throw new Error(result.error.message ?? result.error.code ?? 'SourceDeck Remote call failed')
-    return result.value === undefined || result.value === '' ? undefined : JSON.parse(result.value)
+    if (result.value === undefined || result.value === '') return undefined
+    return op === 'getSet' || op === 'getActiveSet' ? setResponses.decode(result.value) : JSON.parse(result.value)
   }
   const bridge = new ReferenceBridge()
   const submissionRequests = new Map<string, string>()

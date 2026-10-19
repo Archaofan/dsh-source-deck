@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { UseSidebarRightTabInfo } from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { CandidateView, FavoriteView, SetView } from '../ops.ts'
@@ -11,6 +11,7 @@ import { CandidateMutations } from './candidate-mutations.ts'
 import { retainedDeckTarget } from './activity.ts'
 import { safeWebUrl } from './source-presentation.ts'
 import { DeckRefresh } from './deck-refresh.ts'
+import { favoriteIdentity, projectDeck } from './deck-projection.ts'
 import css from './DeckBody.module.css'
 
 export type DeckBodyProps = PropsRuntime<'sidebar.right.pane.tab'> & PropsLocale<'sourceDeck'> & { readonly deck: DeckFace; readonly useTabInfo: UseSidebarRightTabInfo }
@@ -98,9 +99,9 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
       await refresh()
     }).catch(caught => { if (currentOwner.current === owner) setError(caught instanceof Error ? caught.message : String(caught)) })
   }
-  const favoriteKey = (url?: string, title?: string) => url ?? title ?? ''
+  const favoritesByIdentity = useMemo(() => new Map(favorites.map(item => [favoriteIdentity(item.favorite), item])), [favorites])
   const toggleFavorite = (entry: CandidateView) => operate(`favorite:${entry.candidate.sourceId}`, async () => {
-    const saved = favorites.find(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))
+    const saved = favoritesByIdentity.get(favoriteIdentity(entry.source))
     if (saved) await deck.removeFavorite(saved.favoriteId)
     else await deck.addFavorite(entry.source)
     setFavorites(await deck.listFavorites())
@@ -130,18 +131,17 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   })
 
   const candidates = view?.candidates ?? []
-  const keptCount = candidates.filter(item => item.candidate.verdict === 'kept').length
-  const excludedCount = candidates.filter(item => item.candidate.verdict === 'excluded').length
+  const projection = useMemo(() => projectDeck(view, filter, query), [view, filter, query])
+  const keptCount = projection.counts.kept
+  const excludedCount = projection.counts.excluded
   const running = view?.rounds.find(item => item.round.status === 'starting' || item.round.status === 'running')
   const readOnly = view?.set.status === 'submitted'
-  const shown = candidates.filter(item => (filter === 'all' || item.candidate.verdict === filter) && `${item.source.title} ${item.source.note ?? ''} ${item.source.meta?.description ?? ''}`.toLowerCase().includes(query.toLowerCase()))
   const rounds = view?.rounds ?? []
-  const groups = [...rounds.map(item => ({ id: item.roundId, index: item.round.index, request: item.round.request, status: item.round.status, diagnostic: item.round.diagnostic, note: item.round.note })),
-    ...(candidates.some(item => !item.candidate.roundId) ? [{ id: 'manual', index: 0, request: t('v3.manual'), status: undefined, diagnostic: undefined, note: undefined }] : [])]
-  const compareEntries = candidates.filter(item => currentDraft.compare.includes(item.candidate.sourceId))
+  const groups = projection.groups
+  const compareEntries = useMemo(() => candidates.filter(item => currentDraft.compare.includes(item.candidate.sourceId)), [view, currentDraft.compare])
   const card = (entry: CandidateView) => <CandidateCard key={entry.candidateId} entry={entry} t={t}
     reason={currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
-    favorite={favorites.some(item => favoriteKey(item.favorite.url, item.favorite.title) === favoriteKey(entry.source.url, entry.source.title))}
+    favorite={favoritesByIdentity.has(favoriteIdentity(entry.source))}
     compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly}
     busy={operations.has(`favorite:${entry.candidate.sourceId}`)}
     onReason={value => patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } })}
@@ -186,7 +186,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
           <input className={css.input} type="search" aria-label={t('v3.filterSearch')} placeholder={t('v3.filterSearch')} value={query} onChange={event => setQuery(event.target.value)} />
         </div> : null}
         {groups.map(group => {
-          const entries = shown.filter(item => (item.candidate.roundId ?? 'manual') === group.id)
+          const entries = group.entries
           return <section key={group.id} id={`deck-${group.id}`} className={css.section}>
             <div className={css.roundHeading}><span>{group.index ? t('round.title', { index: String(group.index) }) : t('v3.manual')}</span><span className={css.status}>{group.status ? t(`v3.status.${group.status}` as DeckKey) : ''}</span></div>
             {group.index ? <p className={css.roundRequest}>{group.request}</p> : null}

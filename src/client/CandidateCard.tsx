@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { TranslateNS } from '@deepseek-ai/dsh-client-locale/client'
 import type { CandidateView } from '../ops.ts'
 import type { Verdict } from '../model.ts'
@@ -12,11 +12,12 @@ export interface CandidateCardProps {
 }
 export function CandidateCard({ entry, t, reason, favorite, compared, busy, readOnly, onReason, onDecide, onSaveReason, onFavorite, onCompare }: CandidateCardProps) {
   const { source, candidate } = entry
-  const images = sourceImages(source); const imageKey = images.join('|')
+  const images = useMemo(() => sourceImages(source), [source]); const imageKey = images.join('|')
   const [imageIndex, setImageIndex] = useState(0)
   useEffect(() => setImageIndex(0), [imageKey])
   const image = images[imageIndex]
-  const facts = formatSourceFacts(source, document.documentElement.lang || navigator.language || 'zh-CN')
+  const locale = document.documentElement.lang || navigator.language || 'zh-CN'
+  const facts = useMemo(() => formatSourceFacts(source, locale), [source, locale])
   const repo = githubRepo(source); const url = safeWebUrl(source.url)
   const metadataUrl = safeWebUrl(source.meta?.metadataUrl)
   return <article className={css.card} data-verdict={candidate.verdict} data-candidate-id={entry.candidateId}>
