@@ -133,4 +133,5 @@ Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, i
 - [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [Developer workflow research](docs/research/2026-10-18-developer-workflow-review.md)
+- [Comparable tools, experience and performance](docs/research/2026-10-19-comparable-tools-experience-review.en.md) · [Iteration proposal (awaiting review)](docs/design/2026-10-19-experience-iteration-proposal.en.md)
 - [Handoff](docs/HANDOFF.en.md) · [Version policy](docs/VERSION-POLICY.md)

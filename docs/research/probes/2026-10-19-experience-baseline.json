@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "measuredAtUtc": "2026-10-19T01:33:57.864Z",
+  "node": "v26.7.0",
+  "kind": "synthetic-in-memory-baseline",
+  "limitations": "No disk, Remote, React, Electron, image loading, model requests or field INP measured. Scan counters add instrumentation overhead. Timings vary by machine/run.",
+  "historyReads": [
+    {
+      "totalSets": 1,
+      "visibleCandidates": 24,
+      "scansPerRead": {
+        "candidates": 24,
+        "selections": 1,
+        "rounds": 3
+      },
+      "visitedPerRead": 28,
+      "theoreticalVisitsPerMinuteAtTwoSecondInterval": 840,
+      "jsonBytes": 15979,
+      "samples": 60,
+      "p50Ms": 0.008,
+      "p95Ms": 0.021
+    },
+    {
+      "totalSets": 100,
+      "visibleCandidates": 24,
+      "scansPerRead": {
+        "candidates": 2400,
+        "selections": 100,
+        "rounds": 300
+      },
+      "visitedPerRead": 2800,
+      "theoreticalVisitsPerMinuteAtTwoSecondInterval": 84000,
+      "jsonBytes": 16158,
+      "samples": 60,
+      "p50Ms": 0.113,
+      "p95Ms": 0.195
+    },
+    {
+      "totalSets": 1000,
+      "visibleCandidates": 24,
+      "scansPerRead": {
+        "candidates": 24000,
+        "selections": 1000,
+        "rounds": 3000
+      },
+      "visitedPerRead": 28000,
+      "theoreticalVisitsPerMinuteAtTwoSecondInterval": 840000,
+      "jsonBytes": 16337,
+      "samples": 60,
+      "p50Ms": 0.817,
+      "p95Ms": 0.895
+    }
+  ],
+  "factFormatting": [
+    {
+      "callsPerPass": 6,
+      "samples": 30,
+      "p50Ms": 0.524,
+      "p95Ms": 0.626
+    },
+    {
+      "callsPerPass": 24,
+      "samples": 30,
+      "p50Ms": 2.062,
+      "p95Ms": 2.456
+    },
+    {
+      "callsPerPass": 200,
+      "samples": 30,
+      "p50Ms": 18.08,
+      "p95Ms": 20.661
+    }
+  ],
+  "compareFourSourcesFormattingCallsPerRender": 24,
+  "deckFullReadIntervalMsInCurrentSource": 2000,
+  "activityObserverIntervalMsInCurrentSource": 2000,
+  "activityObserverUsesDirectKeys": true
+}

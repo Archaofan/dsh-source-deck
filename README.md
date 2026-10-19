@@ -133,4 +133,5 @@ npm pack
 - [v3 设计](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [已批准实施计划](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [开发工作流调研](docs/research/2026-10-18-developer-workflow-review.md)
+- [同类工具体验与性能调研](docs/research/2026-10-19-comparable-tools-experience-review.md) · [优化迭代提案（待评审）](docs/design/2026-10-19-experience-iteration-proposal.md)
 - [交接](docs/HANDOFF.md) · [版本策略](docs/VERSION-POLICY.md)

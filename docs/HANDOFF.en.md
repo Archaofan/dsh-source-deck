@@ -2,6 +2,14 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
+## 2026-10-19: experience and performance research
+
+The user requested deeper comparable-tool research and an optimization roadmap without feature accumulation. Deliverables: [bilingual research](research/2026-10-19-comparable-tools-experience-review.en.md), [iteration proposal](design/2026-10-19-experience-iteration-proposal.en.md), and an in-memory [probe result](research/probes/2026-10-19-experience-baseline.json). Seven related tools and GitHub were studied through official documents, not hands-on competitive timing.
+
+Proposed order: 0.3.1 removes repeated work; 0.3.2 focuses the result page. Conditional 0.4.0 evidence/narrow-comparison work proceeds only if observations support it. Version labels are proposals; product remains 0.3.0. This new scope awaits review and is not covered by prior v3 approval. No product/dependency/baseline changes, sandbox launch or production operation; live lease was unoccupied. In-memory timings are not Electron UI latency, field INP or measured speedups.
+
+## Previous approval and delivery
+
 The user approved the v3 design, seven-task plan, inline execution, implementation, and Git delivery. Do not request these approvals again. At the user's subsequent request, 0.3.0 delivery has been fast-forwarded to default branch `main`; `feat/sourcedeck-v3` remains available; exact peers remain DSH 0.2.1-rc.2 and Cordis 4.0.5. The sole project is `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`, remote `https://github.com/Archaofan/dsh-source-deck.git`.
 
 0.3.0 was published as GitHub Release `v0.3.0` on 2026-10-18 (tag `8f4b373`; asset `dsh-source-deck-0.3.0.tgz`, SHA256 `216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`). Both READMEs use real Host light/dark screenshots at `docs/assets/screenshots/source-deck-{light,dark}.png` and `source-deck-linkage-{light,dark}.png`; account information in the screenshots has been redacted.

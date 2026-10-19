@@ -4,6 +4,12 @@
 
 继续本项目时先读根 README.md / AGENTS.md、本项目 README.md、MARKETPLACE.md、本文、SETUP-VERIFICATION.md 夜-9、AGENTS.md，再检查共享沙箱 lease。
 
+## 2026-10-19：体验与性能研究
+
+用户要求继续深度调研同类工具并制定优化迭代，明确避免功能堆积。本轮仅交付[中英调研](research/2026-10-19-comparable-tools-experience-review.md)、[迭代提案](design/2026-10-19-experience-iteration-proposal.md)及纯内存[探针/原始数据](research/probes/2026-10-19-experience-baseline.json)。研究覆盖七类相关工具与 GitHub；官方文档研究不冒充竞品实操。
+
+建议先 0.3.1 减少重复工作，再 0.3.2 收拢结果页；0.4.0 的判断依据/窄栏对比仅在观察证据支持时继续。版本号为建议，产品仍 0.3.0。本次新提案待评审，不能套用旧 v3 授权直接实施。未改产品代码/依赖/基线，未启动沙箱或操作生产；本轮实时 lease 为 occupied=false。纯内存耗时不能冒称 Electron UI、真实用户 INP 或优化收益。
+
 ## 已有授权与交付
 
 用户已批准 v3 设计与七项计划，选择当前会话执行，要求落地并推送 Git。不要重复要求设计/计划批准。产品 0.3.0，已按用户后续要求将交付内容快进至默认分支 `main`，原交付分支 `feat/sourcedeck-v3` 保留；精确 peer DSH 0.2.1-rc.2、Cordis 4.0.5。工作区唯一项目目录 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
