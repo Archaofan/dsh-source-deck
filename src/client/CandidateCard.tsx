@@ -37,7 +37,7 @@ export function CandidateCard({ entry, t, reason, favorite, compared, busy, read
       <div className={css.tags}>{[source.meta?.language, source.meta?.license].filter(Boolean).map(tag => <span key={tag}>{tag}</span>)}</div>
       {source.meta?.archived ? <p className={css.warning}>{t('ux.archived')}</p> : null}
       {candidate.policyFlags?.length ? <div className={css.flags}>{candidate.policyFlags.map(flag => <span key={flag} title={t(`flag.${flag}.hint` as DeckKey)}>{t(`flag.${flag}` as DeckKey)}</span>)}</div> : null}
-      {repo || source.meta?.topics?.length ? <details className={css.reason}><summary>{t('ux.sourceDetails')}</summary>
+      {repo || source.meta?.topics?.length || source.meta?.description || source.note || source.snippet ? <details className={css.reason}><summary>{t('ux.sourceDetails')}</summary>
         <p className={css.lookup}>{source.meta?.description || source.note || source.snippet}</p>
         {source.meta?.topics?.length ? <p className={css.lookup}>{source.meta.topics.join(' · ')}</p> : null}
         {repo ? <p className={css.lookup}>{t('source.checked')} {facts.checked}{metadataUrl ? <> · <a href={metadataUrl} target="_blank" rel="noreferrer">{t('source.metadata')}</a></> : null}</p> : null}

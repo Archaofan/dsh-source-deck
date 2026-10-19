@@ -37,9 +37,12 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const editorKind = editor.owner === owner ? editor.kind : 'none'
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
-  const [operations, setOperations] = useState<ReadonlySet<string>>(new Set())
+  const [allOperations, setOperations] = useState<ReadonlySet<string>>(new Set())
+  const operationPrefix = `${owner}\0`
+  const operations = new Set([...allOperations].filter(key => key.startsWith(operationPrefix)).map(key => key.slice(operationPrefix.length)))
+  const deliveryBusy = operations.has('reference') || operations.has('send')
   const inFlight = useRef(new Set<string>())
-  const candidateMutations = useRef(new CandidateMutations())
+  const candidateMutations = useMemo(() => new CandidateMutations(), [owner])
   const candidatePending = useRef(new Map<string, number>())
   const decisionPending = useRef(new Map<string, number>())
   const candidateAttempt = useRef(new Map<string, number>())
@@ -51,6 +54,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const scroll = useRef<HTMLDivElement>(null)
   const resultFocus = useRef<HTMLParagraphElement>(null)
   const compareFocus = useRef<HTMLHeadingElement>(null)
+  const compareButton = useRef<HTMLButtonElement>(null)
   const requestInput = useRef<HTMLTextAreaElement>(null)
   const refineInput = useRef<HTMLTextAreaElement>(null)
   const newButton = useRef<HTMLButtonElement>(null)
@@ -103,12 +107,13 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     else if (returnLocation.current?.owner === owner) {
       if (scroll.current) scroll.current.scrollTop = returnLocation.current.top
       const target = returnLocation.current.focus
-      if (target?.isConnected) target.focus({ preventScroll: true }); else resultFocus.current?.focus({ preventScroll: true })
+      if (target?.isConnected) target.focus({ preventScroll: true }); else (compareButton.current ?? resultFocus.current)?.focus({ preventScroll: true })
       returnLocation.current = undefined
     } else returnLocation.current = undefined
   }, [compareOpen, owner])
 
   const operate = async (key: string, job: () => Promise<void>) => {
+    key = operationPrefix + key
     if (inFlight.current.has(key)) return
     const boundOwner = owner
     inFlight.current.add(key); setOperations(new Set(inFlight.current)); setError(null)
@@ -148,7 +153,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     setCandidateErrors(previous => { const next = { ...previous }; delete next[id]; return next })
     try {
       const job = async () => { await deck.decide(id, verdict, savedReason); await refresh() }
-      await (explicit ? candidateMutations.current.runLatest(id, job) : candidateMutations.current.run(id, job))
+      await (explicit ? candidateMutations.runLatest(id, job) : candidateMutations.run(id, job))
       if (trigger && currentOwner.current === owner) requestAnimationFrame(() => {
         if (currentOwner.current !== owner || trigger.isConnected || (document.activeElement !== document.body && document.activeElement !== trigger)) return
         const articles = Array.from(scroll.current?.querySelectorAll<HTMLElement>('article[data-candidate-id]') ?? [])
@@ -180,13 +185,13 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     else if (selected.length < 4) patchDraft({ compare: [...selected, sourceId] })
     else setError(t('compare.limit'))
   }
-  const reference = () => operate('reference', async () => {
+  const reference = () => operate('reference', () => candidateMutations.withSettledWrites(async () => {
     if (!view) return
     const outcome = await deck.reference(sessionId, view.setId)
     if (outcome !== 'inserted') throw new Error(t(outcome === 'draft-changed' ? 'reference.conflict' : 'reference.unavailable'))
     if (currentOwner.current === owner) setNotice(t('reference.done'))
-  })
-  const sendSummary = () => operate('send', async () => { if (view) { await deck.deliverSelection(sessionId, view.setId); await refresh(); if (currentOwner.current === owner) setNotice(t('submit.done')) } })
+  }))
+  const sendSummary = () => operate('send', () => candidateMutations.withSettledWrites(async () => { if (view) { await deck.deliverSelection(sessionId, view.setId); await refresh(); if (currentOwner.current === owner) setNotice(t('submit.done')) } }))
   const add = () => operate('add', async () => {
     if (!manual.trim()) return
     await deck.add(sessionId, { ...(safeWebUrl(manual.trim()) ? { url: manual.trim() } : { title: manual.trim() }), ...(view ? { setId: view.setId } : {}) })
@@ -210,7 +215,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const shownFavorites = favorites.filter(item => [item.favorite.title, item.favorite.url, item.favorite.note, item.favorite.meta?.description].join(' ').toLocaleLowerCase().includes(favoriteNeedle))
   const card = (entry: CandidateView) => <CandidateCard key={entry.candidateId} entry={entry} t={t}
     reason={currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
-    favorite={favoritesByIdentity.has(favoriteIdentity(entry.source))} compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly}
+    favorite={favoritesByIdentity.has(favoriteIdentity(entry.source))} compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly || deliveryBusy}
     busy={operations.has(`favorite:${entry.candidate.sourceId}`)} saving={saving.has(entry.candidateId)} deciding={deciding.has(entry.candidateId)} error={candidateErrors[entry.candidateId]}
     onReason={value => patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } })}
     onDecide={verdict => void decide(entry, verdict)}
@@ -269,17 +274,17 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
             <div className={css.grid}>{group.entries.map(card)}</div>
             {!group.total ? <p className={css.empty}>{group.status === 'running' || group.status === 'starting' ? t('round.searching') : t('ux.noNewResults')}</p> : null}
           </section>)}
-          {!readOnly ? <details className={css.manual}><summary>{t('v3.manual')}</summary><div><input className={css.input} aria-label={t('add.primary')} placeholder={t('add.primary')} value={manual} onChange={event => setManual(event.target.value)} /><button type="button" className={css.button} disabled={operations.has('add') || !manual.trim()} onClick={() => void add()}>{t('add.submit')}</button></div></details> : null}
+          {!readOnly ? <details className={css.manual}><summary>{t('v3.manual')}</summary><div><input className={css.input} aria-label={t('add.primary')} placeholder={t('add.primary')} value={manual} onChange={event => setManual(event.target.value)} /><button type="button" className={css.button} disabled={deliveryBusy || operations.has('add') || !manual.trim()} onClick={() => void add()}>{t('add.submit')}</button></div></details> : null}
         </div>
       </>}
     </div>
     {mode === 'deck' && view && hasContent ? <footer className={css.footer}>
       <div className={css.summary}><span>✓ {projection.counts.kept} · ✕ {projection.counts.excluded} · {t('v3.pending')} {projection.counts.pending}</span>{running ? <button type="button" className={css.linkButton} disabled={operations.has('cancel')} onClick={() => void operate('cancel', async () => { await deck.cancelRound(sessionId, running.roundId); await refresh() })}>{t('v3.stop')}</button> : latest?.round.status ? <span>{t(`v3.status.${latest.round.status}` as DeckKey)}</span> : null}</div>
-      <button type="button" className={css.primary} disabled={!projection.counts.kept || operations.has('reference')} onClick={() => void reference()}>{t('reference.button', { count: String(projection.counts.kept) })}</button>
+      <button type="button" className={css.primary} disabled={!projection.counts.kept || deliveryBusy} onClick={() => void reference()}>{t('reference.button', { count: String(projection.counts.kept) })}</button>
       <div className={css.secondaryActions}>
         {!readOnly ? <button ref={refineButton} type="button" className={css.linkButton} disabled={Boolean(running)} aria-expanded={editorKind === 'refine'} onClick={() => { if (!latest) newTopic(); else if (editorKind === 'refine') closeEditor(); else { setCompareOpen(false); setEditor({ owner, kind: 'refine' }) } }}>{t(latest ? 'ux.refine' : 'search.start')}</button> : null}
-        {currentDraft.compare.length > 0 && !compareOpen ? <button type="button" className={css.linkButton} onClick={openCompare}>{t('compare.title')} ({currentDraft.compare.length}/4)</button> : null}
-        <details className={css.more}><summary>{t('ux.more')}</summary><div><p>{t('ux.directHint')}</p><button type="button" className={css.button} disabled={Boolean(running) || operations.has('send') || !candidates.length || view.deliveryStatus === 'sent'} onClick={() => void sendSummary()}>{view.deliveryStatus === 'sent' ? t('submit.done') : t('reference.direct')}</button></div></details>
+        {currentDraft.compare.length > 0 && !compareOpen ? <button ref={compareButton} type="button" className={css.linkButton} onClick={openCompare}>{t('compare.title')} ({currentDraft.compare.length}/4)</button> : null}
+        <details className={css.more}><summary>{t('ux.more')}</summary><div><p>{t('ux.directHint')}</p><button type="button" className={css.button} disabled={Boolean(running) || deliveryBusy || !candidates.length || view.deliveryStatus === 'sent'} onClick={() => void sendSummary()}>{view.deliveryStatus === 'sent' ? t('submit.done') : t('reference.direct')}</button></div></details>
       </div>
       {editorKind === 'refine' && !readOnly ? <div className={css.refineEditor}><textarea ref={refineInput} className={css.textarea} rows={2} aria-label={t('feedback.label')} placeholder={t('feedback.placeholder')} value={currentDraft.note} onChange={event => patchDraft({ note: event.target.value })} onKeyDown={event => { if (event.key === 'Escape' && !event.nativeEvent.isComposing) { closeEditor(); event.stopPropagation() } }} /><div className={css.searchActions}><button type="button" className={css.linkButton} onClick={closeEditor}>{t('ux.cancel')}</button><button type="button" className={css.button} disabled={Boolean(running) || operations.has('start')} onClick={() => void start(true)}>{operations.has('start') ? t('search.starting') : t('feedback.continue')}</button></div></div> : null}
       {readOnly ? <p className={css.muted}>{t('v3.historyReadOnly')}</p> : null}

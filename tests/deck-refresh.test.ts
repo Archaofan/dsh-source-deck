@@ -59,3 +59,19 @@ test('a failed read reports once and remains retryable', async () => {
   assert.deepEqual(errors, ['Error: offline']); assert.deepEqual(accepted, ['restored'])
   reader.dispose()
 })
+
+test('a failed old read cannot consume a successful write invalidation queued during that read', async () => {
+  let release!: () => void; let began!: () => void; let reads = 0
+  const gate = new Promise<void>(resolve => { release = resolve })
+  const started = new Promise<void>(resolve => { began = resolve })
+  const accepted: string[] = []; const errors: unknown[] = []
+  const reader = new DeckRefresh(async () => {
+    if (++reads === 1) { began(); await gate; throw new Error('obsolete read failed') }
+    return 'after-successful-write'
+  }, value => accepted.push(value), error => errors.push(error), () => false)
+  const first = reader.refresh(); await started
+  const afterWrite = reader.refresh()
+  release(); await Promise.all([first, afterWrite])
+  assert.equal(reads, 2); assert.deepEqual(accepted, ['after-successful-write']); assert.deepEqual(errors, [])
+  reader.dispose()
+})

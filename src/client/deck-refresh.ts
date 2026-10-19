@@ -34,6 +34,7 @@ export class DeckRefresh<T> {
           this.running = this.isRunning(value); this.accept(value)
         } catch (error) {
           if (this.disposed) return
+          if (this.dirty) continue
           this.failed(error); throw error
         }
       } while (this.dirty && !this.disposed)
