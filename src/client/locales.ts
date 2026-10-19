@@ -16,6 +16,19 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 /** Simplified Chinese dictionary and key-set source of truth. */
 export const zh = {
+  'ux.archived': '此仓库已归档，维护状态需留意。',
+  'ux.sourceDetails': '来源详情',
+  'ux.saving': '正在保存…',
+  'ux.backToResults': '返回候选',
+  'ux.noMatches': '当前筛选条件下没有匹配资料。',
+  'ux.clearFilters': '清除筛选',
+  'ux.manualGroup': '补充资料',
+  'ux.noNewResults': '本轮没有新增候选。',
+  'ux.refine': '补充查找',
+  'ux.more': '更多',
+  'ux.directHint': '立即发送筛选摘要，并将当前资料集设为只读。',
+  'ux.resultCount': '显示 {shown} / {total} 条资料',
+  'ux.cancel': '收起',
   'v3.subtitle': '发现开源库，筛选方案，带回开发对话',
   'v3.sources': '候选资料',
   'v3.refresh': '刷新资料',
@@ -232,6 +245,19 @@ export type DeckKey = keyof typeof zh
 
 /** English dictionary, checked against the Chinese key set. */
 export const en = {
+  'ux.archived': 'Archived repository. Check its maintenance status.',
+  'ux.sourceDetails': 'Source details',
+  'ux.saving': 'Saving…',
+  'ux.backToResults': 'Back to candidates',
+  'ux.noMatches': 'No sources match the current filters.',
+  'ux.clearFilters': 'Clear filters',
+  'ux.manualGroup': 'Added sources',
+  'ux.noNewResults': 'No new candidates in this round.',
+  'ux.refine': 'Refine search',
+  'ux.more': 'More',
+  'ux.directHint': 'Send the screening summary immediately and make this set read-only.',
+  'ux.resultCount': 'Showing {shown} / {total} sources',
+  'ux.cancel': 'Collapse',
   'v3.subtitle': 'Discover libraries, screen options, bring them into development',
   'v3.sources': 'Sources',
   'v3.refresh': 'Refresh sources',

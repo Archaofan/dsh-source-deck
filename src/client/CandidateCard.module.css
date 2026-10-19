@@ -10,7 +10,7 @@
 .eyebrow, .lookup { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .title { font-size: 16px; line-height: 1.45; margin: 0; overflow-wrap: anywhere; }
 .title a { color: var(--dsw-alias-label-primary); text-decoration: none; }
-.description { margin: 0; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; color: var(--dsw-alias-label-secondary); flex: 1; }
+.description { margin: 0; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; color: var(--dsw-alias-label-secondary); flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12px; color: var(--dsw-alias-label-secondary); }
 .facts strong { font-size: 14px; color: var(--dsw-alias-label-primary); }
 .tags, .flags { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -25,8 +25,10 @@
 .keepActive { color: var(--dsw-alias-label-primary); border-color: #258b74; background: color-mix(in srgb, #258b74 15%, transparent); }
 .excludeActive { color: var(--dsw-alias-label-primary); border-color: #c34f61; background: color-mix(in srgb, #c34f61 12%, transparent); }
 .reason { font-size: 12px; color: var(--dsw-alias-label-tertiary); }
-.reason summary { cursor: pointer; padding: 4px 0; }
+.reason summary { cursor: pointer; padding: 5px 0; min-height: 32px; }
 .reason input { box-sizing: border-box; width: 100%; margin-top: 6px; font: inherit; padding: 8px; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); border-radius: 6px; }
 .reason input::placeholder { color: var(--dsw-alias-label-tertiary); }
 .card button:focus-visible, .reason input:focus-visible, .reason summary:focus-visible, .title a:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
 .card button:disabled { opacity: .48; cursor: default; }
+.favorite { min-width: 32px; min-height: 32px; }
+.warning { margin: 0; color: var(--dsw-alias-label-primary); font-size: 12px; overflow-wrap: anywhere; }
