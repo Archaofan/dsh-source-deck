@@ -47,13 +47,13 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.3.0 |
+| SourceDeck | 0.3.2 |
 | DeepSeek Harness Desktop | 0.2.1-rc.2 |
 | @deepseek-ai/cordis | 4.0.5 |
 
 Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Use the Desktop plugin manager to install `dsh-source-deck-0.3.0.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+Use the Desktop plugin manager to install `dsh-source-deck-0.3.2.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
 Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is still open, waiting for the automatic re-check and merge. Availability is not claimed yet. See [market status](docs/MARKETPLACE.md).
 
@@ -69,11 +69,15 @@ Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Offic
 
 ## Screen and compare
 
+0.3.2 focuses the result page: new-search and follow-up editors open on demand, candidate and favorite queries persist independently, and comparison restores return focus. Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Full descriptions remain available in source details.
+
+Full reads are serialized: approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return. No service or dependency was added. See the [implementation record](docs/implementation/2026-10-19-experience-optimization.en.md) for actual evidence and limits. The 0.3.2 package is a local delivery; the Release link above still points to published 0.3.0.
+
 1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
 2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.
 3. Add up to four sources to the comparison panel for descriptions, stars, dates, languages, licenses, reasons, and URLs.
 4. Cards default to two columns, automatically becoming one below 620px of panel content width. Light/dark modes follow the Host, including settings select options. Request/note/reason drafts and comparison choices are stored per session/topic in browser sessionStorage.
-5. Add a note and continue the same topic: the next round receives kept/excluded sources and reasons. New topic creates a separate set; previous results remain accessible through conversation cards.
+5. Open the follow-up editor to continue the same topic with current decisions and reasons. New search opens editing first; Start creates a new set. Cancelling preserves the draft and current results. Historical conversation cards reopen their original sets.
 6. Screening, favorites, comparison, and references remain available during research. Stop affects only that worker. A five-minute timeout ends the task and keeps partial results. Unrestored work is marked interrupted after Host restart and can be retried.
 
 ## Reference and continue development

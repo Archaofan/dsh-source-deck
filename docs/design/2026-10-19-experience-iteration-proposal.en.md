@@ -2,7 +2,7 @@
 
 > [中文（默认）](2026-10-19-experience-iteration-proposal.md) | English
 
-Date: 2026-10-19. **Research-based roadmap awaiting review, not an approved implementation plan.** Evidence: [comparable tools and measured baseline](../research/2026-10-19-comparable-tools-experience-review.en.md). Product remains 0.3.0. Version labels below identify proposed batches, not release commitments or a version bump.
+Date: 2026-10-19. **The user approved this proposal and explicitly requested implementation.** The 0.3.1 and 0.3.2 batches are implemented; conditional 0.4.0 remains excluded. Evidence: [research and baseline](../research/2026-10-19-comparable-tools-experience-review.en.md), with actual results in the [implementation record](../implementation/2026-10-19-experience-optimization.en.md). Targets below remain design budgets, not measured achievements.
 
 ## Intent and success
 
@@ -107,7 +107,7 @@ Matrix: current 6/24/200 items × 1/100/1,000 total topics. Normal tasks emphasi
 - Backoff needs no new platform API. Pane visibility and comparison return behavior require fixed-RC verification. Any later subscription must have public-interface evidence at that exact RC, not master/alpha examples.
 - Writes/invalidation retain session/set/round ownership. Any cache must cover clearing, shared-source metadata changes, other clients and restart. Without complete invalidation, omit the cache.
 - New search/close/return preserve request, follow-up and reason drafts. Collapsing changes presentation, not reference checks or persistence semantics.
-- Review each batch's concrete design before implementation. Previous v3 approval does not approve this new scope. Research/roadmap documents can be checked, committed and synchronized now without extending the task into product implementation.
+- This scope has separate authorization: after seeing the proposal, the user explicitly requested implementation of the first two batches. The conditional batch still requires supporting observations and is not automatically included.
 
 ## Release and stopping
 

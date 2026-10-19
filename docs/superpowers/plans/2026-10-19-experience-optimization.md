@@ -32,10 +32,10 @@
 
 **Interfaces:** `DeckRefresh<T>(read:()=>Promise<T>, accept:(value:T)=>void, failed:(error:unknown)=>void, isRunning:(value:T)=>boolean)` exposes `refresh():Promise<void>`, `setEnabled(enabled:boolean):void`, `dispose():void`. It owns timers, not Host/model state.
 
-- [ ] Write behavior tests: 60 seconds idle produces two reads after initialization; running updates after 2 seconds; concurrent refreshes cause no overlap and one trailing read; pause cancels timers, resume refreshes; dispose ignores late results; errors can retry.
-- [ ] Run `node --test tests/deck-refresh.test.ts`; observe missing behavior fail.
-- [ ] Implement the scheduler and integrate actual `tab.visible` plus document visibility and candidate/favorites mode. Preserve explicit refresh after writes; retain the separate activity observer. Use a per-effect controller so cleanup/restart is safe.
-- [ ] Run scheduler and full suite; build. Record baseline/after in local acceptance materials. Commit independently.
+- [x] Write behavior tests: 60 seconds idle produces two reads after initialization; running updates after 2 seconds; concurrent refreshes cause no overlap and one trailing read; pause cancels timers, resume refreshes; dispose ignores late results; errors can retry.
+- [x] Run `node --test tests/deck-refresh.test.ts`; observe missing behavior fail.
+- [x] Implement the scheduler and integrate actual `tab.visible` plus document visibility and candidate/favorites mode. Preserve explicit refresh after writes; retain the separate activity observer. Use a per-effect controller so cleanup/restart is safe.
+- [x] Run scheduler and full suite; build. Record baseline/after in local acceptance materials. Commit independently.
 
 ### Task 2: presentation work and 0.3.1 delivery
 
@@ -43,10 +43,10 @@
 
 **Interfaces:** `StableJson<T>.decode(raw:string):T` compares only the most recent freshly received payload; no request skipped. `projectDeck(view:SetView|null, filter:'all'|Verdict, query:string)` returns counts, shown entries and grouped entries. `favoriteIdentity(source:{url?:string;title:string}):string` supports a lookup Set. Formatter public behavior remains `formatSourceFacts(source,locale)`.
 
-- [ ] Tests first: changed/null/cleared/other-topic JSON is not stale; grouping retains manual/unmatched running rounds and literal counts; URL/reason search works; structured metadata changes remain visible. Allocation measurement uses the existing probe, not timing assertions.
-- [ ] Observe failing tests, then implement; use memoized projections and per-source facts, bounded locale formatters and one fact computation per comparison source. No blanket memoization or store rewrite.
-- [ ] Run full suite/build and compare the pure formatting probe, identifying its limits. Bump to 0.3.1, pack into hash path, install with official script; verify installed lib bytes and real Host reads/visibility/ordinary 6/24-item flows.
-- [ ] Record actual metrics/limits, commit and push this milestone. Do not treat a failed check as a feature-expansion trigger.
+- [x] Tests first: changed/null/cleared/other-topic JSON is not stale; grouping retains manual/unmatched running rounds and literal counts; URL/reason search works; structured metadata changes remain visible. Allocation measurement uses the existing probe, not timing assertions.
+- [x] Observe failing tests, then implement; use memoized projections and per-source facts, bounded locale formatters and one fact computation per comparison source. No blanket memoization or store rewrite.
+- [x] Run full suite/build and compare the pure formatting probe, identifying its limits. Bump to 0.3.1, pack into hash path, install with official script; verify installed lib bytes and real Host reads/visibility/ordinary 6/24-item flows.
+- [x] Record actual metrics/limits, commit and push this milestone. Do not treat a failed check as a feature-expansion trigger.
 
 ### Task 3: result-focused panel and continuity
 
@@ -54,16 +54,19 @@
 
 **Interfaces:** reuse Task 1 scheduler and Task 2 projection. Existing `DeckFace` remains intact. New search opens editing only; Start uses existing `startRound(...,{mode:'new'})`. UI state remains local/session draft storage.
 
-- [ ] Tests first for transitions/projection: independent scoped queries, zero-filter vs zero-arrival distinction, new-search cancel preserves current set, and same-card blur/choice order with failure recovery. Keep expectations literal.
-- [ ] Implement two navigation destinations, compact topic/result layout, contextual comparison and return, staged new/refine editors, one primary reference action and one-level labeled secondary actions. Preserve optional reasons, immediate-send semantics and submitted-set read-only state.
-- [ ] Add per-card saving feedback; guard stale-owner completions. Focus adjacent card/result status only when the active decision removes its card; preserve position through comparison and disclosure return. Keep all high-frequency controls discoverable and >=32px where appropriate.
-- [ ] Run unit suite/build and real Host flow checks. Commit independently without adding 0.4.0 prompt/data work.
+- [x] Tests first for transitions/projection: independent scoped queries, zero-filter vs zero-arrival distinction, new-search cancel preserves current set, and same-card blur/choice order with failure recovery. Keep expectations literal.
+- [x] Implement two navigation destinations, compact topic/result layout, contextual comparison and return, staged new/refine editors, one primary reference action and one-level labeled secondary actions. Preserve optional reasons, immediate-send semantics and submitted-set read-only state.
+- [x] Add per-card saving feedback; guard stale-owner completions. Focus adjacent card/result status only when the active decision removes its card; preserve position through comparison and disclosure return. Keep all high-frequency controls discoverable and >=32px where appropriate.
+- [x] Run unit suite/build and real Host flow checks. Commit independently without adding 0.4.0 prompt/data work.
 
 ### Task 4: review, acceptance, 0.3.2 package and synchronization
 
 **Files:** package version, bilingual README/HANDOFF, `docs/SETUP-VERIFICATION.md`, implementation record; local evidence under shared sandbox `test-workspaces/dsh-source-deck/experience-acceptance/` only.
 
 - [ ] Execute fixed RC visual/interaction matrix at 320/420/640/900 widths, light/dark; measure 420×800 collapsed-result chrome <=35%, ordinary operation feedback/load timings, 200-item stress costs. Count full/activity calls separately; no idle full reads in favorites/hidden, <=2/minute visible terminal, max one in-flight steady-target full read.
-- [ ] Verify reference insertion with existing draft/attachments contract, history/read-only, independent queries, filter-empty state, failed writes, comparison return, cancellation and restart behavior. Clearly distinguish automated protocol checks, browser Host checks, and unavailable native/human checks.
-- [ ] Request one independent whole-branch review under executing-plans; reproduce/fix Important/Critical findings with failing regression then green suite. Record remaining limits honestly.
-- [ ] Bump 0.3.2, build/pack/hash/install through official sandbox script; verify final bytes. Update Chinese/English user/handoff material and current approval state. Run full suite, diff/package checks, commit/push and verify local/tracking/remote equality. Deliver absolute package path; no production install or external publication implied.
+- [x] Verify reference insertion with existing draft/attachments contract, history/read-only, independent queries, filter-empty state, failed writes, comparison return, cancellation and restart behavior. Clearly distinguish automated protocol checks, browser Host checks, and unavailable native/human checks.
+- [x] Request one independent whole-branch review under executing-plans; reproduce/fix Important/Critical findings with failing regression then green suite. Record remaining limits honestly.
+- [x] Bump 0.3.2, build/pack/hash/install through official sandbox script; verify final bytes. Update Chinese/English user/handoff material and current approval state. Run full suite, diff/package checks, commit/push and verify local/tracking/remote equality. Deliver absolute package path; no production install or external publication implied.
+
+
+Execution result: Tasks 1–3 implemented. Task 4 common-flow/layout/review/package checks completed; the combined performance-matrix checkbox remains open because full real-minute/hidden counts, 200-item end-to-end interaction and latency budgets are not accepted. Native IME/zoom/attachments and human task study remain explicit follow-up items. See bilingual implementation record for actual evidence and browser-control/automatic-review timeout limits. Conditional 0.4.0 excluded.

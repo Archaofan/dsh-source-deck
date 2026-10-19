@@ -379,3 +379,18 @@ Final refresh check passed with historical topic, drafts, verdicts and both comp
 - SHA256：`216AAD7303CE72DEFA0AA90FB16D7A7237A051CC99E17C9947275821BF2EA8C5`。保留实际沙箱验收原包。
 
 English: the user requested Git/remote synchronization and the absolute package path for their own production installation. Default main is fast-forwarded from1043686 to the tested0.3.0 source release388a39c, followed by this handoff note. The67 tests passed again; the unchanged sandbox-verified package path/version/size/hash are listed above. The agent has not modified production or confirmed post-installation state.
+## 2026-10-19 体验迭代：0.3.2 本地交付
+
+用户在同类工具调研和提案后明确要求“按方案执行落地”。实现 0.3.1 性能批及 0.3.2 体验批，条件 0.4.0 未启动。代码提交 `8bcea17`、`c0522c6`、`a4d7415`、`0d4de30`；交付分支 `feat/experience-optimization`，默认分支和公开 Release 未变。
+
+- 最终包：`E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.2.tgz`。
+- SHA256：`0DA971CF273C193EC5B2A7DC0F5EEC919AB9D1E787CB2D6D3BFE950837D781DA`。
+- 使用内容哈希路径 `dsh-source-deck-0.3.2-0da971cf.tgz` 经官方 Install-Plugin.ps1 安装；lib/index.js、lib/client.js、package.json、README 中英文件与本地逐项哈希一致。最终代码与通过 Host 验收的 `4D80AC61…` 包相同，最终 tgz 仅更新随包 README；没有临时诊断日志。
+- `node --test tests/*.test.ts` 81/81；`npm run build` 通过；diff whitespace 检查通过。未增加依赖或改 lockfile；产品 peers 精确 DSH 0.2.1-rc.2、Cordis 4.0.5。
+- 独立全分支审查三项 Important 与一项焦点问题，均先复现再回归修复，无遗留审查项。参考[中英实施记录](implementation/2026-10-19-experience-optimization.md)。
+- 真实固定 RC loopback Host：六条资料筛选、独立搜索、清除空筛选、新搜索取消保稿、原因失焦保存后引用、正文保留且不自动发送、对比焦点与滚动返回；深/浅 × 320/420/640/900矩阵通过。420×800面板固定区28.42%，结果态0textarea。
+- 24条实际界面添加通过；至少158条已显示。继续批量操作出现控制超时，另一次页面观察因自动权限审核超时未获决定，重试后恢复读取；不能据此归因产品性能或绕过权限。200条端到端、100ms/500ms延迟预算、真实完整分钟/隐藏计数矩阵未完成。确定性scheduler测试覆盖60秒2次、运行中2秒、暂停恢复与不重叠；此前47,051ms收藏页诊断为0完整读取/24活动读取，不能等同最终全矩阵。
+- 原生125%/中文IME与附件组合、3–5真人任务未完成；自动草稿/附件协议测试不冒充人工验收。未新增模型调用、操作生产或升级共享基线。只管理本次记录的沙箱主进程7420，核对路径/userData后停止，最终安装后沙箱不占用；浏览器尺寸覆盖已恢复默认。
+- 同步检查使用进程级 Git safe.directory，提交推送后比较 HEAD、origin/feat/experience-optimization 与实际远端 refs/heads/feat/experience-optimization；最终结果以本轮工具输出及交付报告为准。不 force push。
+
+English: local 0.3.2 implements the approved performance and workflow batches without new scope, dependencies, Host/table changes or baseline upgrade. All 81 automated tests and the build passed; the official sandbox install matched final code, package and bilingual README hashes. One independent review's four findings were reproduced and fixed. Real Host common flows and light/dark four-width layout passed; collapsed chrome measured 28.42%. The 200-item/latency/full hidden-minute matrix, native IME/zoom/attachments and human study remain explicitly unverified after control/automatic-approval timeouts. No new model call, public Release or production operation. Final tgz SHA256 is above; Git delivery uses the feature branch with local/tracking/actual-remote verification.

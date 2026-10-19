@@ -2,7 +2,9 @@
 
 同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-## 当前状态（2026-10-18）
+## 当前状态（2026-10-19）
+
+用户已另外批准体验提案并要求“按方案执行落地”。当前 0.3.2 在 `feat/experience-optimization`；本地包完成，未公开发布或安装生产。串行读取/格式化复用、按需编辑、独立查询、返回焦点与写后引用已实施，81/81 测试及构建通过。独立审查三项 Important 和一项焦点问题均已回归修复。实际 Host 通过六条常用流程、24条回读、深浅四宽矩阵和28.42%页面预算；200条交互延迟、完整分钟/隐藏读取计数及原生/真人项目仍待复核，不能宣称全矩阵达标。最新状态以 [实施记录](docs/implementation/2026-10-19-experience-optimization.md) 为准；下列 0.3.0 段落为既有交付历史。
 
 用户已批准 v3 设计、七项实施计划及当前会话执行，并要求落地后推送 Git；不再要求重复评审。用户随后要求同步 Git 与远端并提供生产安装包，已将 0.3.0 交付快进到 `main`；原交付分支 `feat/sourcedeck-v3` 保留。交付记录见 [验收](docs/SETUP-VERIFICATION.md) 夜-9、[交接](docs/HANDOFF.md)。旧版本/设计提案说明不能覆盖当前实现。
 
