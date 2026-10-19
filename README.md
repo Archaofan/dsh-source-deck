@@ -2,7 +2,7 @@
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.2 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -71,7 +71,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 0.3.2 收拢了结果页：新搜索与补充要求按需展开，候选和收藏各自记住查询，对比从已选项进入并恢复返回焦点。卡片显示保存状态；引用及直接摘要会等待已有筛选写入，失败时保留草稿供重试。详情仍可展开查看完整说明。
 
-完整读取改为串行：研究中约 2 秒一次，静置结果 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。没有增加后台服务或依赖。实测范围与限制见[实施记录](docs/implementation/2026-10-19-experience-optimization.md)；0.3.2 为本地交付包，顶部 Release 链接仍指向已发布的 0.3.0。
+完整读取改为串行：研究中约 2 秒一次，静置结果 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。没有增加后台服务或依赖。0.3.2 按预发行交付：6/24/200 条列表、完整分钟读取和主要任务已实测，原生 Electron 125% 缩放、真实 IME、附件组合及真人观察仍有限制。实测方法和边界见[实施记录](docs/implementation/2026-10-19-experience-optimization.md)，稳定入口保留 0.3.0。
 
 1. 卡片展示仓库图 / Logo，失败时尝试 GitHub owner 头像，再显示字标。GitHub 的 stars、最近代码推送时间、查询时间与来源链接分别显示。未知数据明确显示未知，0 stars 保留为 0。
 2. `✓ 保留` / `✕ 排除`，再次点击同一选项恢复待处理；可展开填写原因。收藏、对比与筛选互相独立。

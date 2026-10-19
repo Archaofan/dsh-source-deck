@@ -394,3 +394,18 @@ English: the user requested Git/remote synchronization and the absolute package 
 - 同步检查使用进程级 Git safe.directory，提交推送后比较 HEAD、origin/feat/experience-optimization 与实际远端 refs/heads/feat/experience-optimization；最终结果以本轮工具输出及交付报告为准。不 force push。
 
 English: local 0.3.2 implements the approved performance and workflow batches without new scope, dependencies, Host/table changes or baseline upgrade. All 81 automated tests and the build passed; the official sandbox install matched final code, package and bilingual README hashes. One independent review's four findings were reproduced and fixed. Real Host common flows and light/dark four-width layout passed; collapsed chrome measured 28.42%. The 200-item/latency/full hidden-minute matrix, native IME/zoom/attachments and human study remain explicitly unverified after control/automatic-approval timeouts. No new model call, public Release or production operation. Final tgz SHA256 is above; Git delivery uses the feature branch with local/tracking/actual-remote verification.
+
+## 2026-10-19 发布前追加验收（覆盖上一节未完成的性能项）
+
+- 用户明确要求自行检查、推送并发布，不由用户测试。保留原支持基线、生产隔离和条件性0.4.0范围外的决定。
+- 实际Host逐项加入并回读独立24条及200条样本；6/24/200条过滤和对比各30次，24条真实判定30次。反馈p95最高76.1ms，判定Host确认p95为15.6ms；24/200条暖返回控制端耗时上界p95为295/302ms。完整读取32次，最大在途1，RPC p95为66ms。
+- 完整60秒窗口可见终态/收藏/隐藏分别2/0/0次完整读取，活动各30次。短窗口不计作完整分钟。方法、范围和去除账号/日志后的摘要见实施记录与Host acceptance JSON。
+- 五条代理任务走查通过：六选二引用并保留中文正文、不发送；新需求中文换行/取消保稿；独立查询；筛选空态恢复；两项对比返回当前按钮焦点。并非真人研究或原生IME验收。
+- 纯内存6/24/200×1/100/1,000主题另测，每格30次；最大读取p95 2.575ms、投影和事实格式化0.539ms，不冒充真实Host历史规模矩阵。
+- 真实测试附件上传两次被浏览器权限审核拒绝（第二次在用户明确授权之后）；未改用其他接口绕过，不计通过。原生Electron125%、真实IME/附件组合、真人观察及真实Host大历史/冷启动仍未覆盖，因此0.3.2按预发行交付，0.3.0保留稳定入口。
+- 新鲜验证：node --test tests/*.test.ts 为81/81；npm run build通过；无依赖/lockfile变更；最终包53文件，不含src/tests/日志/缓存；lib/client.js无临时诊断标记。重建差异仅CSS class-map键排列，映射及业务代码不变。
+- 最终预发行包：E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.2.tgz；SHA256 B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545。官方安装使用内容哈希路径-b1ad8cb1.tgz；index/client/package/README中英哈希均与本地一致。最终Host冒烟及发布同步结果在后续追加。
+
+English: Additional actual Host checks completed 6/24/200-item representative timings, complete visible/favorite/hidden minute windows and five heuristic task scenarios. All 81 tests, build and official installed-byte checks passed. Native zoom/IME/real attachments and human observation remain limited; browser upload authorization rejected the fixture despite user consent. Release policy is 0.3.2 prerelease, retaining stable 0.3.0. No production action or new model call. The package hash above supersedes the earlier local-delivery artifact.
+- 最终无诊断包再次启动实际Host：24条可读；切回六条后过滤zap为1条、清除恢复6条；2条引用成功且保留中文正文，不自动发送，无面板错误和控制台error。420×800实际419×762、固定区28.4203%、0常驻textarea、无横向溢出；最终截图docs/assets/screenshots/source-deck-0.3.2-final.png。已恢复浏览器默认尺寸。
+- 最终安装lib/index.js SHA256 497873EFC7B695D711B5161F91B90DA7027F92919B772946A28C735157D0824B；lib/client.js SHA256 2D1C6DB3F979AC0B403B51978588509FCC07A08E1DC4076FF65FCFE2D9B3CACC；package.json SHA256 3E0E8796958602A7B57EDE4475615315E595100490FA0F0B40F07B0C6375FAE7。README中英也逐项匹配。

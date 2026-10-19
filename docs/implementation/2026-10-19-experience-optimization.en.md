@@ -24,14 +24,35 @@ All four classes were reproduced before fixes. Focused tests passed 11/11; `node
 - Two-source comparison returned focus exactly to its comparison button; scroll return was checked. Reason blur followed by reference insertion retained the existing composer text and inserted a two-source chip without sending.
 - At 420×800, the panel was 419×762; header/nav/footer occupied 28.42%, with zero permanent textareas and no horizontal overflow.
 - Light/dark × 320/420/640/900 viewport matrix produced 319/419/639/899px panels: one column at the two narrow sizes and two at the others, without root horizontal overflow.
-- Twenty-four title-only sources were added via the actual interface. At least 158 were subsequently confirmed visible. Continued bulk control encountered browser-control and automatic-approval timeouts; **200-item interaction performance is not accepted**.
+- Separate 24-item and 200-item title-only fixtures were added through the actual interface and read back. Representative 6/24/200-item interaction measurements are recorded below.
 
 Actual Host screenshots (panel only, no account area): [light](../assets/screenshots/source-deck-0.3.2-light.png), [dark while reading](../assets/screenshots/source-deck-0.3.2-dark.png). Local raw evidence remains under the shared sandbox's `test-workspaces/dsh-source-deck/experience-acceptance/` and is not uploaded.
 
-A diagnostic build observed zero full reads and 24 activity reads during 47,051ms in favorites. An idle sample was only 34,287ms (one full/17 activity reads), not a complete minute. Deterministic tests verify two reads in sixty idle seconds, two-second active delay, pause/resume and no overlap; the real full-minute/hidden matrix remains incomplete.
+Earlier short 34,287ms and 31,863ms samples remain historical and are excluded from full-minute claims. New complete windows supersede them.
+
+## Additional pre-release acceptance
+
+The user requested independent verification, pushing and release without user testing. The same pinned RC sandbox was used. A temporary ignored diagnostic client recorded operation names, durations and DOM feedback, without request contents. The final package is rebuilt without diagnostics.
+
+| Actual Host check | Samples | p95 / result |
+|---|---:|---:|
+| Filter feedback at 6 / 24 / 200 items | 30 each | 33.7 / 33.2 / 76.1ms |
+| Comparison selection feedback at 6 / 24 / 200 | 30 each | 30.2 / 29.7 / 28.8ms |
+| Decision feedback / Host confirmation at 24 | 30 | 32.8 / 15.6ms |
+| Actionable warm return at 24 / 200 | 30 each | 295 / 302ms upper bound |
+| Full reads at 200 | 32 | RPC p95 66ms; maximum in-flight 1 |
+| Visible terminal / favorites / hidden | 60 seconds each | Full reads 2 / 0 / 0; activity 30 each |
+
+Feedback runs from event capture to two animation frames after the first plugin DOM mutation: a local laboratory approximation, **not field INP or exact pixel-paint time**. Warm return includes controller overhead and restores retained actionable data while requesting fresh data in the background; it is not cold start or fresh-data completion. Each cadence result uses the first 60,000ms of actual 110,001 / 71,387 / 72,066ms observations. See the [Host summary](../research/probes/2026-10-19-host-acceptance-summary.json).
+
+A separate in-memory 6/24/200-item × 1/100/1,000-topic matrix ran 30 samples per cell. The largest case had read p95 2.575ms and projection/facts p95 0.539ms. It excludes disk/RPC/React and **does not represent actual Host profiles at these history sizes**. [Reproducible probe](../research/probes/2026-10-19-experience-acceptance.mjs), [results](../research/probes/2026-10-19-experience-acceptance.json). These measurements do not justify adding storage rewrites or virtualization.
+
+Five single-agent scenarios passed: six sources/two kept/reference/continue drafting; Chinese edit/Enter/Escape/reopen; independent candidate/favorite queries; no-match recovery; and two-source comparison returning focus to the current button. Chinese composer text and a two-source chip coexisted without sending. This is a heuristic walkthrough, **not a 3–5-person study** or OS-native IME composition test.
+
+Real attachment upload was denied twice by the browser authorization gate, including after explicit user authorization for a generated text-only fixture. No alternate route bypassed that restriction. Actual attachment combinations remain unverified; automated draft/attachment protocol regressions are separate evidence.
 
 ## Delivery limits
 
-The local 0.3.2 package and branch are delivered without a public Release or production installation. The 100ms/500ms user-latency budgets, 200-item end-to-end interaction and complete real hidden/minute read matrix need reliable follow-up measurement. Automation timing includes tool/approval overhead and is not INP. Native Electron 125%, real Chinese IME/attachment combinations and a 3–5-person task study remain unverified. Automated attachment/draft protocol checks passed but do not replace those native checks. Existing model/cancel/restart evidence belongs to the previous release, not a new model run in this iteration.
+Release policy is **0.3.2 prerelease**, retaining stable 0.3.0; production remains untouched. Representative actions satisfy local 100ms feedback / 500ms warm-return targets, without extending that claim to all actions, hardware, fresh loads, image completion or INP. Cold launch and the actual Host history-size matrix are unmeasured. Native Electron 125%, real IME/attachment combinations and human observation remain unverified, so full-matrix stable acceptance is not claimed. Existing model/cancel/restart evidence belongs to the previous release, not a new model run in this iteration. Actual publication and synchronization results appear in setup verification.
 
 Final package hash and Git synchronization are recorded in [setup verification](../SETUP-VERIFICATION.md), under “2026-10-19 体验迭代”.

@@ -1,0 +1,108 @@
+{
+  "measuredAtUtc": "2026-10-19T08:12:19.337Z",
+  "baseline": "DSH 0.2.1-rc.2 / 687f282",
+  "plugin": "0.3.2",
+  "method": "Temporary ignored client-only QA build installed through official sandbox script. Feedback is event capture to two animation frames after first plugin DOM mutation; laboratory approximation, not field INP. Warm return includes controller calls and shows retained actionable data while a fresh full read runs.",
+  "feedback": [
+    {
+      "candidates": 6,
+      "action": "filter",
+      "samples": 30,
+      "p50Ms": 21.6,
+      "p95Ms": 33.7
+    },
+    {
+      "candidates": 6,
+      "action": "compare",
+      "samples": 30,
+      "p50Ms": 28.4,
+      "p95Ms": 30.2
+    },
+    {
+      "candidates": 24,
+      "action": "filter",
+      "samples": 30,
+      "p50Ms": 26.8,
+      "p95Ms": 33.2
+    },
+    {
+      "candidates": 24,
+      "action": "compare",
+      "samples": 30,
+      "p50Ms": 29,
+      "p95Ms": 29.7
+    },
+    {
+      "candidates": 200,
+      "action": "filter",
+      "samples": 30,
+      "p50Ms": 61.2,
+      "p95Ms": 76.1
+    },
+    {
+      "candidates": 200,
+      "action": "compare",
+      "samples": 30,
+      "p50Ms": 27.3,
+      "p95Ms": 28.8
+    },
+    {
+      "candidates": 24,
+      "action": "decision local feedback",
+      "samples": 30,
+      "p95Ms": 32.8,
+      "rpcP95Ms": 15.6
+    }
+  ],
+  "warmReturn": [
+    {
+      "candidates": 24,
+      "samples": 30,
+      "p50Ms": 291,
+      "p95Ms": 295,
+      "unit": "controller-inclusive ms upper bound"
+    },
+    {
+      "candidates": 200,
+      "samples": 30,
+      "p50Ms": 297,
+      "p95Ms": 302,
+      "unit": "controller-inclusive ms upper bound"
+    }
+  ],
+  "cadence": [
+    {
+      "state": "idle",
+      "windowMs": 60000,
+      "observedMs": 110001,
+      "full": 2,
+      "activity": 30
+    },
+    {
+      "state": "favorites",
+      "windowMs": 60000,
+      "observedMs": 71387,
+      "full": 0,
+      "activity": 30
+    },
+    {
+      "state": "hidden",
+      "windowMs": 60000,
+      "observedMs": 72066,
+      "full": 0,
+      "activity": 30
+    }
+  ],
+  "limitations": [
+    "Not a 3–5-person user study",
+    "OS-native IME / Electron 125% not controlled",
+    "Real attachment upload denied twice by browser gate despite explicit user permission",
+    "1/100/1000 history-size matrix measured only in memory, not actual Host profiles",
+    "No new model call or cold-launch performance claim"
+  ],
+  "fullReads": {
+    "samples": 32,
+    "maxInFlight": 1,
+    "rpcP95Ms": 66
+  }
+}

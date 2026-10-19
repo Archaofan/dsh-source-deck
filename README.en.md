@@ -2,7 +2,7 @@
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.2 preview](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -71,7 +71,7 @@ Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Offic
 
 0.3.2 focuses the result page: new-search and follow-up editors open on demand, candidate and favorite queries persist independently, and comparison restores return focus. Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Full descriptions remain available in source details.
 
-Full reads are serialized: approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return. No service or dependency was added. See the [implementation record](docs/implementation/2026-10-19-experience-optimization.en.md) for actual evidence and limits. The 0.3.2 package is a local delivery; the Release link above still points to published 0.3.0.
+Full reads are serialized: approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return. No service or dependency was added. Version 0.3.2 is a preview: actual 6/24/200-item lists, full-minute cadence and core tasks were checked; native Electron 125%, real IME, attachment combinations and human observation remain limited. See the [implementation record](docs/implementation/2026-10-19-experience-optimization.en.md) for methods and scope. Stable 0.3.0 remains available.
 
 1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
 2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.

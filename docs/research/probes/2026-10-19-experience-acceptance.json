@@ -1,0 +1,136 @@
+{
+  "measuredAtUtc": "2026-10-19T08:04:49.164Z",
+  "kind": "synthetic-in-memory-acceptance",
+  "node": "v26.7.0",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12400F",
+  "logicalCpus": 12,
+  "limitations": "No disk, RPC, React, browser paint, Electron, native input or INP. This is not the actual Host history-size matrix.",
+  "matrix": [
+    {
+      "totalSets": 1,
+      "candidates": 6,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.004,
+        "p95Ms": 0.021
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.021,
+        "p95Ms": 0.04
+      }
+    },
+    {
+      "totalSets": 1,
+      "candidates": 24,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.007,
+        "p95Ms": 0.014
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.084,
+        "p95Ms": 0.146
+      }
+    },
+    {
+      "totalSets": 1,
+      "candidates": 200,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.023,
+        "p95Ms": 0.046
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.522,
+        "p95Ms": 0.607
+      }
+    },
+    {
+      "totalSets": 100,
+      "candidates": 6,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.013,
+        "p95Ms": 0.16
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.016,
+        "p95Ms": 0.017
+      }
+    },
+    {
+      "totalSets": 100,
+      "candidates": 24,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.05,
+        "p95Ms": 0.141
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.063,
+        "p95Ms": 0.12
+      }
+    },
+    {
+      "totalSets": 100,
+      "candidates": 200,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.177,
+        "p95Ms": 0.438
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.521,
+        "p95Ms": 0.544
+      }
+    },
+    {
+      "totalSets": 1000,
+      "candidates": 6,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.048,
+        "p95Ms": 0.083
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.016,
+        "p95Ms": 0.017
+      }
+    },
+    {
+      "totalSets": 1000,
+      "candidates": 24,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 0.359,
+        "p95Ms": 0.451
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.067,
+        "p95Ms": 0.086
+      }
+    },
+    {
+      "totalSets": 1000,
+      "candidates": 200,
+      "storeRead": {
+        "samples": 30,
+        "p50Ms": 2.102,
+        "p95Ms": 2.575
+      },
+      "projectionAndFacts": {
+        "samples": 30,
+        "p50Ms": 0.517,
+        "p95Ms": 0.539
+      }
+    }
+  ]
+}
