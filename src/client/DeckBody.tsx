@@ -10,6 +10,7 @@ import { ComparePanel } from './ComparePanel.tsx'
 import { CandidateMutations } from './candidate-mutations.ts'
 import { retainedDeckTarget } from './activity.ts'
 import { safeWebUrl } from './source-presentation.ts'
+import { DeckRefresh } from './deck-refresh.ts'
 import css from './DeckBody.module.css'
 
 export type DeckBodyProps = PropsRuntime<'sidebar.right.pane.tab'> & PropsLocale<'sourceDeck'> & { readonly deck: DeckFace; readonly useTabInfo: UseSidebarRightTabInfo }
@@ -34,7 +35,8 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const [operations, setOperations] = useState<ReadonlySet<string>>(new Set())
   const inFlight = useRef(new Set<string>())
   const candidateMutations = useRef(new CandidateMutations())
-  const readSequence = useRef(0)
+  const reader = useRef<{ owner: string; value: DeckRefresh<SetView | null> }>()
+  const [documentVisible, setDocumentVisible] = useState(document.visibilityState !== 'hidden')
   const owner = `${sessionId}:${targetSetId ?? 'active'}`
   const currentOwner = useRef(owner); currentOwner.current = owner
   const [draft, setDraft] = useState<Draft>(() => emptyDraft(owner))
@@ -49,19 +51,24 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     } catch { setDraft(emptyDraft(owner)) }
   }, [owner])
   useEffect(() => { try { sessionStorage.setItem(`source-deck:${draft.owner}`, JSON.stringify(draft)) } catch { /* Editing remains available if storage is full. */ } }, [draft])
-  const refresh = useCallback(async () => {
-    const sequence = ++readSequence.current
-    const next = targetSetId ? await deck.loadSet(sessionId, targetSetId) : await deck.load(sessionId)
-    if (sequence !== readSequence.current || currentOwner.current !== owner) return
-    setView(next); setLoading(false)
-  }, [deck, sessionId, targetSetId, owner])
+  const refresh = useCallback(() => reader.current?.owner === owner ? reader.current.value.refresh() : Promise.resolve(), [owner])
+  useEffect(() => {
+    const changed = () => setDocumentVisible(document.visibilityState !== 'hidden')
+    document.addEventListener('visibilitychange', changed)
+    return () => document.removeEventListener('visibilitychange', changed)
+  }, [])
   useEffect(() => {
     setLoading(true); setView(null); setError(null); setNotice(null)
-    let cancelled = false
-    const read = () => { void refresh().catch(caught => { if (!cancelled) { setError(caught instanceof Error ? caught.message : String(caught)); setLoading(false) } }) }
-    read(); const timer = window.setInterval(read, 2000)
-    return () => { cancelled = true; readSequence.current++; window.clearInterval(timer) }
-  }, [refresh])
+    const value = new DeckRefresh(
+      () => targetSetId ? deck.loadSet(sessionId, targetSetId) : deck.load(sessionId),
+      next => { if (currentOwner.current === owner) { setView(next); setLoading(false) } },
+      caught => { if (currentOwner.current === owner) { setError(caught instanceof Error ? caught.message : String(caught)); setLoading(false) } },
+      next => Boolean(next?.rounds.some(item => item.round.status === 'starting' || item.round.status === 'running')),
+    )
+    reader.current = { owner, value }
+    return () => { value.dispose(); if (reader.current?.value === value) reader.current = undefined }
+  }, [deck, sessionId, targetSetId, owner])
+  useEffect(() => { reader.current?.value.setEnabled(mode === 'deck' && tab.visible && documentVisible) }, [deck, owner, mode, tab.visible, documentVisible])
   useEffect(() => { let cancelled = false; void deck.listFavorites().then(value => { if (!cancelled) setFavorites(value) }).catch(caught => { if (!cancelled) setError(String(caught)) }); return () => { cancelled = true } }, [deck, mode, sessionId])
   useEffect(() => { if (params?.roundId && view) document.getElementById(`deck-${params.roundId}`)?.scrollIntoView({ block: 'nearest' }) }, [params?.roundId, view?.setId])
 
