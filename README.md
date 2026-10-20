@@ -2,7 +2,7 @@
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.2 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -47,13 +47,13 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 | 项目 | 精确版本 |
 |---|---|
-| 本插件 | 0.3.2 |
+| 本插件 | 0.3.3 |
 | DeepSeek Harness Desktop | 0.2.1-rc.2 |
 | @deepseek-ai/cordis | 4.0.5 |
 
 只使用 `0.2.1-rc.2` 的公共接口。**目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。** 升级到新的 RC 或正式版需要单独评估和验收。
 
-在 Desktop 的插件管理页选择本地安装 `dsh-source-deck-0.3.2.tgz`，按提示重启。安装列表显示自定义资料卡图标及「SourceDeck · 资料台」。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
+在 Desktop 的插件管理页选择本地安装 `dsh-source-deck-0.3.3.tgz`，按提示重启。安装列表显示自定义资料卡图标及「SourceDeck · 资料台」。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
 市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 目前仍为 open，等待自动复检与合并，当前不声称已上架。详见 [市场记录](docs/MARKETPLACE.md)。
 
@@ -68,6 +68,8 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 研究工具仅允许 `web_search`、`web_fetch`、`deck_submit_sources`。需要官方网页工具和 spawn provider 可用；无法安全启动时显示失败原因，不自动改配置或升级基线。
 
 ## 筛选与比较
+
+0.3.3 优先显示已有的「筛选说明」，方便先看资料与本次需求的关系；简介和完整说明都保留在来源详情中。缺少说明时回退到简介或摘录，不生成新的判断。对比按资料台宽度适配：不足 620px 时按维度纵向阅读，每个值带来源名称；宽栏保留表格，最多四项。研究流程和引用行为保持不变。
 
 0.3.2 收拢了结果页：新搜索与补充要求按需展开，候选和收藏各自记住查询，对比从已选项进入并恢复返回焦点。卡片显示保存状态；引用及直接摘要会等待已有筛选写入，失败时保留草稿供重试。详情仍可展开查看完整说明。
 

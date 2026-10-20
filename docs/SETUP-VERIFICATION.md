@@ -420,3 +420,12 @@ English: Additional actual Host checks completed 6/24/200-item representative ti
 - 下一轮先阅读既有卡片/对比/研究提示实现：卡片和对比均优先 description、note 被遮盖；对比 CSS 每来源最小 130px，加维度列最小 66px 和 padding，窄栏需横向滚动。这是代码检查发现的使用摩擦，不声称已完成真人观察。已提出小范围 0.3.3 设计，等待范围确认；旧原生 IME/缩放/附件等限制继续保留。
 
 English: The existing draft was completed and v0.3.2 published as a prerelease at 2026-10-20 01:44:40 UTC. The original 175531-byte accepted asset was uploaded, and both GitHub's SHA256 digest and a freshly downloaded copy match the recorded local package hash. All 81 tests passed again. The tag still resolves to 1a1103c, Latest remains v0.3.0, and no production or baseline changes occurred. The next bounded iteration's card explanation/narrow comparison scope is awaiting confirmation; no new product implementation or native-interaction acceptance is claimed.
+
+## 2026-10-20：0.3.3 使用优化验收
+
+- 用户确认 0.3.3 简短设计并授权验证、提交、推送和发布预发行版。交付分支 `feat/screening-readability-0.3.3`；变更为卡片说明优先、全文详情和窄栏同维度对比，见[中英实施记录](implementation/2026-10-20-screening-readability.md)。未扩展研究或数据架构。
+- 新增两个回归在旧组件失败后修复，全量 83/83 和构建通过。独立审查的首列表头无障碍问题已修复，并在实际 Chromium Host 核对五列表头和每行五格；不冒充原生屏幕阅读器验收。
+- 真实固定 RC Host 深色中文/浅色英文各覆盖四项、319/419/639/899px 实际面板宽度，长文本和未知项通过；窄栏及页面无横向溢出，639px 四项表格只在对比区内滚动。键盘移除、返回焦点、查询保留和两项引用保留草稿且不发送通过，控制台 error 0。没有新模型调用。
+- 资产 `dsh-source-deck-0.3.3.tgz`：177295 bytes、53 文件，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`；官方哈希路径安装后 index/client/package/中英 README 均与本地字节一致，Host index.js 与 0.3.2 相同。包不含 src/tests/docs/日志/缓存。额外安装插件仅本插件，内置 profile 未改。
+- 原生 125%/IME/附件、真人观察和原生屏幕阅读器仍未覆盖；本轮未重跑完整性能矩阵。继续预发行并保留 0.3.0 稳定入口，不操作生产、不升级基线。已恢复中文/浅色/默认视口，关闭临时页，核对路径及 userData 后只停止本次沙箱主进程 17068；Get-SandboxStatus 为 occupied=false。
+- Git/Release 实际同步结果在发布后追加；此处不提前声称已发布。

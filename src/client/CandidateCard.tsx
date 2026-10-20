@@ -21,6 +21,9 @@ export function CandidateCard({ entry, t, reason, favorite, compared, busy, read
   const facts = useMemo(() => formatSourceFacts(source, locale), [source, locale])
   const repo = githubRepo(source); const url = safeWebUrl(source.url)
   const metadataUrl = safeWebUrl(source.meta?.metadataUrl)
+  const note = source.note?.trim() ? source.note : undefined
+  const description = source.meta?.description?.trim() ? source.meta.description : undefined
+  const snippet = source.snippet?.trim() ? source.snippet : undefined
   return <article className={css.card} data-verdict={candidate.verdict} data-candidate-id={entry.candidateId} aria-busy={saving || undefined}>
     <div className={css.art}>
       {image ? <img src={image} alt={source.title} loading="lazy" referrerPolicy="no-referrer" onError={() => {
@@ -32,13 +35,15 @@ export function CandidateCard({ entry, t, reason, favorite, compared, busy, read
     <div className={css.content}>
       <div className={css.eyebrow}>{repo ? 'GitHub' : t('source.web')} · {t(`card.verdict.${candidate.verdict}`)}</div>
       <h3 className={css.title}>{url ? <a href={url} target="_blank" rel="noreferrer">{repo ?? source.title} ↗</a> : source.title}</h3>
-      <p className={css.description}>{source.meta?.description || source.note || source.snippet || t('source.noDescription')}</p>
+      <p className={css.description}>{note ? <><strong>{t('source.note')} · </strong>{note}</> : description || snippet || t('source.noDescription')}</p>
       {repo ? <div className={css.facts}><strong>★ {facts.stars}</strong><span>{t('source.updated')} {facts.updated}</span></div> : null}
       <div className={css.tags}>{[source.meta?.language, source.meta?.license].filter(Boolean).map(tag => <span key={tag}>{tag}</span>)}</div>
       {source.meta?.archived ? <p className={css.warning}>{t('ux.archived')}</p> : null}
       {candidate.policyFlags?.length ? <div className={css.flags}>{candidate.policyFlags.map(flag => <span key={flag} title={t(`flag.${flag}.hint` as DeckKey)}>{t(`flag.${flag}` as DeckKey)}</span>)}</div> : null}
-      {repo || source.meta?.topics?.length || source.meta?.description || source.note || source.snippet ? <details className={css.reason}><summary>{t('ux.sourceDetails')}</summary>
-        <p className={css.lookup}>{source.meta?.description || source.note || source.snippet}</p>
+      {repo || source.meta?.topics?.length || description || note || snippet ? <details className={css.reason}><summary>{t('ux.sourceDetails')}</summary>
+        {note ? <p className={css.lookup}><strong>{t('source.note')} · </strong>{note}</p> : null}
+        {description && description !== note ? <p className={css.lookup}><strong>{t('source.description')} · </strong>{description}</p> : null}
+        {snippet && snippet !== note && snippet !== description ? <p className={css.lookup}>{snippet}</p> : null}
         {source.meta?.topics?.length ? <p className={css.lookup}>{source.meta.topics.join(' · ')}</p> : null}
         {repo ? <p className={css.lookup}>{t('source.checked')} {facts.checked}{metadataUrl ? <> · <a href={metadataUrl} target="_blank" rel="noreferrer">{t('source.metadata')}</a></> : null}</p> : null}
       </details> : null}

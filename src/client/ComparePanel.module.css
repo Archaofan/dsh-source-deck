@@ -2,10 +2,21 @@
 .panel h3 { font-size: 15px; margin: 0 0 10px; }
 .panel p { color: var(--dsw-alias-label-secondary); font-size: 13px; }
 .scroll { overflow: auto; }
-.panel table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.panel table { border-collapse: collapse; width: 100%; font-size: 14px; }
 .panel th, .panel td { border-bottom: 1px solid var(--dsw-alias-border-l2); padding: 10px; text-align: left; vertical-align: top; min-width: 130px; max-width: 260px; overflow-wrap: anywhere; }
 .panel th:first-child { min-width: 66px; position: sticky; left: 0; background: var(--dsw-alias-bg-layer-1); }
 .panel td { color: var(--dsw-alias-label-secondary); }
 .panel a { color: var(--dsw-alias-link); }
-.panel button { margin-left: 8px; cursor: pointer; color: inherit; background: transparent; border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; }
+.panel button { margin-left: 8px; min-width: 32px; min-height: 32px; cursor: pointer; color: inherit; background: transparent; border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; }
 .panel button:focus-visible { outline: 2px solid var(--dsw-alias-link); }
+.sourceLabel { display: none; }
+@container (max-width: 619px) {
+  .panel table, .panel thead, .panel tbody { display: block; }
+  .panel thead tr { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
+  .panel thead th:first-child { position: absolute; width: 1px; height: 1px; min-width: 0; max-width: 1px; padding: 0; margin: -1px; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .panel thead th { display: flex; align-items: center; justify-content: space-between; flex: 1 1 180px; gap: 8px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; }
+  .panel tbody tr { display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--dsw-alias-border-l2); padding: 10px 0; }
+  .panel th, .panel td { min-width: 0; max-width: none; width: auto; padding: 8px; border-bottom: 0; }
+  .panel tbody th:first-child { position: static; padding-top: 0; }
+  .sourceLabel { display: block; color: var(--dsw-alias-label-primary); font-weight: 600; margin-bottom: 4px; }
+}

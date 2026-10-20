@@ -1,6 +1,6 @@
 {
   "name": "dsh-source-deck",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "SourceDeck: research sources in the background, screen and compare candidates, and reference selections in your conversation draft.",
   "type": "module",
   "main": "lib/index.js",

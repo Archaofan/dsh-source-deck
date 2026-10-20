@@ -2,7 +2,7 @@
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.2 preview](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.3 preview](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -47,13 +47,13 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.3.2 |
+| SourceDeck | 0.3.3 |
 | DeepSeek Harness Desktop | 0.2.1-rc.2 |
 | @deepseek-ai/cordis | 4.0.5 |
 
 Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Use the Desktop plugin manager to install `dsh-source-deck-0.3.2.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+Use the Desktop plugin manager to install `dsh-source-deck-0.3.3.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
 Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is still open, waiting for the automatic re-check and merge. Availability is not claimed yet. See [market status](docs/MARKETPLACE.md).
 
@@ -68,6 +68,8 @@ Research runs in an official managed child session, inheriting the parent's mode
 Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Official web tools and the spawn provider must be available. Startup failure is explicit; the plugin does not change configuration or upgrade the baseline.
 
 ## Screen and compare
+
+0.3.3 prioritizes the existing screening note so you can see why a source may fit the task; source details retain both the complete note and the general description. Missing notes fall back to the description or excerpt without generating a new judgment. Comparison adapts to the deck's width: below 620px it presents dimensions vertically, labeling every value with its source; wider panes retain the table and four-source limit. Research and reference behavior stay unchanged.
 
 0.3.2 focuses the result page: new-search and follow-up editors open on demand, candidate and favorite queries persist independently, and comparison restores return focus. Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Full descriptions remain available in source details.
 
