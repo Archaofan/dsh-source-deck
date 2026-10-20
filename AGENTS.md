@@ -2,7 +2,9 @@
 
 同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-## 当前状态（2026-10-19）
+## 当前状态（2026-10-20）
+
+0.3.2 已合并到 `main`，发布标签指向 `1a1103cc2d02f0cf918c71fad94661d499d111a8`。2026-10-20 按用户要求重试成功：[v0.3.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) 已公开发布为 prerelease，资产 175531 bytes；GitHub digest 与下载回读 SHA256 均为 `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`。Latest 仍为 v0.3.0。81/81 测试再次通过；未重建或替换已验收包，生产未动。用户要求开始下一轮使用优化；已提出 0.3.3 的卡片说明优先级与窄栏对比简短设计，等待本轮范围确认，尚未改产品代码。下段为前次交付和验收范围。
 
 用户已批准体验提案、实施，并进一步要求自行验证、推送和发布，不再由用户测试。0.3.2 在 `feat/experience-optimization`，按预发行交付并保留 0.3.0 稳定入口；生产未动。串行读取、按需编辑、独立查询、焦点及写后引用已实施，81/81 测试和构建通过，独立审查四项问题均已回归修复。实际 Host 已完成 6/24/200 条过滤/对比各30次、24条真实判定30次、暖返回30次及完整分钟可见/收藏/隐藏计数；深浅四宽和28.42%空间预算通过。原生125%/IME、真实附件组合、真人研究及实际大历史 Host 矩阵仍未覆盖；上传两次被浏览器审核拒绝（含用户明确授权后），不可绕过或写成通过。发布/同步实际结果见 [验收](docs/SETUP-VERIFICATION.md)，方法与限制见 [实施记录](docs/implementation/2026-10-19-experience-optimization.md)；下列 0.3.0 段落为历史。
 

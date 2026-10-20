@@ -6,6 +6,8 @@
 
 ## 2026-10-19：体验与性能研究
 
+**2026-10-20 发布收尾**：用户要求重试后，复用既有草稿上传原验收包并成功发布 [v0.3.2 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2)。资产 `dsh-source-deck-0.3.2.tgz` 为 175531 bytes，GitHub digest 与下载回读 SHA256 均为 `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`。标签 commit 为 `1a1103cc2d02f0cf918c71fad94661d499d111a8`，main 已包含本轮交付；Latest 仍为 v0.3.0。81/81 回归再次通过，不重建已验收资产。下一轮正在确认 0.3.3 的简短设计：卡片说明优先级和窄栏同维度对比；尚未实施，不将既有条件性 0.4.0 自动当作已批准。详情见验收末节。
+
 用户要求继续深度调研同类工具并制定优化迭代，明确避免功能堆积。本轮仅交付[中英调研](research/2026-10-19-comparable-tools-experience-review.md)、[迭代提案](design/2026-10-19-experience-iteration-proposal.md)及纯内存[探针/原始数据](research/probes/2026-10-19-experience-baseline.json)。研究覆盖七类相关工具与 GitHub；官方文档研究不冒充竞品实操。
 
 用户随后明确要求“按方案执行落地”。0.3.1 减少重复工作、0.3.2 收拢结果页已实施；0.4.0 未启动。当前交付分支 `feat/experience-optimization`，本地包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.2.tgz`。81/81 测试和构建通过，独立审查四项问题已修复；深浅四宽矩阵、独立查询、筛选空态、取消保稿、对比焦点、原因保存后引用已在实际固定 RC Host 检查。420×800固定区占28.42%。详见[实施记录](implementation/2026-10-19-experience-optimization.md)及验收记录“2026-10-19 体验迭代”。

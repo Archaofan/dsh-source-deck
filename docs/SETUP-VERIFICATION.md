@@ -409,3 +409,14 @@ English: local 0.3.2 implements the approved performance and workflow batches wi
 English: Additional actual Host checks completed 6/24/200-item representative timings, complete visible/favorite/hidden minute windows and five heuristic task scenarios. All 81 tests, build and official installed-byte checks passed. Native zoom/IME/real attachments and human observation remain limited; browser upload authorization rejected the fixture despite user consent. Release policy is 0.3.2 prerelease, retaining stable 0.3.0. No production action or new model call. The package hash above supersedes the earlier local-delivery artifact.
 - 最终无诊断包再次启动实际Host：24条可读；切回六条后过滤zap为1条、清除恢复6条；2条引用成功且保留中文正文，不自动发送，无面板错误和控制台error。420×800实际419×762、固定区28.4203%、0常驻textarea、无横向溢出；最终截图docs/assets/screenshots/source-deck-0.3.2-final.png。已恢复浏览器默认尺寸。
 - 最终安装lib/index.js SHA256 497873EFC7B695D711B5161F91B90DA7027F92919B772946A28C735157D0824B；lib/client.js SHA256 2D1C6DB3F979AC0B403B51978588509FCC07A08E1DC4076FF65FCFE2D9B3CACC；package.json SHA256 3E0E8796958602A7B57EDE4475615315E595100490FA0F0B40F07B0C6375FAE7。README中英也逐项匹配。
+
+## 2026-10-20：0.3.2 Release 重试完成
+
+- 用户明确要求先重试之前的 release 提交，再开始下一轮使用优化。检查发现既有 v0.3.2 草稿没有资产，main 和已推送标签对应 `1a1103cc2d02f0cf918c71fad94661d499d111a8`，工作区干净。
+- `node --test tests/*.test.ts` 再次 81/81 通过，`git diff --check` 通过；包内版本 0.3.2、DSH peers 精确 0.2.1-rc.2、Cordis 4.0.5。不重建或替换已验收包。
+- `gh release upload` 上传原包成功；API 资产 ID 657965211，状态 uploaded，175531 bytes，digest `sha256:b1ad8cb15ae9076ed6d2aac0f0eccfda867b89ce41eecbcd09d924681bf26545`。下载回本沙箱 staging/release-verification-20261020/ 后计算 SHA256，与本地原包及记录完全一致。
+- `gh release edit v0.3.2 --draft=false --prerelease --latest=false --verify-tag` 成功。回读 `isDraft=false`、`isPrerelease=true`，发布时间 UTC `2026-10-20T01:44:40Z`（北京时间 09:44:40），地址：[v0.3.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2)。`releases/latest` 回读仍为 v0.3.0。
+- 远端 annotated tag `db6202e8addfc0021ee9ef384b8392f43a1eb2d0` peel 到 `1a1103cc2d02f0cf918c71fad94661d499d111a8`。未改写标签、force push、创建重复 release 或操作生产。共享沙箱 Get-SandboxStatus 显示 occupied=false，基线仍为 0.2.1-rc.2。
+- 下一轮先阅读既有卡片/对比/研究提示实现：卡片和对比均优先 description、note 被遮盖；对比 CSS 每来源最小 130px，加维度列最小 66px 和 padding，窄栏需横向滚动。这是代码检查发现的使用摩擦，不声称已完成真人观察。已提出小范围 0.3.3 设计，等待范围确认；旧原生 IME/缩放/附件等限制继续保留。
+
+English: The existing draft was completed and v0.3.2 published as a prerelease at 2026-10-20 01:44:40 UTC. The original 175531-byte accepted asset was uploaded, and both GitHub's SHA256 digest and a freshly downloaded copy match the recorded local package hash. All 81 tests passed again. The tag still resolves to 1a1103c, Latest remains v0.3.0, and no production or baseline changes occurred. The next bounded iteration's card explanation/narrow comparison scope is awaiting confirmation; no new product implementation or native-interaction acceptance is claimed.
