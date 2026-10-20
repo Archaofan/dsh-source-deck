@@ -428,4 +428,7 @@ English: The existing draft was completed and v0.3.2 published as a prerelease a
 - 真实固定 RC Host 深色中文/浅色英文各覆盖四项、319/419/639/899px 实际面板宽度，长文本和未知项通过；窄栏及页面无横向溢出，639px 四项表格只在对比区内滚动。键盘移除、返回焦点、查询保留和两项引用保留草稿且不发送通过，控制台 error 0。没有新模型调用。
 - 资产 `dsh-source-deck-0.3.3.tgz`：177295 bytes、53 文件，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`；官方哈希路径安装后 index/client/package/中英 README 均与本地字节一致，Host index.js 与 0.3.2 相同。包不含 src/tests/docs/日志/缓存。额外安装插件仅本插件，内置 profile 未改。
 - 原生 125%/IME/附件、真人观察和原生屏幕阅读器仍未覆盖；本轮未重跑完整性能矩阵。继续预发行并保留 0.3.0 稳定入口，不操作生产、不升级基线。已恢复中文/浅色/默认视口，关闭临时页，核对路径及 userData 后只停止本次沙箱主进程 17068；Get-SandboxStatus 为 occupied=false。
-- Git/Release 实际同步结果在发布后追加；此处不提前声称已发布。
+- 发布源码提交 `1554e79de632375c6eef4050b8460da8bedb1bc4` 已推送至 main 和 `feat/screening-readability-0.3.3`；远端 annotated tag `ff446194af02458a1adb687cd48f2c769e3c3ba0` peel 到相同源码 commit。main 整合后的83项测试通过。受限执行环境无法读取keyring，Git推送和gh发布使用获准的单条主机命令，没有改全局Git信任或TLS。
+- [v0.3.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) 于UTC `2026-10-20T02:22:58Z`（北京时间10:22:58）发布，回读 `isDraft=false`、`isPrerelease=true`。资产ID658036353，177295 bytes、uploaded，GitHub digest与上列验收哈希一致。下载至沙箱 staging/release-0.3.3-verified-download/ 再算SHA256，也与原包一致；只有完成这两项核对后才公开草稿。Latest仍为v0.3.0。发布后仅追加交接记录，不重建或替换验收包、不移动标签。
+
+English: The reviewed source commit 1554e79 is on main and the retained feature branch; remote tag v0.3.3 resolves to it. All83 tests passed after integration. Published at 2026-10-20 02:22:58 UTC as a prerelease, not a draft. GitHub's uploaded asset digest and a freshly downloaded copy match the accepted 177295-byte package. Stable Latest remains v0.3.0. Subsequent handoff documentation does not rebuild the accepted package or move its tag.

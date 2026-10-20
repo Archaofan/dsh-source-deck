@@ -2,7 +2,13 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
-## 2026-10-19: experience and performance research
+## 2026-10-20: 0.3.3 published
+
+The user approved this iteration's bounded design. Screening-note priority, full card details and narrow per-dimension comparison are delivered on main and published as [v0.3.3 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3). Source/tag commit: `1554e79de632375c6eef4050b8460da8bedb1bc4`; branch `feat/screening-readability-0.3.3` remains available. Latest stays v0.3.0. The accepted package `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.3.tgz` is 177295 bytes, SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`; GitHub digest and a fresh download match.
+
+All 83 tests, build and official sandbox installed-byte checks passed. Actual Host dark Chinese/light English each covered 319/419/639/899px panels, long titles/missing data, keyboard removal, return focus/query and reference insertion preserving draft text without sending. Independent review's header accessibility issue was fixed, with column headers retained in Chromium output; native screen-reader speech remains untested. No new research prompt, model call, tables, dependencies or baseline changes; existing native zoom/IME/attachments and human-observation limitations remain. Sandbox Chinese/light settings and default viewport were restored, the temporary page closed, and only verified sandbox main PID17068 stopped; lease is released. See the [implementation record](implementation/2026-10-20-screening-readability.en.md) and final verification section.
+
+## 2026-10-19: experience and performance research (historical)
 
 **2026-10-20 publication follow-up:** At the user's request, the original accepted package was uploaded to the existing draft and [v0.3.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) was published as a prerelease. The 175531-byte asset's GitHub digest and downloaded SHA256 both equal `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`. The tag resolves to `1a1103cc2d02f0cf918c71fad94661d499d111a8`; delivery is already on main. Latest remains v0.3.0. All 81 regression tests passed again; the accepted asset was not rebuilt. A bounded 0.3.3 design for card explanation priority and narrow comparison is awaiting scope confirmation, with no product changes yet. The earlier conditional 0.4.0 proposal does not constitute approval of this new iteration. See the final verification section.
 

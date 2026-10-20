@@ -4,7 +4,9 @@
 
 ## 当前状态（2026-10-20）
 
-0.3.2 已合并到 `main`，发布标签指向 `1a1103cc2d02f0cf918c71fad94661d499d111a8`。2026-10-20 按用户要求重试成功：[v0.3.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2) 已公开发布为 prerelease，资产 175531 bytes；GitHub digest 与下载回读 SHA256 均为 `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`。Latest 仍为 v0.3.0。81/81 测试再次通过；未重建或替换已验收包，生产未动。用户要求开始下一轮使用优化；已提出 0.3.3 的卡片说明优先级与窄栏对比简短设计，等待本轮范围确认，尚未改产品代码。下段为前次交付和验收范围。
+用户已确认本轮简短设计并授权验证、提交、推送和预发行发布。**0.3.3 已交付至 main 并发布 [v0.3.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3)**，源码/tag commit `1554e79de632375c6eef4050b8460da8bedb1bc4`，保留 `feat/screening-readability-0.3.3` 分支。卡片优先已有筛选说明并保留全文；窄栏按维度比较、宽栏保留表格，最多四项。83/83 测试、构建、官方安装字节核对和实际 RC Host 深色中文/浅色英文四宽、键盘/焦点/查询/引用冒烟通过。首列表头无障碍审查项已修复；未宣称原生屏幕阅读器播报通过。包 177295 bytes，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`，GitHub digest 和下载回验一致。Latest 仍为 v0.3.0。没有新依赖、研究提示/协议/数据架构变化或模型调用；生产未动、共享沙箱已释放。详见[本轮实施记录](docs/implementation/2026-10-20-screening-readability.md)和验收末节。原生125%/IME/附件/真人观察等限制仍有效。
+
+0.3.2 于同日先完成 Release 重试，原包未变；标签 commit `1a1103c`，SHA256 `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`。以下为前次 0.3.2/0.3.0 交付历史。
 
 用户已批准体验提案、实施，并进一步要求自行验证、推送和发布，不再由用户测试。0.3.2 在 `feat/experience-optimization`，按预发行交付并保留 0.3.0 稳定入口；生产未动。串行读取、按需编辑、独立查询、焦点及写后引用已实施，81/81 测试和构建通过，独立审查四项问题均已回归修复。实际 Host 已完成 6/24/200 条过滤/对比各30次、24条真实判定30次、暖返回30次及完整分钟可见/收藏/隐藏计数；深浅四宽和28.42%空间预算通过。原生125%/IME、真实附件组合、真人研究及实际大历史 Host 矩阵仍未覆盖；上传两次被浏览器审核拒绝（含用户明确授权后），不可绕过或写成通过。发布/同步实际结果见 [验收](docs/SETUP-VERIFICATION.md)，方法与限制见 [实施记录](docs/implementation/2026-10-19-experience-optimization.md)；下列 0.3.0 段落为历史。
 

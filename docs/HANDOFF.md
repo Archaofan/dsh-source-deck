@@ -4,7 +4,13 @@
 
 继续本项目时先读根 README.md / AGENTS.md、本项目 README.md、MARKETPLACE.md、本文、SETUP-VERIFICATION.md 夜-9、AGENTS.md，再检查共享沙箱 lease。
 
-## 2026-10-19：体验与性能研究
+## 2026-10-20：0.3.3 已发布
+
+用户确认本轮简短设计后，已完成卡片说明优先、全文详情和窄栏同维度对比。源码/tag commit `1554e79de632375c6eef4050b8460da8bedb1bc4`，已快进到 main、推送并发布 [v0.3.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3)，保留 `feat/screening-readability-0.3.3`。Latest 仍为 v0.3.0。包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.3.tgz` 为 177295 bytes，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`；GitHub digest 及下载回验一致。
+
+83/83 测试、构建、官方沙箱安装字节核对通过；实际 Host 深色中文/浅色英文分别检查 319/419/639/899px 面板，长名称/未知数据、键盘移除、返回焦点/查询、引用保留草稿且不发送通过。独立审查的首列表头语义问题已修复，实际 AX 树保留列头，不等同原生屏幕阅读器播报。没有新研究提示、模型调用、数据表、依赖或基线改动；旧原生125%/IME/附件和真人观察限制保留。中文/浅色/默认视口已恢复，临时页已关闭，只停止核对过隔离路径与 userData 的本次主进程17068，lease已释放。详见[中英实施记录](implementation/2026-10-20-screening-readability.md)及验收末节。
+
+## 2026-10-19：体验与性能研究（历史）
 
 **2026-10-20 发布收尾**：用户要求重试后，复用既有草稿上传原验收包并成功发布 [v0.3.2 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.2)。资产 `dsh-source-deck-0.3.2.tgz` 为 175531 bytes，GitHub digest 与下载回读 SHA256 均为 `B1AD8CB15AE9076ED6D2AAC0F0ECCFDA867B89CE41EECBCD09D924681BF26545`。标签 commit 为 `1a1103cc2d02f0cf918c71fad94661d499d111a8`，main 已包含本轮交付；Latest 仍为 v0.3.0。81/81 回归再次通过，不重建已验收资产。下一轮正在确认 0.3.3 的简短设计：卡片说明优先级和窄栏同维度对比；尚未实施，不将既有条件性 0.4.0 自动当作已批准。详情见验收末节。
 
