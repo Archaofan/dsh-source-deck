@@ -10,6 +10,14 @@
 .panel button { margin-left: 8px; min-width: 32px; min-height: 32px; cursor: pointer; color: inherit; background: transparent; border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; }
 .panel button:focus-visible { outline: 2px solid var(--dsw-alias-link); }
 .sourceLabel { display: none; }
+.selection { margin: 12px 16px; padding: 10px 12px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; background: var(--dsw-alias-bg-layer-1); font-size: 12px; }
+.selectionActions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.selectionActions strong { margin-right: auto; }
+.selection button { font: inherit; min-height: 32px; min-width: 32px; color: var(--dsw-alias-link); border: 0; border-radius: 5px; background: transparent; cursor: pointer; }
+.selection button:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 1px; }
+.selection ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 6px 0 0; }
+.selection li { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 100%; border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; padding-left: 8px; }
+.selection li span { overflow-wrap: anywhere; min-width: 0; }
 @container (max-width: 619px) {
   .panel table, .panel thead, .panel tbody { display: block; }
   .panel thead tr { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }

@@ -16,6 +16,17 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 /** Simplified Chinese dictionary and key-set source of truth. */
 export const zh = {
+  'sort.label': '排序',
+  'sort.original': '原顺序',
+  'sort.stars': 'Stars 从高到低',
+  'sort.updated': '代码更新由近到远',
+  'sort.title': '名称',
+  'compare.selected': '已选对比',
+  'compare.clear': '清空',
+  'compare.open': '打开对比',
+  'undo.button': '↶ 撤销判定 · {title}',
+  'undo.done': '已恢复上一判定：{title}',
+  'undo.conflict': '这条资料已变化，无法撤销旧判定。请按当前状态重新选择。',
   'ux.archived': '此仓库已归档，维护状态需留意。',
   'ux.sourceDetails': '来源详情',
   'ux.saving': '正在保存…',
@@ -64,7 +75,7 @@ export const zh = {
   'source.reason': '可选：筛选原因',
   'source.reasonPlaceholder': '记录适合或不适合本项目的原因',
   'source.description': '简介',
-  'source.note': '筛选说明',
+  'source.note': '研究判断',
   'source.stars': 'GitHub stars',
   'source.language': '语言',
   'source.license': '许可证',
@@ -246,6 +257,17 @@ export type DeckKey = keyof typeof zh
 
 /** English dictionary, checked against the Chinese key set. */
 export const en = {
+  'sort.label': 'Sort',
+  'sort.original': 'Original order',
+  'sort.stars': 'Stars: high to low',
+  'sort.updated': 'Code push: newest first',
+  'sort.title': 'Name',
+  'compare.selected': 'Selected for comparison',
+  'compare.clear': 'Clear',
+  'compare.open': 'Open comparison',
+  'undo.button': '↶ Undo decision · {title}',
+  'undo.done': 'Previous decision restored: {title}',
+  'undo.conflict': 'This source has changed. Choose again using its current state instead of undoing an old decision.',
   'ux.archived': 'Archived repository. Check its maintenance status.',
   'ux.sourceDetails': 'Source details',
   'ux.saving': 'Saving…',
@@ -294,7 +316,7 @@ export const en = {
   'source.reason': 'Optional screening reason',
   'source.reasonPlaceholder': 'Why does this fit or not fit your project?',
   'source.description': 'Description',
-  'source.note': 'Screening note',
+  'source.note': 'Research judgment',
   'source.stars': 'GitHub stars',
   'source.language': 'Language',
   'source.license': 'License',

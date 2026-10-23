@@ -3,6 +3,21 @@ import test from 'node:test'
 import { memoryStore } from './memory-store.ts'
 import { prepareResearchRound } from '../src/research-ops.ts'
 
+test('resolving an active topic preserves legacy drafts without overwriting a named topic draft', async () => {
+  const { retainLoadedDeckTarget } = await import('../src/client/activity.ts')
+  assert.equal(typeof retainLoadedDeckTarget, 'function')
+  const values = new Map<string, string>([['source-deck:s:active', JSON.stringify({ owner: 's:active', request: 'draft', note: '', reasons: {}, compare: ['a'], sort: 'stars' })]])
+  const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } }
+  retainLoadedDeckTarget(storage, 's', 'topic')
+  assert.deepEqual(JSON.parse(values.get('source-deck:s:topic')!).compare, ['a'])
+  assert.equal(JSON.parse(values.get('source-deck:s:topic')!).owner, 's:topic')
+  assert.equal(values.get('source-deck:target:s'), 'topic')
+  values.set('source-deck:s:topic', 'existing named draft')
+  retainLoadedDeckTarget(storage, 's', 'topic')
+  assert.equal(values.get('source-deck:s:topic'), 'existing named draft')
+  assert.ok(values.has('source-deck:s:active'), 'Retain the original legacy record')
+})
+
 test('late research opening cannot replace a newer topic or its open intent', async () => {
   const { requestDeckOpen, getDeckActivity } = await import('../src/activity.ts')
   const { startNewSet } = await import('../src/ops.ts')

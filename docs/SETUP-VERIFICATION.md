@@ -432,3 +432,16 @@ English: The existing draft was completed and v0.3.2 published as a prerelease a
 - [v0.3.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) 于UTC `2026-10-20T02:22:58Z`（北京时间10:22:58）发布，回读 `isDraft=false`、`isPrerelease=true`。资产ID658036353，177295 bytes、uploaded，GitHub digest与上列验收哈希一致。下载至沙箱 staging/release-0.3.3-verified-download/ 再算SHA256，也与原包一致；只有完成这两项核对后才公开草稿。Latest仍为v0.3.0。发布后仅追加交接记录，不重建或替换验收包、不移动标签。
 
 English: The reviewed source commit 1554e79 is on main and the retained feature branch; remote tag v0.3.3 resolves to it. All83 tests passed after integration. Published at 2026-10-20 02:22:58 UTC as a prerelease, not a draft. GitHub's uploaded asset digest and a freshly downloaded copy match the accepted 177295-byte package. Stable Latest remains v0.3.0. Subsequent handoff documentation does not rebuild the accepted package or move its tag.
+
+## 2026-10-23：0.4.0 本地预览
+
+用户选择整体委托判断、优先减少操作阻力。元数据搜索/排序、对比名单、最近判定撤销、研究判断与数量约束、同主题不同入口的草稿接续已完成。详细变更、复现、模型调用和限制见[中英实施验收](implementation/2026-10-23-workflow-0.4.0.md)。
+
+- 最终全量 94/94、实际 React DOM/领域操作探针 6/6、构建通过；独立审查与 Host 发现的问题均已复现修复，最终复核无剩余具体发现。
+- 交付包 187148 bytes、53 文件，SHA256 `505B93611204D654BCAAB98C4637F09B785797F66B99EC1E305F6882B7014BAB`。经官方哈希路径安装，Host/Client JS、package.json、中英 README 与本地一致；不含 src/tests/docs/测试材料/日志。没有新依赖或支持基线变化。
+- 最终固定 RC Host 深色英文、浅色中文，结果和四项比较各覆盖实测319/419/639/899px；无页面横向溢出。6/24/200 项组合搜索、排序、收藏、键盘移除、不同入口状态接续和200项中引用保留正文且不发送通过。显示 undo 时420×800固定区占33.15%。原始最终矩阵在项目专属沙箱 `layout-0.4.0-delivery.json`；不外推性能比例。
+- 两轮正常受管模型研究：首轮暴露默认六项覆盖指定名单，修正提示后同题只返回指定两个仓库。仅作样本验收，未独立审计全部事实/生成时间。三个合成父会话的原始 `/deck` API提示曾触发模型并逐一取消，详见实施记录；不冒充确定性命令或质量样本。
+- 无0.4.0 GitHub Release，代码分支 `feat/workflow-0.4.0`，生产未操作。原生125%/IME/真实附件/屏幕阅读器和真人观察限制保留；未重跑完整历史与一分钟性能矩阵。
+- 中文/浅色及默认浏览器视口已恢复，临时页关闭。核对隔离路径及userData后只停止本轮最终主进程34336；实时 `occupied=false`。远端同步由交付末次Git核对确认。
+
+English: 0.4.0 is a local preview on `feat/workflow-0.4.0`, not a new GitHub Release. All 94 tests, six actual component interaction checks, build and installed-byte checks passed. The final RC Host covered both themes/languages at four actual widths, 6/24/200-item retrieval/sorting and draft-preserving references. A second managed research sample respected the explicit two-source list after a prompt correction; this is not a general accuracy claim. The 187148-byte package hash above is authoritative. Production was untouched; native-input/accessibility and full performance limits remain. Sandbox settings were restored and the lease released.

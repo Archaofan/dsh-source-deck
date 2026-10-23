@@ -6,16 +6,16 @@ import type { Verdict } from '../model.ts'
 import type { DeckFace } from './deck-face.ts'
 import type { DeckKey } from './locales.ts'
 import { CandidateCard } from './CandidateCard.tsx'
-import { ComparePanel } from './ComparePanel.tsx'
-import { CandidateMutations } from './candidate-mutations.ts'
-import { retainedDeckTarget } from './activity.ts'
+import { ComparePanel, CompareSelection } from './ComparePanel.tsx'
+import { CandidateMutations, DecisionUndo, type UndoDecision } from './candidate-mutations.ts'
+import { retainedDeckTarget, retainLoadedDeckTarget } from './activity.ts'
 import { safeWebUrl } from './source-presentation.ts'
 import { DeckRefresh } from './deck-refresh.ts'
-import { favoriteIdentity, projectDeck } from './deck-projection.ts'
+import { favoriteIdentity, projectDeck, sourceMatches, compareSources, comparisonEntries, deckSorts, type DeckSort } from './deck-projection.ts'
 import css from './DeckBody.module.css'
 
 export type DeckBodyProps = PropsRuntime<'sidebar.right.pane.tab'> & PropsLocale<'sourceDeck'> & { readonly deck: DeckFace; readonly useTabInfo: UseSidebarRightTabInfo }
-interface Draft { owner: string; request: string; note: string; reasons: Record<string, string>; compare: string[]; query?: string; favoriteQuery?: string; filter?: 'all' | Verdict }
+interface Draft { owner: string; request: string; note: string; reasons: Record<string, string>; compare: string[]; query?: string; favoriteQuery?: string; filter?: 'all' | Verdict; sort?: DeckSort; favoriteSort?: DeckSort }
 const emptyDraft = (owner: string): Draft => ({ owner, request: '', note: '', reasons: {}, compare: [] })
 
 export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
@@ -25,9 +25,15 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const setTargetSetId = (setId?: string) => updateTargetSetId(retainedDeckTarget(window.sessionStorage, sessionId, setId))
   const owner = `${sessionId}:${targetSetId ?? 'active'}`
   const currentOwner = useRef(owner); currentOwner.current = owner
+  const undoHistory = useMemo(() => new DecisionUndo(), [owner])
+  const [undoAction, setUndoAction] = useState<UndoDecision>()
+  const latestView = useRef<{ owner: string; value: SetView | null }>({ owner, value: null })
   const [viewState, setViewState] = useState<{ owner: string; value: SetView | null }>({ owner, value: null })
   const view = viewState.owner === owner ? viewState.value : null
-  const setView = useCallback((value: SetView | null) => setViewState(previous => previous.owner === owner && previous.value === value ? previous : { owner, value }), [owner])
+  const setView = useCallback((value: SetView | null) => {
+    latestView.current = { owner, value }; undoHistory.observe(value); setUndoAction(undoHistory.available(value))
+    setViewState(previous => previous.owner === owner && previous.value === value ? previous : { owner, value })
+  }, [owner, undoHistory])
   const [loading, setLoading] = useState(true)
   const [favorites, setFavorites] = useState<readonly FavoriteView[]>([])
   const [mode, setMode] = useState<'deck' | 'favorites'>('deck')
@@ -40,7 +46,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const [allOperations, setOperations] = useState<ReadonlySet<string>>(new Set())
   const operationPrefix = `${owner}\0`
   const operations = new Set([...allOperations].filter(key => key.startsWith(operationPrefix)).map(key => key.slice(operationPrefix.length)))
-  const deliveryBusy = operations.has('reference') || operations.has('send')
+  const deliveryBusy = operations.has('reference') || operations.has('send') || operations.has('undo')
   const inFlight = useRef(new Set<string>())
   const candidateMutations = useMemo(() => new CandidateMutations(), [owner])
   const candidatePending = useRef(new Map<string, number>())
@@ -66,6 +72,8 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const query = typeof currentDraft.query === 'string' ? currentDraft.query : ''
   const favoriteQuery = typeof currentDraft.favoriteQuery === 'string' ? currentDraft.favoriteQuery : ''
   const filter = ['all', 'pending', 'kept', 'excluded'].includes(currentDraft.filter ?? '') ? currentDraft.filter! : 'all'
+  const sort = deckSorts.includes(currentDraft.sort!) ? currentDraft.sort! : 'original'
+  const favoriteSort = deckSorts.includes(currentDraft.favoriteSort!) ? currentDraft.favoriteSort! : 'original'
   const setQuery = (value: string) => patchDraft({ query: value })
   const setFilter = (value: 'all' | Verdict) => patchDraft({ filter: value })
 
@@ -88,7 +96,10 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     setLoading(true); setView(null); setError(null); setNotice(null)
     const value = new DeckRefresh(
       () => targetSetId ? deck.loadSet(sessionId, targetSetId) : deck.load(sessionId),
-      next => { if (currentOwner.current === owner) { setView(next); setLoading(false) } },
+      next => { if (currentOwner.current === owner) {
+        if (!targetSetId && next) { retainLoadedDeckTarget(window.sessionStorage, sessionId, next.setId); setTargetSetId(next.setId); return }
+        setView(next); setLoading(false)
+      } },
       caught => { if (currentOwner.current === owner) { setError(caught instanceof Error ? caught.message : String(caught)); setLoading(false) } },
       next => Boolean(next?.rounds.some(item => item.round.status === 'starting' || item.round.status === 'running')),
     )
@@ -141,6 +152,9 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   }
   const decide = async (entry: CandidateView, verdict: Verdict, reason?: string, explicit = true) => {
     const id = entry.candidateId
+    const undoTicket = explicit ? undoHistory.begin(id) : undefined
+    if (!explicit) undoHistory.invalidate(id)
+    setUndoAction(undoHistory.available(view))
     const attempt = (candidateAttempt.current.get(id) ?? 0) + 1
     candidateAttempt.current.set(id, attempt); setError(null)
     const savedReason = reason ?? currentDraft.reasons[id] ?? entry.candidate.reason
@@ -152,7 +166,16 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     if (explicit) { decisionPending.current.set(id, (decisionPending.current.get(id) ?? 0) + 1); setDeciding(new Set(decisionPending.current.keys())) }
     setCandidateErrors(previous => { const next = { ...previous }; delete next[id]; return next })
     try {
-      const job = async () => { await deck.decide(id, verdict, savedReason); await refresh() }
+      const job = async () => {
+        const before = latestView.current.owner === owner ? latestView.current.value?.candidates.find(item => item.candidateId === id) : undefined
+        await deck.decide(id, verdict, savedReason); await refresh()
+        if (undoTicket !== undefined && before && currentOwner.current === owner && candidateAttempt.current.get(id) === attempt) {
+          const after = latestView.current.value?.candidates.find(item => item.candidateId === id)
+          if (after && after.candidate.verdict === verdict && after.candidate.reason === savedReason) {
+            undoHistory.confirm(undoTicket, before, after); setUndoAction(undoHistory.available(latestView.current.value))
+          }
+        }
+      }
       await (explicit ? candidateMutations.runLatest(id, job) : candidateMutations.run(id, job))
       if (trigger && currentOwner.current === owner) requestAnimationFrame(() => {
         if (currentOwner.current !== owner || trigger.isConnected || (document.activeElement !== document.body && document.activeElement !== trigger)) return
@@ -180,11 +203,38 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     setFavorites(await deck.listFavorites())
   })
   const toggleCompare = (sourceId: string) => {
-    const selected = currentDraft.compare
-    if (selected.includes(sourceId)) patchDraft({ compare: selected.filter(id => id !== sourceId) })
+    const selected = comparisonEntries(view?.candidates ?? [], currentDraft.compare).map(item => item.candidate.sourceId)
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const selection = trigger?.closest('[data-compare-selection]')
+    const selectionIndex = Array.from(selection?.querySelectorAll('li button') ?? []).indexOf(trigger as Element)
+    if (selected.includes(sourceId)) {
+      patchDraft({ compare: selected.filter(id => id !== sourceId) })
+      requestAnimationFrame(() => {
+        if (currentOwner.current !== owner || !trigger || trigger.isConnected || document.activeElement !== document.body) return
+        const remaining = selection?.isConnected ? selection.querySelectorAll<HTMLButtonElement>('li button') : undefined
+        ;(remaining?.[Math.min(selectionIndex, remaining.length - 1)] ?? (compareOpen ? compareFocus.current : resultFocus.current))?.focus({ preventScroll: true })
+      })
+    }
     else if (selected.length < 4) patchDraft({ compare: [...selected, sourceId] })
-    else setError(t('compare.limit'))
   }
+  const undo = () => operate('undo', async () => {
+    const action = undoAction
+    const trigger = document.activeElement
+    if (!action) return
+    await candidateMutations.run(action.candidateId, async () => {
+      await refresh()
+      if (currentOwner.current !== owner || undoHistory.available(latestView.current.value) !== action) throw new Error(t('undo.conflict'))
+      await deck.decide(action.candidateId, action.before.verdict, action.before.reason)
+      undoHistory.invalidate()
+      if (currentOwner.current === owner) {
+        setUndoAction(undefined)
+        setDraft(previous => previous.owner === owner ? { ...previous, reasons: { ...previous.reasons, [action.candidateId]: action.before.reason ?? '' } } : previous)
+        setNotice(t('undo.done', { title: action.title }))
+        if (document.activeElement === trigger || document.activeElement === document.body) resultFocus.current?.focus({ preventScroll: true })
+      }
+      await refresh()
+    })
+  })
   const reference = () => operate('reference', () => candidateMutations.withSettledWrites(async () => {
     if (!view) return
     const outcome = await deck.reference(sessionId, view.setId)
@@ -202,7 +252,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     if (currentOwner.current !== owner) return
     setTargetSetId(added.setId); setMode('deck'); await refresh()
   })
-  const projection = useMemo(() => projectDeck(view, filter, query), [view, filter, query])
+  const projection = useMemo(() => projectDeck(view, filter, query, sort), [view, filter, query, sort])
   const candidates = view?.candidates ?? []
   const rounds = view?.rounds ?? []
   const running = rounds.find(item => item.round.status === 'starting' || item.round.status === 'running')
@@ -210,14 +260,15 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
   const readOnly = view?.set.status === 'submitted'
   const hasContent = Boolean(candidates.length || rounds.length)
   const showRequest = !loading && (!hasContent || editorKind === 'new')
-  const compareEntries = useMemo(() => candidates.filter(item => currentDraft.compare.includes(item.candidate.sourceId)), [view, currentDraft.compare])
-  const favoriteNeedle = favoriteQuery.trim().toLocaleLowerCase()
-  const shownFavorites = favorites.filter(item => [item.favorite.title, item.favorite.url, item.favorite.note, item.favorite.meta?.description].join(' ').toLocaleLowerCase().includes(favoriteNeedle))
+  const compareEntries = useMemo(() => comparisonEntries(candidates, currentDraft.compare), [view, currentDraft.compare])
+  const shownFavorites = useMemo(() => favorites.filter(item => sourceMatches(item.favorite, favoriteQuery)).sort((a, b) => compareSources(a.favorite, b.favorite, favoriteSort)), [favorites, favoriteQuery, favoriteSort])
+  const sortControl = (value: DeckSort, change: (sort: DeckSort) => void) => <label className={css.sort}>{t('sort.label')}<select value={value} onChange={event => change(event.target.value as DeckSort)}>{deckSorts.map(item => <option key={item} value={item}>{t(`sort.${item}`)}</option>)}</select></label>
   const card = (entry: CandidateView) => <CandidateCard key={entry.candidateId} entry={entry} t={t}
     reason={currentDraft.reasons[entry.candidateId] ?? entry.candidate.reason ?? ''}
     favorite={favoritesByIdentity.has(favoriteIdentity(entry.source))} compared={currentDraft.compare.includes(entry.candidate.sourceId)} readOnly={readOnly || deliveryBusy}
     busy={operations.has(`favorite:${entry.candidate.sourceId}`)} saving={saving.has(entry.candidateId)} deciding={deciding.has(entry.candidateId)} error={candidateErrors[entry.candidateId]}
-    onReason={value => patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } })}
+    compareFull={compareEntries.length >= 4}
+    onReason={value => { undoHistory.invalidate(entry.candidateId); setUndoAction(undoHistory.available(view)); patchDraft({ reasons: { ...currentDraft.reasons, [entry.candidateId]: value } }) }}
     onDecide={verdict => void decide(entry, verdict)}
     onSaveReason={() => { const reason = currentDraft.reasons[entry.candidateId]; if (reason !== undefined && reason !== (entry.candidate.reason ?? '')) void decide(entry, entry.candidate.verdict, reason, false) }}
     onFavorite={() => void toggleFavorite(entry)} onCompare={() => toggleCompare(entry.candidate.sourceId)} />
@@ -241,6 +292,7 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
     <div ref={scroll} className={css.scroll}>
       {mode === 'favorites' ? <section className={css.section}>
         <input className={css.input} type="search" value={favoriteQuery} onChange={event => patchDraft({ favoriteQuery: event.target.value })} placeholder={t('favorites.search')} aria-label={t('favorites.search')} />
+        {sortControl(favoriteSort, value => patchDraft({ favoriteSort: value }))}
         {shownFavorites.map(item => <article key={item.favoriteId} className={css.favoriteRow}>
           <strong>{safeWebUrl(item.favorite.url) ? <a href={safeWebUrl(item.favorite.url)} target="_blank" rel="noreferrer">{item.favorite.title}</a> : item.favorite.title}</strong><p>{item.favorite.note ?? item.favorite.meta?.description}</p>
           <button type="button" className={css.button} disabled={operations.has(`library:${item.favoriteId}`)} onClick={() => void addFavorite(item)}>{t('favorites.add')}</button>
@@ -264,8 +316,10 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
           {candidates.length ? <div className={css.filterBar}>
             <div className={css.filters}>{(['all', 'pending', 'kept', 'excluded'] as const).map(value => <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{t(`v3.filter.${value}` as DeckKey)} {projection.counts[value]}</button>)}</div>
             <input className={css.input} type="search" aria-label={t('v3.filterSearch')} placeholder={t('v3.filterSearch')} value={query} onChange={event => setQuery(event.target.value)} />
+            {sortControl(sort, value => patchDraft({ sort: value }))}
           </div> : null}
           <p ref={resultFocus} tabIndex={-1} className={css.resultStatus} aria-live="polite">{hasContent ? t('ux.resultCount', { shown: String(projection.shown.length), total: String(candidates.length) }) : ''}</p>
+          {compareEntries.length ? <CompareSelection entries={compareEntries} t={t} remove={toggleCompare} clear={() => { patchDraft({ compare: [] }); resultFocus.current?.focus({ preventScroll: true }) }} open={openCompare} /> : null}
           {candidates.length > 0 && !projection.shown.length ? <div className={css.section}><p>{t('ux.noMatches')}</p><button type="button" className={css.button} onClick={() => patchDraft({ query: '', filter: 'all' })}>{t('ux.clearFilters')}</button></div> : null}
           {projection.groups.filter(group => group.entries.length || !projection.filtered || group.status === 'running' || group.status === 'starting' || group.diagnostic).map(group => <section key={group.id} id={`deck-${group.id}`} className={css.section}>
             <div className={css.roundHeading}><span>{group.index ? t('round.title', { index: String(group.index) }) : t('ux.manualGroup')} · {group.entries.length}/{group.total}</span><span className={css.status}>{group.status ? t(`v3.status.${group.status}` as DeckKey) : ''}</span></div>
@@ -279,11 +333,12 @@ export function DeckBody({ sessionId, useTabInfo, t, deck }: DeckBodyProps) {
       </>}
     </div>
     {mode === 'deck' && view && hasContent ? <footer className={css.footer}>
+      {undoAction && undoHistory.available(view) === undoAction ? <button type="button" className={`${css.linkButton} ${css.undo}`} title={t('undo.button', { title: undoAction.title })} disabled={deliveryBusy || operations.has('undo') || saving.size > 0} onClick={() => void undo()}>{t('undo.button', { title: undoAction.title })}</button> : null}
       <div className={css.summary}><span>✓ {projection.counts.kept} · ✕ {projection.counts.excluded} · {t('v3.pending')} {projection.counts.pending}</span>{running ? <button type="button" className={css.linkButton} disabled={operations.has('cancel')} onClick={() => void operate('cancel', async () => { await deck.cancelRound(sessionId, running.roundId); await refresh() })}>{t('v3.stop')}</button> : latest?.round.status ? <span>{t(`v3.status.${latest.round.status}` as DeckKey)}</span> : null}</div>
       <button type="button" className={css.primary} disabled={!projection.counts.kept || deliveryBusy} onClick={() => void reference()}>{t('reference.button', { count: String(projection.counts.kept) })}</button>
       <div className={css.secondaryActions}>
         {!readOnly ? <button ref={refineButton} type="button" className={css.linkButton} disabled={Boolean(running)} aria-expanded={editorKind === 'refine'} onClick={() => { if (!latest) newTopic(); else if (editorKind === 'refine') closeEditor(); else { setCompareOpen(false); setEditor({ owner, kind: 'refine' }) } }}>{t(latest ? 'ux.refine' : 'search.start')}</button> : null}
-        {currentDraft.compare.length > 0 && !compareOpen ? <button ref={compareButton} type="button" className={css.linkButton} onClick={openCompare}>{t('compare.title')} ({currentDraft.compare.length}/4)</button> : null}
+        {compareEntries.length > 0 && !compareOpen ? <button ref={compareButton} type="button" className={css.linkButton} onClick={openCompare}>{t('compare.title')} ({compareEntries.length}/4)</button> : null}
         <details className={css.more}><summary>{t('ux.more')}</summary><div><p>{t('ux.directHint')}</p><button type="button" className={css.button} disabled={Boolean(running) || deliveryBusy || !candidates.length || view.deliveryStatus === 'sent'} onClick={() => void sendSummary()}>{view.deliveryStatus === 'sent' ? t('submit.done') : t('reference.direct')}</button></div></details>
       </div>
       {editorKind === 'refine' && !readOnly ? <div className={css.refineEditor}><textarea ref={refineInput} className={css.textarea} rows={2} aria-label={t('feedback.label')} placeholder={t('feedback.placeholder')} value={currentDraft.note} onChange={event => patchDraft({ note: event.target.value })} onKeyDown={event => { if (event.key === 'Escape' && !event.nativeEvent.isComposing) { closeEditor(); event.stopPropagation() } }} /><div className={css.searchActions}><button type="button" className={css.linkButton} onClick={closeEditor}>{t('ux.cancel')}</button><button type="button" className={css.button} disabled={Boolean(running) || operations.has('start')} onClick={() => void start(true)}>{operations.has('start') ? t('search.starting') : t('feedback.continue')}</button></div></div> : null}

@@ -6,6 +6,16 @@ import css from './ComparePanel.module.css'
 
 const dimensions = ['source.note', 'source.description', 'source.stars', 'source.updated', 'source.language', 'source.license', 'source.reason'] as const
 
+export function CompareSelection({ entries, t, remove, clear, open }: {
+  entries: readonly CandidateView[]; t: TranslateNS<'sourceDeck'>; remove(sourceId: string): void; clear(): void; open(): void
+}) {
+  return <section className={css.selection} data-compare-selection aria-label={t('compare.selected')}>
+    <div className={css.selectionActions}><strong>{t('compare.selected')} · {entries.length}/4</strong>
+      <button type="button" onClick={clear}>{t('compare.clear')}</button><button type="button" onClick={open}>{t('compare.open')}</button></div>
+    <ul>{entries.map(entry => <li key={entry.candidate.sourceId}><span>{entry.source.title}</span><button type="button" aria-label={`${t('compare.remove')} · ${entry.source.title}`} onClick={() => remove(entry.candidate.sourceId)}>×</button></li>)}</ul>
+  </section>
+}
+
 export function ComparePanel({ entries, t, remove }: { entries: readonly CandidateView[]; t: TranslateNS<'sourceDeck'>; remove(sourceId: string): void }) {
   const locale = document.documentElement.lang || navigator.language || 'zh-CN'
   const columns = useMemo(() => entries.map(entry => {

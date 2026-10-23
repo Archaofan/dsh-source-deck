@@ -2,9 +2,9 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
-## 2026-10-23: new review; short design awaiting approval
+## 2026-10-23: 0.4.0 local preview delivery
 
-The user requested another substantial optimization. Current 0.3.3 code and comparable plugins' primary sources were reviewed; see the [new review](research/2026-10-23-next-iteration-review.en.md). Proposed areas are metadata search/sorting, visible comparison membership, latest-decision undo and better research guidance. This iteration's short design is not approved yet; product code, version and packages are unchanged. Baseline regression passed 83/83; the shared sandbox reports `occupied=false` on the fixed RC. No Desktop, model or production interaction occurred. Earlier approval and acceptance do not establish implementation of this iteration.
+After seeing the four proposed areas, the user delegated prioritization to reduce friction. Metadata retrieval/sorting, visible comparison membership, undo, research guidance and same-topic entry retention are implemented; see [implementation and acceptance](implementation/2026-10-23-workflow-0.4.0.en.md). The earlier [review](research/2026-10-23-next-iteration-review.en.md) records the pre-implementation state. The full suite (94/94), actual component probe (6/6), build, installed-byte checks and final RC Host width/theme/language and 6/24/200 checks passed. Two research samples exposed and corrected default-count padding; the second returned only the two named sources, without establishing general accuracy. Native zoom/IME/attachment limits remain. Package: 187148 bytes, SHA256 `505B93611204D654BCAAB98C4637F09B785797F66B99EC1E305F6882B7014BAB`, at `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.0.tgz`. Branch `feat/workflow-0.4.0`; no new Release or production action. Sandbox Chinese/light restored and lease released. Synchronization follows final Git verification.
 
 ## 2026-10-20: 0.3.3 published
 

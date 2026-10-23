@@ -4,6 +4,72 @@ import { addSource, commitSelection, decide } from '../src/ops.ts'
 import { createReference } from '../src/references.ts'
 import { memoryStore } from './memory-store.ts'
 
+const undoCandidate = (verdict: 'kept' | 'excluded' | 'pending', reason?: string, decidedAt = '2026-10-23T01:00:00Z') => ({
+  candidateId: 'c', candidate: { setId: 's', sourceId: 'src', verdict, reason, decidedAt, createdAt: '2026-10-20' },
+  source: { title: 'Editor', origin: 'user' as const, dedupeKey: 'editor', createdAt: '2026-10-20' },
+})
+const undoView = (entry: ReturnType<typeof undoCandidate>, status = 'open') => ({ set: { status }, candidates: [entry] })
+
+test('undo remembers the confirmed previous verdict and reason, and rejects observed conflicts or readonly sets', async () => {
+  const { DecisionUndo } = await import('../src/client/candidate-mutations.ts')
+  assert.equal(typeof DecisionUndo, 'function')
+  const history = new DecisionUndo()
+  const before = undoCandidate('excluded', 'needs cloud')
+  const after = undoCandidate('kept', 'has offline mode', '2026-10-23T02:00:00Z')
+  history.confirm(history.begin(), before, after)
+  assert.equal(history.available(undoView(after))?.before.verdict, 'excluded')
+  assert.equal(history.available(undoView(after))?.before.reason, 'needs cloud')
+  history.observe(undoView(undoCandidate('kept', 'edited elsewhere', after.candidate.decidedAt)))
+  assert.equal(history.available(undoView(after)), undefined, 'Conflicts must permanently invalidate the old action')
+  history.confirm(history.begin(), before, after)
+  assert.equal(history.available(undoView(after, 'submitted')), undefined)
+})
+
+test('newer local choices invalidate undo and late confirmation cannot replace the latest action', async () => {
+  const { DecisionUndo } = await import('../src/client/candidate-mutations.ts')
+  assert.equal(typeof DecisionUndo, 'function')
+  const history = new DecisionUndo()
+  const first = history.begin(); const latest = history.begin()
+  const before = undoCandidate('pending'); const after = undoCandidate('kept')
+  history.confirm(first, before, after)
+  assert.equal(history.available(undoView(after)), undefined)
+  history.confirm(latest, before, after)
+  assert.equal(history.available(undoView(after))?.before.reason, undefined)
+  history.invalidate('different-candidate')
+  assert.ok(history.available(undoView(after)))
+  history.invalidate('c')
+  assert.equal(history.available(undoView(after)), undefined)
+})
+
+test('editing a reason while a decision is pending prevents late creation of a stale undo', async () => {
+  const { DecisionUndo } = await import('../src/client/candidate-mutations.ts')
+  const history = new DecisionUndo()
+  const ticket = history.begin('c')
+  history.invalidate('c')
+  const after = undoCandidate('kept')
+  history.confirm(ticket, undoCandidate('pending'), after)
+  assert.equal(history.available(undoView(after)), undefined)
+})
+
+test('undo restoration shares the write queue and references wait for the restored decision', async () => {
+  const { DecisionUndo, CandidateMutations } = await import('../src/client/candidate-mutations.ts')
+  assert.equal(typeof DecisionUndo, 'function')
+  const store = memoryStore(); const queue = new CandidateMutations(); const history = new DecisionUndo()
+  const added = await addSource(store, { sessionId: 's', origin: 'user', title: 'Editor' })
+  const before = { ...undoCandidate('pending'), candidateId: added.candidateId, candidate: store.get('candidates', added.candidateId) as any }
+  await decide(store, { candidateId: added.candidateId, verdict: 'kept', reason: 'selected' })
+  const after = { ...before, candidate: store.get('candidates', added.candidateId) as any }
+  history.confirm(history.begin(), before, after)
+  const action = history.available(undoView(after))!
+  let release!: () => void; const gate = new Promise<void>(resolve => { release = resolve })
+  const restoring = queue.run(added.candidateId, async () => { await gate; await decide(store, { candidateId: added.candidateId, verdict: action.before.verdict, reason: action.before.reason }) })
+  const reference = queue.withSettledWrites(() => createReference(store, { sessionId: 's', setId: added.setId, requestId: 'undo-ref' }))
+  release(); await restoring
+  await assert.rejects(reference, /keep|kept|保留/i)
+  assert.equal((store.get('candidates', added.candidateId) as any).verdict, 'pending')
+  assert.equal((store.get('candidates', added.candidateId) as any).reason, undefined)
+})
+
 test('reason blur and immediate explicit verdict are both persisted in user order', async () => {
   const { CandidateMutations } = await import('../src/client/candidate-mutations.ts')
   const queue = new CandidateMutations()

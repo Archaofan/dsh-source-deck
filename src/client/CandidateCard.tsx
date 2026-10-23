@@ -8,10 +8,10 @@ import css from './CandidateCard.module.css'
 
 export interface CandidateCardProps {
   entry: CandidateView; t: TranslateNS<'sourceDeck'>; reason: string; favorite: boolean; compared: boolean; busy: boolean; readOnly: boolean
-  saving?: boolean; deciding?: boolean; error?: string
+  saving?: boolean; deciding?: boolean; error?: string; compareFull?: boolean
   onReason(value: string): void; onDecide(verdict: Verdict): void; onSaveReason(): void; onFavorite(): void; onCompare(): void
 }
-export function CandidateCard({ entry, t, reason, favorite, compared, busy, readOnly, saving, deciding, error, onReason, onDecide, onSaveReason, onFavorite, onCompare }: CandidateCardProps) {
+export function CandidateCard({ entry, t, reason, favorite, compared, busy, readOnly, saving, deciding, error, compareFull, onReason, onDecide, onSaveReason, onFavorite, onCompare }: CandidateCardProps) {
   const { source, candidate } = entry
   const images = useMemo(() => sourceImages(source), [source]); const imageKey = images.join('|')
   const [imageIndex, setImageIndex] = useState(0)
@@ -50,7 +50,7 @@ export function CandidateCard({ entry, t, reason, favorite, compared, busy, read
       <div className={css.actions}>
         <button type="button" aria-pressed={candidate.verdict === 'kept'} className={candidate.verdict === 'kept' ? css.keepActive : css.button} disabled={busy || readOnly} onClick={() => onDecide(candidate.verdict === 'kept' ? 'pending' : 'kept')}>✓ {t('action.keep')}</button>
         <button type="button" aria-pressed={candidate.verdict === 'excluded'} className={candidate.verdict === 'excluded' ? css.excludeActive : css.button} disabled={busy || readOnly} onClick={() => onDecide(candidate.verdict === 'excluded' ? 'pending' : 'excluded')}>✕ {t('action.exclude')}</button>
-        <button type="button" className={css.button} aria-pressed={compared} onClick={onCompare}>{t(compared ? 'compare.remove' : 'compare.add')}</button>
+        <button type="button" className={css.button} aria-pressed={compared} disabled={!compared && compareFull} onClick={onCompare}>{t(compared ? 'compare.remove' : compareFull ? 'compare.limit' : 'compare.add')}</button>
       </div>
       {saving ? <p className={css.lookup} role="status">{t('ux.saving')}</p> : null}
       {error ? <p className={css.warning} role="alert">{error}</p> : null}

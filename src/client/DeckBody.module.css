@@ -36,6 +36,11 @@
 .filterBar > input { flex: 1; min-width: 150px; }
 .filters { display: flex; flex-wrap: wrap; gap: 3px; }
 .filters button { font-size: 12px; }
+.sort { display: flex; align-items: center; gap: 8px; min-height: 34px; font-size: 12px; color: var(--dsw-alias-label-secondary); }
+.sort select { max-width: 100%; font: inherit; min-height: 34px; padding: 4px 8px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-base); }
+.sort option { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-base); }
+.sort select:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
+.undo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
 .empty { color: var(--dsw-alias-label-tertiary); padding: 14px 0; font-size: 13px; }
 .manual { margin: 16px; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .manual summary { cursor: pointer; }

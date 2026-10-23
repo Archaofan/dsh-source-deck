@@ -2,7 +2,13 @@
 
 同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-## 当前状态（2026-10-20）
+## 当前状态（2026-10-23）
+
+用户看到新四项范围后选择「整体由你判断，优先减少操作阻力」。0.4.0 本地预览已实现于 `feat/workflow-0.4.0`：元数据多词搜索、按轮次稳定排序、直接可编辑的对比名单、最近判定撤销、适用性与数量约束研究提示，以及输入框/历史卡片同主题草稿键统一。94/94 测试、6/6 实际 React/领域交互、构建、官方安装字节核对及最终 RC Host 深浅中英四宽和6/24/200项检查通过。独立审查及 Host 发现的撤销竞态、焦点和入口接续问题均已复现修复。两轮实际研究中，默认数量覆盖明确名单的问题已修正，第二轮只返回指定两个来源；不得外推事实准确率。见[实施验收](docs/implementation/2026-10-23-workflow-0.4.0.md)。
+
+交付包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.0.tgz`，187148 bytes、SHA256 `505B93611204D654BCAAB98C4637F09B785797F66B99EC1E305F6882B7014BAB`。没有新依赖/八表/基线变化；未创建0.4.0 GitHub Release，不将本地预览说成公开发布。生产未操作。原生125%/IME/附件/屏幕阅读器与真人观察限制保留；未重跑完整性能矩阵。最终沙箱PID34336核对后已停止，中文/浅色恢复、临时页关闭、lease释放。代码/文档仍按工作区要求提交推送，最终同步结果以Git核对为准。
+
+## 交付历史（2026-10-20）
 
 用户已确认本轮简短设计并授权验证、提交、推送和预发行发布。**0.3.3 已交付至 main 并发布 [v0.3.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3)**，源码/tag commit `1554e79de632375c6eef4050b8460da8bedb1bc4`，保留 `feat/screening-readability-0.3.3` 分支。卡片优先已有筛选说明并保留全文；窄栏按维度比较、宽栏保留表格，最多四项。83/83 测试、构建、官方安装字节核对和实际 RC Host 深色中文/浅色英文四宽、键盘/焦点/查询/引用冒烟通过。首列表头无障碍审查项已修复；未宣称原生屏幕阅读器播报通过。包 177295 bytes，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`，GitHub digest 和下载回验一致。Latest 仍为 v0.3.0。没有新依赖、研究提示/协议/数据架构变化或模型调用；生产未动、共享沙箱已释放。详见[本轮实施记录](docs/implementation/2026-10-20-screening-readability.md)和验收末节。原生125%/IME/附件/真人观察等限制仍有效。
 

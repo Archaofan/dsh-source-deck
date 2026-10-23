@@ -69,3 +69,25 @@ test('generic web and title-only long descriptions have an accessible full-detai
     assert.ok(details.includes(description))
   }
 })
+
+test('full comparison blocks only unselected cards and explains the limit at the action', async () => {
+  const { CandidateCard } = await import('../src/client/CandidateCard.tsx')
+  const props = { entry: candidate('Editor', {}), t: (key: any) => key, reason: '', favorite: false, busy: false, readOnly: false,
+    compareFull: true, onReason() {}, onDecide() {}, onSaveReason() {}, onFavorite() {}, onCompare() {} }
+  const unselected = renderToStaticMarkup(createElement(CandidateCard, { ...props, compared: false }))
+  assert.match(unselected, /disabled=""[^>]*>compare.limit/)
+  const selected = renderToStaticMarkup(createElement(CandidateCard, { ...props, compared: true }))
+  assert.match(selected, /aria-pressed="true">compare.remove/)
+})
+
+test('comparison selection exposes source-specific removal, clearing and opening without hiding names', async () => {
+  const module = await import('../src/client/ComparePanel.tsx')
+  assert.equal(typeof module.CompareSelection, 'function')
+  const html = renderToStaticMarkup(createElement(module.CompareSelection, {
+    entries: [candidate('Editor A', {}), candidate('Editor B', {})], t: (key: any) => key,
+    remove() {}, clear() {}, open() {},
+  }))
+  assert.ok(html.includes('Editor A') && html.includes('Editor B'))
+  assert.ok(html.includes('aria-label="compare.remove · Editor A"'))
+  assert.ok(html.includes('compare.clear') && html.includes('compare.open'))
+})

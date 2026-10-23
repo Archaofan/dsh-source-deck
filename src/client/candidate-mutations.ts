@@ -1,3 +1,30 @@
+import type { CandidateView } from '../ops.ts'
+import type { CandidateRecord } from '../model.ts'
+
+type UndoView = { set: { status: string }; candidates: readonly CandidateView[] } | null
+export interface UndoDecision {
+  candidateId: string; title: string; before: CandidateRecord; after: CandidateRecord
+}
+const sameDecision = (a: CandidateRecord, b: CandidateRecord) => a.verdict === b.verdict && a.reason === b.reason && a.decidedAt === b.decidedAt
+
+/** One confirmed local action; observation of another write permanently expires it. */
+export class DecisionUndo {
+  private revision = 0
+  private action?: UndoDecision
+  private pendingCandidate?: string
+  begin(candidateId?: string): number { this.action = undefined; this.pendingCandidate = candidateId; return ++this.revision }
+  confirm(revision: number, before: CandidateView, after: CandidateView): void {
+    if (revision !== this.revision || before.candidateId !== after.candidateId || (before.candidate.verdict === after.candidate.verdict && before.candidate.reason === after.candidate.reason)) return
+    this.action = { candidateId: before.candidateId, title: before.source.title, before: { ...before.candidate }, after: { ...after.candidate } }
+  }
+  available(view: UndoView): UndoDecision | undefined {
+    const current = view?.candidates.find(entry => entry.candidateId === this.action?.candidateId)
+    return this.action && view?.set.status === 'open' && current && sameDecision(current.candidate, this.action.after) ? this.action : undefined
+  }
+  observe(view: UndoView): void { if (this.action && !this.available(view)) this.begin() }
+  invalidate(candidateId?: string): void { if (!candidateId || this.action?.candidateId === candidateId || this.pendingCandidate === candidateId) this.begin() }
+}
+
 /** Preserve blur saves and explicit choices across asynchronous Remote writes. */
 export class CandidateMutations {
   private handoff = false

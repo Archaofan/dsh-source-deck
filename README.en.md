@@ -47,13 +47,13 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.3.3 |
+| SourceDeck | 0.4.0 |
 | DeepSeek Harness Desktop | 0.2.1-rc.2 |
 | @deepseek-ai/cordis | 4.0.5 |
 
 Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Use the Desktop plugin manager to install `dsh-source-deck-0.3.3.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+Use the Desktop plugin manager to install `dsh-source-deck-0.4.0.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path. See this iteration's acceptance record for local 0.4.0 preview delivery; the GitHub link above still points to published 0.3.3.
 
 Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is still open, waiting for the automatic re-check and merge. Availability is not claimed yet. See [market status](docs/MARKETPLACE.md).
 
@@ -68,6 +68,8 @@ Research runs in an official managed child session, inheriting the parent's mode
 Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Official web tools and the spawn provider must be available. Startup failure is explicit; the plugin does not change configuration or upgrade the baseline.
 
 ## Screen and compare
+
+0.4.0 searches existing language, license, topics and other text fields together, for example `TypeScript MIT`. Candidates and favorites remember separate queries/sorts. Original order remains the default; candidates can be sorted within each round by stars, code push or name, with unknown values last. A visible comparison list supports removal/clearing, follows selection order and keeps the four-source limit. Undo restores the previous verdict and reason for the latest confirmed local choice; navigation, later edits to that item or observed conflicts expire it. It is not atomic multi-window undo. New research requests ask for applicability and material uncertainty, labeled Research judgment, without extra model calls or guessed facts. References still wait for writes and preserve drafts.
 
 0.3.3 prioritizes the existing screening note so you can see why a source may fit the task; source details retain both the complete note and the general description. Missing notes fall back to the description or excerpt without generating a new judgment. Comparison adapts to the deck's width: below 620px it presents dimensions vertically, labeling every value with its source; wider panes retain the table and four-source limit. Research and reference behavior stay unchanged.
 
