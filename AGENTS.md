@@ -4,11 +4,11 @@
 
 ## 当前状态（2026-10-23）
 
-用户随后明确要求合入 main。2026-10-23 已将交付分支截至 `a7a0c741071c6ba571dc41649bc13808ffc7bee2` 快进合入本地 main，包含源码提交 `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd`；保留 `feat/workflow-0.4.0`。远端同步以最终 Git 核对为准。后续同步文档不得重建或替换已验收包。
+用户明确要求合入 main、检查 README 并发布 Release。main 已推送并核对；保留 `feat/workflow-0.4.0`。中英文 README 已更新版本入口、功能措辞、实际截图和市场状态。[v0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 于 `2026-10-23T14:04:16Z` 发布为预发行（isDraft=false、isPrerelease=true），标签 commit `2a6cde50ca568ac22fd6815cae752a464cabc60d`，Latest 仍为 v0.3.0。GitHub 资产 digest 与重新下载 SHA256 均匹配下列原验收包。发布后只补记文档，不重建或替换该包、不移动标签。
 
 用户看到新四项范围后选择「整体由你判断，优先减少操作阻力」。0.4.0 本地预览已实现于 `feat/workflow-0.4.0`：元数据多词搜索、按轮次稳定排序、直接可编辑的对比名单、最近判定撤销、适用性与数量约束研究提示，以及输入框/历史卡片同主题草稿键统一。94/94 测试、6/6 实际 React/领域交互、构建、官方安装字节核对及最终 RC Host 深浅中英四宽和6/24/200项检查通过。独立审查及 Host 发现的撤销竞态、焦点和入口接续问题均已复现修复。两轮实际研究中，默认数量覆盖明确名单的问题已修正，第二轮只返回指定两个来源；不得外推事实准确率。见[实施验收](docs/implementation/2026-10-23-workflow-0.4.0.md)。
 
-交付包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.0.tgz`，187148 bytes、SHA256 `505B93611204D654BCAAB98C4637F09B785797F66B99EC1E305F6882B7014BAB`。没有新依赖/八表/基线变化；未创建0.4.0 GitHub Release，不将本地预览说成公开发布。生产未操作。原生125%/IME/附件/屏幕阅读器与真人观察限制保留；未重跑完整性能矩阵。最终沙箱PID34336核对后已停止，中文/浅色恢复、临时页关闭、lease释放。代码/文档仍按工作区要求提交推送，最终同步结果以Git核对为准。
+交付包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.0.tgz`，187148 bytes、SHA256 `505B93611204D654BCAAB98C4637F09B785797F66B99EC1E305F6882B7014BAB`，已作为 Release 资产发布。包内 README 为验收时版本，在线 README 为本次发布措辞。发布前再次通过94/94测试、6/6组件交互及34个本地文档链接检查。没有新依赖/八表/基线变化。生产未操作。原生125%/IME/附件/屏幕阅读器与真人观察限制保留；未重跑完整性能矩阵。最终沙箱PID34336核对后已停止，中文/浅色恢复、临时页关闭、lease释放。代码/文档仍按工作区要求提交推送，最终同步结果以Git核对为准。
 
 ## 交付历史（2026-10-20）
 
@@ -43,6 +43,6 @@
 - 真实 Host 已覆盖带参命令、自然语言、模型并行、停止隔离、仓库结果、引用发送、重启中断与深浅宽度矩阵。
 - 当前控制端无法完成 Electron 原生 125% 缩放、OS 原生展开菜单截图及真实中文 IME/附件组合的完整验收；不能把 DOM/抽象草稿测试说成这些都已通过。
 - 没有新增依赖或 lock 图变化；离线 frozen 校验缺少 registry metadata，明确记录，不能禁用供应链策略绕过。
-- [市场 PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 最新确认仍停留在10:43 open/年龄 gate 失败；下午复核受连接器和 API 限流阻断。不能声称已上架，不关/重开/force-push。见 docs/MARKETPLACE.md。
+- [市场 PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于2026-10-18T20:22:40Z合并；2026-10-23默认分支条目仍指向0.3.3。目录收录已确认，不等同于0.4.0市场安装验收；本轮未修改外部条目，见 docs/MARKETPLACE.md。
 - 中文默认、英文同步。检查后提交并推送本项目交付分支，核对 HEAD 与 origin 一致；失败记 pending。
 - Git 使用进程级 safe.directory；不改全局配置或关闭 TLS。沙箱、node_modules、tgz、日志、缓存、凭据和个人记忆摘录不提交。

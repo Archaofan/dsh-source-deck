@@ -447,3 +447,13 @@ English: The reviewed source commit 1554e79 is on main and the retained feature 
 - 中文/浅色及默认浏览器视口已恢复，临时页关闭。核对隔离路径及userData后只停止本轮最终主进程34336；实时 `occupied=false`。远端同步由交付末次Git核对确认。
 
 English: 0.4.0 is a local preview on `feat/workflow-0.4.0`, not a new GitHub Release. All 94 tests, six actual component interaction checks, build and installed-byte checks passed. The final RC Host covered both themes/languages at four actual widths, 6/24/200-item retrieval/sorting and draft-preserving references. A second managed research sample respected the explicit two-source list after a prompt correction; this is not a general accuracy claim. The 187148-byte package hash above is authoritative. Production was untouched; native-input/accessibility and full performance limits remain. Sandbox settings were restored and the lease released.
+
+## 2026-10-23：0.4.0 Release 发布收尾（取代上节本地预览状态）
+
+- 用户明确要求合入main、检查README并发布Release。中英文README已统一0.4.0发布入口、安装步骤、当前功能说明及截图；去除旧版本堆叠和待评审措辞。市场PR #7739经API确认已于2026-10-18T20:22:40Z合并；默认分支条目回读仍指向0.3.3，未更改外部条目或宣称0.4.0市场安装已验收。
+- 发布前重跑94/94测试、6/6实际组件交互通过；34个本地文档链接、diff检查、包内53文件及精确peer核对通过。原包187148 bytes，SHA256仍为上节`505B9361…14BAB`完整值；Host/Client哈希与原验收记录一致。不重新构建或修改包，包内README保留验收时版本，在线文档已更新。
+- [v0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 于UTC `2026-10-23T14:04:16Z` 发布。远端annotated tag对象`f6a563ccb8b5b66c89126ee84f45c66cc9afbb49` peel到`2a6cde50ca568ac22fd6815cae752a464cabc60d`，同次main已包含该提交。回读isDraft=false、isPrerelease=true；Latest API仍为v0.3.0。
+- 资产ID 669305941、uploaded、187148 bytes，GitHub digest与验收SHA256一致。发布草稿阶段下载至本项目沙箱staging/release-0.4.0-verified-download/，下载回验也一致后才正式发布。GitHub请求在受限环境TLS超时，后续Git/gh使用获准的单条主机命令，没有改TLS或全局信任。
+- 发布后只补记文档并同步main，不移动tag、不替换资产；生产未操作，已有原生输入、无障碍和完整性能矩阵限制保留。
+
+English: v0.4.0 was published at 2026-10-23 14:04:16 UTC as a prerelease, not a draft. The remote tag resolves to 2a6cde5 on main. All 94 tests, six component interactions, 34 local links and accepted-package checks passed. GitHub's uploaded asset digest and a fresh download match the original 187148-byte package; its bundled README remains unchanged while online READMEs reflect publication. Stable Latest remains v0.3.0. The catalog PR is merged but still points to 0.3.3; no market installation or production change was performed.

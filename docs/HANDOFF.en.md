@@ -2,7 +2,11 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
-## 2026-10-23: 0.4.0 local preview delivery
+## 2026-10-23: 0.4.0 published
+
+After requesting main integration, the user requested README review and a Release. Both READMEs now reflect current release/install links, features, synthetic QA screenshots and catalog status. [v0.4.0 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) was published at `2026-10-23T14:04:16Z`, verified as isDraft=false and isPrerelease=true. Tag commit `2a6cde50ca568ac22fd6815cae752a464cabc60d` is on remote main; Latest remains v0.3.0. Asset ID 669305941, 187148 bytes: GitHub digest and a downloaded copy match the accepted SHA256 below. Fresh checks passed all 94 tests, six component interactions and 34 local document links. The package's bundled README reflects acceptance time; do not rebuild the package or move its tag. The market PR is merged but its catalog still points to 0.3.3. No market installation or production changes. See [release notes](releases/0.4.0.md).
+
+## 2026-10-23: local preview delivery history
 
 Source commit `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd` was pushed to `origin/feat/workflow-0.4.0` and verified with `ls-remote`. The user subsequently requested integration into main; the delivery branch through `a7a0c741071c6ba571dc41649bc13808ffc7bee2` was fast-forwarded into local main, retaining the feature branch. Remote synchronization follows final Git verification. Subsequent synchronization notes do not rebuild the accepted package. The earlier restricted push could not read a username; the approved single host command completed it without changing global trust or TLS.
 

@@ -4,7 +4,11 @@
 
 继续本项目时先读根 README.md / AGENTS.md、本项目 README.md、MARKETPLACE.md、本文、SETUP-VERIFICATION.md 夜-9、AGENTS.md，再检查共享沙箱 lease。
 
-## 2026-10-23：0.4.0 本地预览交付
+## 2026-10-23：0.4.0 已发布
+
+用户要求合入 main 后，又要求检查 README 并发布。中英文 README 已更新发布/安装链接、当前功能说明、0.4.0 合成 QA 截图和市场收录状态。[v0.4.0 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 于 `2026-10-23T14:04:16Z` 发布，回读 isDraft=false、isPrerelease=true；标签 commit `2a6cde50ca568ac22fd6815cae752a464cabc60d` 已在远端 main。Latest 仍为 v0.3.0。资产ID669305941、187148 bytes，GitHub digest 与下载回验均匹配下列原包SHA256。发布前重跑94/94及6/6交互通过，34个本地文档链接有效。包内README保留验收时版本，不重建包或移动标签。市场PR已合并，但目录仍指向0.3.3；没有市场安装或生产操作。详见[发布说明](releases/0.4.0.md)。
+
+## 2026-10-23：本地预览交付历史
 
 源码提交 `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd` 已推送到 `origin/feat/workflow-0.4.0`，`ls-remote` 核对一致。用户随后明确要求合入 main，已将截至 `a7a0c741071c6ba571dc41649bc13808ffc7bee2` 的交付分支快进合入本地 main，保留原分支；远端同步以最终 Git 核对为准。后续仅追加同步记录，不重建已验收安装包。此前受限推送无法读取用户名后，使用获准的单条主机 Git 命令完成，没有改全局信任或 TLS。
 
