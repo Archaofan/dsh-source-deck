@@ -2,7 +2,7 @@
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.3 preview](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.0 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -21,11 +21,11 @@ Not for: replacing deep code audits or formal security/compliance review.
 
 ## Screenshots
 
-Real Host screenshots (light / dark), using mainstream agent projects such as Hermes Agent and OpenClaw. Account information in the screenshots has been redacted.
+Actual 0.4.0 Host screenshots (light Chinese / dark English). QA sources are synthetic acceptance fixtures demonstrating search, sorting, comparison selection and undo.
 
 | Light | Dark |
 |---|---|
-| ![SourceDeck light interface](docs/assets/screenshots/source-deck-light.png) | ![SourceDeck dark interface](docs/assets/screenshots/source-deck-dark.png) |
+| ![SourceDeck 0.4.0 light interface](docs/assets/screenshots/source-deck-0.4.0-light-wide.png) | ![SourceDeck 0.4.0 dark interface](docs/assets/screenshots/source-deck-0.4.0-dark.png) |
 
 ## Chat and deck work together
 
@@ -37,7 +37,7 @@ The deck is not a separate search page. It shares the same conversation context 
 4. **Reference back into chat**: click “Reference in chat”; kept sources enter the composer as an immutable snapshot. Existing draft text and attachments are preserved, and nothing is auto-sent. Then continue with “study these repositories and propose an improvement for our design”.
 5. **Re-decisions do not rewrite inserted references**: later changes only affect future references. The inserted snapshot stays as it was and can be removed before sending.
 
-The left side keeps the conversation going while the right-side deck stays in sync; the composer already holds a SourceDeck reference and a follow-up instruction:
+The left side keeps the conversation going while the right-side deck stays in sync; the composer holds a SourceDeck reference and a follow-up instruction. These earlier-version screenshots illustrate the reference workflow:
 
 | Light | Dark |
 |---|---|
@@ -53,9 +53,9 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Use the Desktop plugin manager to install `dsh-source-deck-0.4.0.tgz`, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path. See this iteration's acceptance record for local 0.4.0 preview delivery; the GitHub link above still points to published 0.3.3.
+Download `dsh-source-deck-0.4.0.tgz` from the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0), install it through the Desktop plugin manager, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is still open, waiting for the automatic re-check and merge. Availability is not claimed yet. See [market status](docs/MARKETPLACE.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23; use the Release package above for 0.4.0. Catalog inclusion does not establish actual market-UI acceptance of this version. See [market status](docs/MARKETPLACE.en.md).
 
 ## Start from chat
 
@@ -69,13 +69,15 @@ Workers may only use `web_search`, `web_fetch`, and `deck_submit_sources`. Offic
 
 ## Screen and compare
 
-0.4.0 searches existing language, license, topics and other text fields together, for example `TypeScript MIT`. Candidates and favorites remember separate queries/sorts. Original order remains the default; candidates can be sorted within each round by stars, code push or name, with unknown values last. A visible comparison list supports removal/clearing, follows selection order and keeps the four-source limit. Undo restores the previous verdict and reason for the latest confirmed local choice; navigation, later edits to that item or observed conflicts expire it. It is not atomic multi-window undo. New research requests ask for applicability and material uncertainty, labeled Research judgment, without extra model calls or guessed facts. References still wait for writes and preserve drafts.
+Search titles, URLs, notes, screening reasons and existing language, license and topic metadata together, for example `TypeScript MIT`. Space-separated terms must all match. Candidates and favorites remember separate queries and sorts. Original order is the default; candidates can be sorted within each round by stars, code push or name, with unknown values last.
 
-0.3.3 prioritizes the existing screening note so you can see why a source may fit the task; source details retain both the complete note and the general description. Missing notes fall back to the description or excerpt without generating a new judgment. Comparison adapts to the deck's width: below 620px it presents dimensions vertically, labeling every value with its source; wider panes retain the table and four-source limit. Research and reference behavior stay unchanged.
+The comparison list shows selected names, supports individual removal or clearing, and follows selection order with up to four sources. Below 620px, dimensions appear vertically with source labels; wider panes use a table. Undo restores the prior verdict and reason for the latest confirmed local choice; changing topics, later edits to that item or observed conflicts expire it.
 
-0.3.2 focuses the result page: new-search and follow-up editors open on demand, candidate and favorite queries persist independently, and comparison restores return focus. Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Full descriptions remain available in source details.
+Cards prioritize the existing Research judgment, with full notes and descriptions retained in details. New research prompts ask for task applicability and material uncertainty, and respect explicitly named sources or counts. These instructions do not guarantee factual accuracy. Queries, sorts, comparison choices and drafts continue between the composer entry and historical cards for the same topic.
 
-Full reads are serialized: approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return. No service or dependency was added. Version 0.3.2 is a preview: actual 6/24/200-item lists, full-minute cadence and core tasks were checked; native Electron 125%, real IME, attachment combinations and human observation remain limited. See the [implementation record](docs/implementation/2026-10-19-experience-optimization.en.md) for methods and scope. Stable 0.3.0 remains available.
+Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Reads occur approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return.
+
+0.4.0 is a prerelease. Actual pinned-RC Host checks covered 6/24/200 items, both themes and four panel widths. Native zoom, real IME/attachment combinations, screen-reader speech and human observation remain limited; the full performance matrix was not rerun. See [this iteration's implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md).
 
 1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
 2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.
@@ -123,9 +125,9 @@ You do not need to finish a whole feature. A clear scenario, one test, or one pa
 ## Find the project
 
 - GitHub: <https://github.com/Archaofan/dsh-source-deck> (searchable via `dsh-plugin`, `source-deck`, `DeepSeek Harness`)
-- Latest release: <https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0>
+- Latest prerelease: [0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP documentation index: <https://gitmcp.io/Archaofan/dsh-source-deck>
-- Plugin marketplace: awesome-dsh-plugin [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) (under review, not listed yet)
+- Plugin marketplace: [catalog entry](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml) (included; points to 0.3.3 as checked on 2026-10-23)
 
 ## Development
 
@@ -141,5 +143,5 @@ Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, i
 - [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [Developer workflow research](docs/research/2026-10-18-developer-workflow-review.md)
-- [Comparable tools, experience and performance](docs/research/2026-10-19-comparable-tools-experience-review.en.md) · [Iteration proposal (awaiting review)](docs/design/2026-10-19-experience-iteration-proposal.en.md)
+- [This iteration's comparable-tool review](docs/research/2026-10-23-next-iteration-review.en.md) · [0.4.0 implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md)
 - [Handoff](docs/HANDOFF.en.md) · [Version policy](docs/VERSION-POLICY.md)

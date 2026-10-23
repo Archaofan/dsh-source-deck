@@ -2,7 +2,7 @@
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.3.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.0 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -21,11 +21,11 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 ## 界面预览
 
-真实 Host 截图（浅色 / 深色），以 Hermes Agent、OpenClaw 等主流 Agent 项目为例。截图中的账号信息已脱敏。
+0.4.0 真实 Host 截图（浅色中文 / 深色英文）。画面中的 QA 来源为合成验收材料，用于展示搜索、排序、对比名单和撤销。
 
 | 浅色 | 深色 |
 |---|---|
-| ![资料台浅色界面](docs/assets/screenshots/source-deck-light.png) | ![资料台深色界面](docs/assets/screenshots/source-deck-dark.png) |
+| ![0.4.0 资料台浅色界面](docs/assets/screenshots/source-deck-0.4.0-light-wide.png) | ![0.4.0 资料台深色界面](docs/assets/screenshots/source-deck-0.4.0-dark.png) |
 
 ## 对话与资料台联动
 
@@ -37,7 +37,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 4. **引用回对话**：点“引用到对话”，保留项作为不可变快照进入输入框；原有正文、附件不丢，也不会自动发送。然后继续写“参考这几个仓库，给我们的设计提改进方案”。
 5. **改判不影响已插入引用**：之后改判只影响新引用；已插入的是当时快照，发送前可移除。
 
-左侧继续对话，右侧资料台同步；底部输入框已插入 SourceDeck 引用，并续写开发要求：
+左侧继续对话，右侧资料台同步；底部输入框已插入 SourceDeck 引用，并续写开发要求。以下为较早版本的联动截图，展示引用流程：
 
 | 浅色 | 深色 |
 |---|---|
@@ -53,9 +53,9 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 只使用 `0.2.1-rc.2` 的公共接口。**目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。** 升级到新的 RC 或正式版需要单独评估和验收。
 
-在 Desktop 的插件管理页选择本地安装 `dsh-source-deck-0.4.0.tgz`，按提示重启。安装列表显示自定义资料卡图标及「SourceDeck · 资料台」。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。0.4.0 本地预览包的实际交付状态见本轮验收记录，以上 GitHub 链接仍为已发布的 0.3.3。
+从 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 下载 `dsh-source-deck-0.4.0.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。安装列表显示自定义资料卡图标及「SourceDeck · 资料台」。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
-市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 目前仍为 open，等待自动复检与合并，当前不声称已上架。详见 [市场记录](docs/MARKETPLACE.md)。
+市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已合并。2026-10-23 核对市场目录条目仍指向 0.3.3；安装 0.4.0 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收该版本，详见[市场记录](docs/MARKETPLACE.md)。
 
 ## 从聊天开始
 
@@ -69,13 +69,15 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 ## 筛选与比较
 
-0.4.0 支持按已有语言、许可证和标签等字段组合搜索，例如 `TypeScript MIT`；候选与收藏分别记住查询和排序。候选默认原顺序，也可在每轮内按 stars、代码更新时间或名称排序，未知值排后。对比名单直接显示所选名称，可移除或清空，比较顺序跟随选择，最多四项。最近成功保存的判定可一键撤销并恢复原原因；切主题、后续同项编辑或发现冲突后失效，不提供跨窗口原子撤销。研究说明标为「研究判断」，新研究要求给出适用点及关键待核验点，事实未知时保留未知，不增加模型调用。引用仍等待已有写入完成并保留草稿。
+可组合搜索标题、URL、说明、筛选原因及已有语言、许可证、标签，例如 `TypeScript MIT`；空格分隔的词需同时匹配。候选与收藏分别记住查询和排序。候选默认原顺序，也可在每轮内按 stars、代码更新时间或名称排序，未知值排后。
 
-0.3.3 优先显示已有的「筛选说明」，方便先看资料与本次需求的关系；简介和完整说明都保留在来源详情中。缺少说明时回退到简介或摘录，不生成新的判断。对比按资料台宽度适配：不足 620px 时按维度纵向阅读，每个值带来源名称；宽栏保留表格，最多四项。研究流程和引用行为保持不变。
+对比名单直接显示所选名称，可逐项移除或清空，比较顺序跟随选择，最多四项。不足 620px 时按维度纵向阅读，每个值带来源名称；宽栏使用表格。最近成功保存的本地判定可一键撤销并恢复原原因；切主题、后续同项编辑或发现冲突后失效。
 
-0.3.2 收拢了结果页：新搜索与补充要求按需展开，候选和收藏各自记住查询，对比从已选项进入并恢复返回焦点。卡片显示保存状态；引用及直接摘要会等待已有筛选写入，失败时保留草稿供重试。详情仍可展开查看完整说明。
+卡片优先显示已有的「研究判断」，详情保留完整判断与简介。新研究的提示要求说明适用点和关键待核验点，并遵循用户明确指定的来源名单或数量；这些要求不构成事实准确性保证。查询、排序、对比和草稿在同主题的输入框入口与历史卡片之间接续。
 
-完整读取改为串行：研究中约 2 秒一次，静置结果 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。没有增加后台服务或依赖。0.3.2 按预发行交付：6/24/200 条列表、完整分钟读取和主要任务已实测，原生 Electron 125% 缩放、真实 IME、附件组合及真人观察仍有限制。实测方法和边界见[实施记录](docs/implementation/2026-10-19-experience-optimization.md)，稳定入口保留 0.3.0。
+卡片显示保存状态；引用和直接摘要等待已有筛选写入，失败时保留草稿供重试。研究中约每 2 秒读取一次，静置结果约每 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。
+
+0.4.0 按预发行交付。6/24/200 项、深浅模式和四种面板宽度已在固定 RC Host 检查；原生缩放、真实 IME/附件组合、屏幕阅读器和真人观察仍有限制，未重跑完整性能矩阵。详见[本轮实施与验收](docs/implementation/2026-10-23-workflow-0.4.0.md)。
 
 1. 卡片展示仓库图 / Logo，失败时尝试 GitHub owner 头像，再显示字标。GitHub 的 stars、最近代码推送时间、查询时间与来源链接分别显示。未知数据明确显示未知，0 stars 保留为 0。
 2. `✓ 保留` / `✕ 排除`，再次点击同一选项恢复待处理；可展开填写原因。收藏、对比与筛选互相独立。
@@ -123,9 +125,9 @@ SourceDeck 还在早期，很多取舍可以一起讨论。欢迎 fork、提 iss
 ## 检索与索引
 
 - GitHub 仓库：<https://github.com/Archaofan/dsh-source-deck>（可搜索 `dsh-plugin`、`source-deck`、`DeepSeek Harness`）
-- 最新 Release：<https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0>
+- 最新预发行：[0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP 文档索引：<https://gitmcp.io/Archaofan/dsh-source-deck>
-- 插件市场：awesome-dsh-plugin [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739)（审核中，未上架）
+- 插件市场：[目录条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)（已收录；2026-10-23 指向 0.3.3）
 
 ## 开发
 
@@ -141,5 +143,5 @@ npm pack
 - [v3 设计](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [已批准实施计划](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [开发工作流调研](docs/research/2026-10-18-developer-workflow-review.md)
-- [同类工具体验与性能调研](docs/research/2026-10-19-comparable-tools-experience-review.md) · [优化迭代提案（待评审）](docs/design/2026-10-19-experience-iteration-proposal.md)
+- [本轮同类工具调研](docs/research/2026-10-23-next-iteration-review.md) · [0.4.0 实施与验收](docs/implementation/2026-10-23-workflow-0.4.0.md)
 - [交接](docs/HANDOFF.md) · [版本策略](docs/VERSION-POLICY.md)

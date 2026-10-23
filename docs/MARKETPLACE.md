@@ -4,9 +4,17 @@
 
 > [English status](MARKETPLACE.en.md)
 
+## 2026-10-23 当前核对
+
+[PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 **2026-10-18 20:22:40 UTC** 合并，merge commit `b51b8394b9a1155f64e18ba6269649be6adab27d`。通过 GitHub API 核对 merged=true，并从默认分支回读[市场条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)，当前 `tarball` 指向 `v0.3.3/dsh-source-deck-0.3.3.tgz`。
+
+目录已收录；没有据此宣称 0.4.0 已由市场提供，也没有执行实际市场界面安装验收。0.4.0 使用本仓库 Release 中的安装包。本次未修改外部市场条目或生产安装。以下为历史记录，旧的 OPEN/年龄 gate 结论已被本节取代。
+
+## 2026-10-18 历史记录
+
 **2026-10-18 17:55 北京时间复核：** PR #7739 仍为 OPEN、merged=false，mergeable=true（mergeable_state=unstable）；`check` 为 success，`Submission gate` 仍是 2026-10-17 13:23 UTC 的年龄失败。仓库已超过 1 天（创建于 2026-10-17 03:35:45 UTC），但 gate 尚未自动重跑。市场主目录不存在该条目（`data/plugins/Archaofan__dsh-source-deck.yml` 在 `main` 上 404），当前未上架。未修改 PR 分支，未声称已合并或已上架。
 
-## 最后确认状态
+## 当时确认状态
 
 | 项目 | 状态 |
 |---|---|
