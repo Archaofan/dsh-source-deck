@@ -435,6 +435,8 @@ English: The reviewed source commit 1554e79 is on main and the retained feature 
 
 ## 2026-10-23：0.4.0 本地预览
 
+源码交付提交 `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd` 已推送 `origin/feat/workflow-0.4.0`，`ls-remote` 与本地 HEAD 相同。保留分支、未合并 main；同步后仅补记文档，不重建验收包。
+
 用户选择整体委托判断、优先减少操作阻力。元数据搜索/排序、对比名单、最近判定撤销、研究判断与数量约束、同主题不同入口的草稿接续已完成。详细变更、复现、模型调用和限制见[中英实施验收](implementation/2026-10-23-workflow-0.4.0.md)。
 
 - 最终全量 94/94、实际 React DOM/领域操作探针 6/6、构建通过；独立审查与 Host 发现的问题均已复现修复，最终复核无剩余具体发现。
