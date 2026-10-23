@@ -435,7 +435,7 @@ English: The reviewed source commit 1554e79 is on main and the retained feature 
 
 ## 2026-10-23：0.4.0 本地预览
 
-源码交付提交 `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd` 已推送 `origin/feat/workflow-0.4.0`，`ls-remote` 与本地 HEAD 相同。保留分支、未合并 main；同步后仅补记文档，不重建验收包。
+源码交付提交 `c89f755063a9b6b5c1fcaffac920a4d9f6f891cd` 已推送 `origin/feat/workflow-0.4.0`，`ls-remote` 核对一致。用户随后要求合入 main，已将交付分支截至 `a7a0c741071c6ba571dc41649bc13808ffc7bee2` 快进合入本地 main；保留原分支，远端同步以最终 Git 核对为准。同步后仅补记文档，不重建验收包。
 
 用户选择整体委托判断、优先减少操作阻力。元数据搜索/排序、对比名单、最近判定撤销、研究判断与数量约束、同主题不同入口的草稿接续已完成。详细变更、复现、模型调用和限制见[中英实施验收](implementation/2026-10-23-workflow-0.4.0.md)。
 
