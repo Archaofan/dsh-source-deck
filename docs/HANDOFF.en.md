@@ -2,6 +2,10 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
+## 2026-10-23: new review; short design awaiting approval
+
+The user requested another substantial optimization. Current 0.3.3 code and comparable plugins' primary sources were reviewed; see the [new review](research/2026-10-23-next-iteration-review.en.md). Proposed areas are metadata search/sorting, visible comparison membership, latest-decision undo and better research guidance. This iteration's short design is not approved yet; product code, version and packages are unchanged. Baseline regression passed 83/83; the shared sandbox reports `occupied=false` on the fixed RC. No Desktop, model or production interaction occurred. Earlier approval and acceptance do not establish implementation of this iteration.
+
 ## 2026-10-20: 0.3.3 published
 
 The user approved this iteration's bounded design. Screening-note priority, full card details and narrow per-dimension comparison are delivered on main and published as [v0.3.3 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3). Source/tag commit: `1554e79de632375c6eef4050b8460da8bedb1bc4`; branch `feat/screening-readability-0.3.3` remains available. Latest stays v0.3.0. The accepted package `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.3.tgz` is 177295 bytes, SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`; GitHub digest and a fresh download match.

@@ -4,6 +4,10 @@
 
 继续本项目时先读根 README.md / AGENTS.md、本项目 README.md、MARKETPLACE.md、本文、SETUP-VERIFICATION.md 夜-9、AGENTS.md，再检查共享沙箱 lease。
 
+## 2026-10-23：新一轮调研，短设计待确认
+
+用户要求再次大幅优化。已检查 0.3.3 当前代码并复核同类插件官方资料，见[本轮调研](research/2026-10-23-next-iteration-review.md)。推荐改进元数据检索/排序、可见对比名单、最近判定撤销和研究判断依据；尚未获得本轮短设计确认，未改产品代码、版本或包。原版回归 83/83，实时共享沙箱 `occupied=false`，固定 RC 不变；未启动 Desktop、调用模型或操作生产。旧授权和验收不代表本轮实现状态。
+
 ## 2026-10-20：0.3.3 已发布
 
 用户确认本轮简短设计后，已完成卡片说明优先、全文详情和窄栏同维度对比。源码/tag commit `1554e79de632375c6eef4050b8460da8bedb1bc4`，已快进到 main、推送并发布 [v0.3.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.3)，保留 `feat/screening-readability-0.3.3`。Latest 仍为 v0.3.0。包 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.3.3.tgz` 为 177295 bytes，SHA256 `20E87669430F10052CCDBB9D41859352806BB739F7FC5F85FC9086AE0B61520C`；GitHub digest 及下载回验一致。
