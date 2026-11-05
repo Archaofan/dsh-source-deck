@@ -78,4 +78,4 @@
 - 0.2.2 删除 `tools.presentAs()`，工具呈现改为按 scope 挂载 executor 插件。研究 worker 改为在自身 scope 动态 import 并挂载官方 native executor；`restrict`/`guard` 与只读工具集不变。
 - 94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空数据。按用户指示只复制生产 `DEEPSEEK_API_KEY` 到沙箱后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留 Ghostwriter、插入引用并发送后，模型正确读取引用 JSON。单样本通过不等于普遍研究质量；PTC 父预设分支未单独切换复验。
 - 交付包 `dsh-source-deck-0.4.1.tgz`：188322 bytes、53 文件，SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`；安装后 index.js、client.js、package.json 与中英 README 均与包内逐字节一致。
-- **0.4.1 发布材料已就绪（最终包、Release 说明、README 0.4.1 入口、安装字节核对），GitHub Release 尚未创建；未安装到生产。** 已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。下一步执行 Release 后回读 tag/资产并补记；发布前不得宣称 0.4.1 已可下载，也不得把 0.4.0 说成兼容 0.2.2-rc.1。
+- **`v0.4.1` 已于 2026-11-05T12:33:31Z 发布为预发行**，tag commit `820bf58244b4292d3c4eb26e13b63887ee27ec1f`，资产 188322 bytes / SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`，Latest 仍为 v0.3.0；未安装到生产。已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。发布后不重建/替换资产或移动 tag；生产安装需用户另行明确指示。

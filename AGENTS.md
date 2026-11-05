@@ -4,9 +4,9 @@
 
 ## 当前状态（2026-11-05）
 
-用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`，仍在开发分支 `feat/adapt-0.2.2-rc.1`。**发布材料已就绪（最终包、Release 说明、README、安装字节核对），GitHub Release 尚未创建；未安装到生产。**
+用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`。**`v0.4.1` 已于 2026-11-05T12:33:31Z 发布为预发行**（tag commit `820bf58244b4292d3c4eb26e13b63887ee27ec1f`，资产 188322 bytes / SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`，Latest 仍为 v0.3.0）；未安装到生产。
 
-适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据。按用户指示，沙箱只复制生产 `DEEPSEEK_API_KEY` 后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留一项、插入引用并发送后，模型正确读取引用 JSON。**单样本通过不等于普遍研究质量保证；PTC 父预设分支未单独切换复验。** 详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 的下一步只需创建 GitHub Release；README 已切换为 0.4.1 入口，Release 说明在 `docs/releases/0.4.1.md`，发布后立即回读 tag/资产并补记。
+适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据。按用户指示，沙箱只复制生产 `DEEPSEEK_API_KEY` 后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留一项、插入引用并发送后，模型正确读取引用 JSON。**单样本通过不等于普遍研究质量保证；PTC 父预设分支未单独切换复验。** 详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。发布结果：tag `v0.4.1` 指向 `820bf58`，Release 资产 digest 与本地 SHA256 一致，下载回验通过；README 与 `docs/releases/0.4.1.md` 已是发布措辞。详见[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。
 
 ## 历史交付（2026-10-23）
 
