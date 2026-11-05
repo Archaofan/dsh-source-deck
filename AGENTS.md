@@ -6,7 +6,7 @@
 
 用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`，仍在开发分支 `feat/adapt-0.2.2-rc.1`，**尚未发布 Release、未安装到生产**。
 
-适配内容：四个 DSH peer 与 devDependencies 精确 `0.2.2-rc.1`，Cordis `4.1.0`；新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据；研究轮次创建了子智能体并进入执行，因沙箱无模型而以 `Research ended: error` 结束，监听器未抛错，但**未做真实模型研究质量验收**。详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 需用户明确指示；Release 前 README 下载入口仍指 0.4.0。
+适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据；研究轮次创建了子智能体并进入执行，因沙箱无模型而以 `Research ended: error` 结束，监听器未抛错，但**未做真实模型研究质量验收**。详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 需用户明确指示；Release 前 README 下载入口仍指 0.4.0。
 
 ## 历史交付（2026-10-23）
 

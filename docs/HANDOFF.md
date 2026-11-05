@@ -8,7 +8,7 @@
 
 用户告知沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与共用沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`，release `2026-11-04T13:07:14Z`），0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒。本轮在 `feat/adapt-0.2.2-rc.1` 完成适配，版本 `0.4.1`；**尚未发布 Release、未安装到生产**，是否发布需用户明确指示。
 
-- 变更：四个 DSH peer 与官方 Client devDependencies 精确 `0.2.2-rc.1`；Cordis `4.0.5 → 4.1.0`；新增 `@deepseek-ai/dsh-tool-executor-native`、`@deepseek-ai/dsh-tools`（0.2.2 删除 `tools.presentAs()`，改为按 scope 挂 executor 插件）；研究 worker 动态 import native executor 并挂到自己的 scope，限制/守卫不变。无 UI/八表/研究提示/Remote 协议变化。
+- 变更：原有四个 DSH peer 与官方 Client devDependencies 精确升级到 `0.2.2-rc.1`；Cordis `4.0.5 → 4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native`、`@deepseek-ai/dsh-tools` 两个 peer/dev 依赖（0.2.2 删除 `tools.presentAs()`，改为按 scope 挂 executor 插件）；研究 worker 动态 import native executor 并挂到自己的 scope，限制/守卫不变。无 UI/八表/研究提示/Remote 协议变化。
 - 验证：94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 退出 0；实际 Host 深色中文验证资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空资料台数据；研究轮次创建了子智能体并进入执行，因沙箱无模型以 `Research ended: error` 结束，未做真实模型质量验收。
 - 包：`E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.1.tgz`，188031 bytes、53 文件，SHA256 `45805676E8A0D9265E05DB2C1EEE79407EE69D1B2BF7F4DFF6E062D0227BE28A`；文档定稿后重新打包并用内容哈希路径重装，index.js/client.js/package.json/中英 README 与安装字节一致（client.js `CF60D21A…C64CAC175`）。
 - 详见[接口差异](research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。沙箱已正常 UI 关闭、lease 释放；测试数据已清除，未操作生产、未导入凭据。
