@@ -47,15 +47,15 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 | 项目 | 精确版本 |
 |---|---|
-| 本插件 | 0.4.0 |
-| DeepSeek Harness Desktop | 0.2.1-rc.2 |
-| @deepseek-ai/cordis | 4.0.5 |
+| 本插件 | 0.4.1（开发版，未发布） |
+| DeepSeek Harness Desktop | 0.2.2-rc.1 |
+| @deepseek-ai/cordis | 4.1.0 |
 
-只使用 `0.2.1-rc.2` 的公共接口。**目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。** 升级到新的 RC 或正式版需要单独评估和验收。
+只使用 `0.2.2-rc.1` 的公共接口。**0.4.1 是适配新基线的开发版本，尚未发布 Release；已发布的 0.4.0 只支持 `0.2.1-rc.2`，在 0.2.2-rc.1 环境不会加载。** 目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
 
-从 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 下载 `dsh-source-deck-0.4.0.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。安装列表显示自定义资料卡图标及「SourceDeck · 资料台」。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
+已发布入口仍为 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)：从那里下载 `dsh-source-deck-0.4.0.tgz`，适用于仍停留在 `0.2.1-rc.2` 的环境。已升级到 `0.2.2-rc.1` 的环境请使用 0.4.1 开发包（当前分支构建，见[适配记录](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)），在 Desktop 插件管理页选择本地安装，按提示重启。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
-市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已合并。2026-10-23 核对市场目录条目仍指向 0.3.3；安装 0.4.0 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收该版本，详见[市场记录](docs/MARKETPLACE.md)。
+市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已合并。2026-10-23 核对市场目录条目仍指向 0.3.3；该条目同样只对应旧基线。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
 
 ## 从聊天开始
 

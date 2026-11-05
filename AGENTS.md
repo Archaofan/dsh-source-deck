@@ -2,7 +2,13 @@
 
 同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-## 当前状态（2026-10-23）
+## 当前状态（2026-11-05）
+
+用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`，仍在开发分支 `feat/adapt-0.2.2-rc.1`，**尚未发布 Release、未安装到生产**。
+
+适配内容：四个 DSH peer 与 devDependencies 精确 `0.2.2-rc.1`，Cordis `4.1.0`；新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据；研究轮次创建了子智能体并进入执行，因沙箱无模型而以 `Research ended: error` 结束，监听器未抛错，但**未做真实模型研究质量验收**。详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 需用户明确指示；Release 前 README 下载入口仍指 0.4.0。
+
+## 历史交付（2026-10-23）
 
 用户明确要求合入 main、检查 README 并发布 Release。main 已推送并核对；保留 `feat/workflow-0.4.0`。中英文 README 已更新版本入口、功能措辞、实际截图和市场状态。[v0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) 于 `2026-10-23T14:04:16Z` 发布为预发行（isDraft=false、isPrerelease=true），标签 commit `2a6cde50ca568ac22fd6815cae752a464cabc60d`，Latest 仍为 v0.3.0。GitHub 资产 digest 与重新下载 SHA256 均匹配下列原验收包。发布后只补记文档，不重建或替换该包、不移动标签。
 
@@ -30,19 +36,19 @@
 
 ## 固定环境与权限
 
-产品 peer 精确 `@deepseek-ai/dsh@0.2.1-rc.2`、Cordis `4.0.5`；上游 commit `687f282e8625c6b8d11ff58211a90524be2e4317`。不得升级基线、使用 alpha API 或改上游产品源码。
+产品 peer 精确 `@deepseek-ai/dsh@0.2.2-rc.1`、Cordis `4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.1`、`@deepseek-ai/dsh-tools@0.2.2-rc.1`；上游 commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`。不得升级基线、使用 alpha API 或改上游产品源码。
 
 全部安装只用共享 `sandbox/dsh-desktop/scripts/Install-Plugin.ps1`，启动只用 Start-Desktop.ps1，隔离 DSH_HOME/userData/APPDATA/LOCALAPPDATA/缓存/临时目录。先检查 baseline/status/实时 lease，一次一个项目。测试材料限本项目 test-workspaces。停止进程前核对准确 PID、路径和隔离 userData，不按名称批量结束。
 
-生产 Desktop 为 0.2.1-rc.2；插件最后确认版本为 0.1.17。用户已要求提供 0.3.0 安装包绝对路径，拟自行在生产安装；本 Agent 未操作生产或验收安装后的状态。不导入生产配置或凭据，不输出 bootstrap token/API key。
+生产 Desktop 现为 0.2.2-rc.1；先前的 0.4.0 包只声明 0.2.1-rc.2，在该环境不会加载。0.4.1 目前只在共用沙箱安装并验收，本 Agent 未操作生产。不导入生产配置或凭据，不输出 bootstrap token/API key。
 
-开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径，经官方脚本安装后核对 lib 字节。交付包仍为 dsh-source-deck-0.3.0.tgz，哈希见夜-9。
+开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用新版本号，经官方脚本安装后核对 lib 字节。当前开发包 `dsh-source-deck-0.4.1.tgz`，SHA256 `45805676E8A0D9265E05DB2C1EEE79407EE69D1B2BF7F4DFF6E062D0227BE28A`；已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。
 
 ## 验证与同步
 
-- 真实 Host 已覆盖带参命令、自然语言、模型并行、停止隔离、仓库结果、引用发送、重启中断与深浅宽度矩阵。
+- 真实 Host 已覆盖带参命令、自然语言、模型并行、停止隔离、仓库结果、引用发送、重启中断与深浅宽度矩阵。0.4.1 适配轮实际验证了入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空数据和研究子智能体创建；研究轮次因沙箱无模型结束，未做模型质量验收。
 - 当前控制端无法完成 Electron 原生 125% 缩放、OS 原生展开菜单截图及真实中文 IME/附件组合的完整验收；不能把 DOM/抽象草稿测试说成这些都已通过。
-- 没有新增依赖或 lock 图变化；离线 frozen 校验缺少 registry metadata，明确记录，不能禁用供应链策略绕过。
+- 0.4.1 新增 `@deepseek-ai/dsh-tool-executor-native` 与 `@deepseek-ai/dsh-tools` 两个官方依赖，lockfile 图已变化；未新增其他依赖。离线 frozen 校验缺少 registry metadata，明确记录，不能禁用供应链策略绕过。
 - [市场 PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于2026-10-18T20:22:40Z合并；2026-10-23默认分支条目仍指向0.3.3。目录收录已确认，不等同于0.4.0市场安装验收；本轮未修改外部条目，见 docs/MARKETPLACE.md。
 - 中文默认、英文同步。检查后提交并推送本项目交付分支，核对 HEAD 与 origin 一致；失败记 pending。
 - Git 使用进程级 safe.directory；不改全局配置或关闭 TLS。沙箱、node_modules、tgz、日志、缓存、凭据和个人记忆摘录不提交。

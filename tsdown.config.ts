@@ -39,6 +39,7 @@ const NODE_EXTERNALS: readonly string[] = [
   '@deepseek-ai/dsh',
   '@deepseek-ai/dsh-session',
   '@deepseek-ai/dsh-typert-protocol',
+  '@deepseek-ai/dsh-tool-executor-native',
   '@deepseek-ai/cordis',
 ]
 const isNodeExternal = (specifier: string): boolean =>

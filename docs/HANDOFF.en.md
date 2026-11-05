@@ -2,6 +2,16 @@
 
 > [中文（默认）](HANDOFF.md) | English
 
+## 2026-11-05: 0.4.1 adapted to DSH 0.2.2-rc.1 (development complete, unreleased)
+
+The user reported that the shared sandbox had been upgraded and asked for SourceDeck to be adapted. Production Desktop and the shared sandbox are now both `0.2.2-rc.1` (commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`, released `2026-11-04T13:07:14Z`); 0.4.0's exact `0.2.1-rc.2` peers are rejected by the new baseline. Work is on `feat/adapt-0.2.2-rc.1`, version `0.4.1`. **No Release has been published and production is untouched**; publication needs an explicit user instruction.
+
+- Changes: DSH peers and official client devDependencies are exact `0.2.2-rc.1`; Cordis `4.0.5 → 4.1.0`; added `@deepseek-ai/dsh-tool-executor-native` and `@deepseek-ai/dsh-tools` because 0.2.2 removed `tools.presentAs()` in favor of a per-scope executor plugin. Research workers import the native executor and mount it in their own scope; restrictions and guards are unchanged. No UI, eight-table, prompt or Remote-protocol changes.
+- Verification: 94/94 tests and tsdown+tsc passed; the official `Install-Plugin.ps1` exited 0; on the real dark/Chinese Host the deck entry/tab, manual add, conversation card, keep decision, reference chip, settings section and data clearing worked. A research round created a subagent and entered execution, then ended as `Research ended: error` because the sandbox has no model; no real-model quality acceptance was performed.
+- Package: `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck/dsh-source-deck-0.4.1.tgz`, 188031 bytes / 53 files, SHA256 `45805676E8A0D9265E05DB2C1EEE79407EE69D1B2BF7F4DFF6E062D0227BE28A`. After the docs were finalized it was repacked and reinstalled through a content-hashed path; index.js, client.js (CF60D21A…C64CAC175), package.json and both READMEs match the installed bytes.
+- See the [interface delta](research/2026-11-05-0.2.2-rc.1-interface-delta.md) and [implementation/acceptance](implementation/2026-11-05-0.2.2-rc.1-adaptation.md). The sandbox closed normally and the lease was released; test data was cleared; production and credentials were untouched.
+- Next step: the user decides whether to publish 0.4.1 and update README/Release/market entries. Until then, do not claim 0.4.1 is downloadable.
+
 ## 2026-10-23: 0.4.0 published
 
 After requesting main integration, the user requested README review and a Release. Both READMEs now reflect current release/install links, features, synthetic QA screenshots and catalog status. [v0.4.0 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) was published at `2026-10-23T14:04:16Z`, verified as isDraft=false and isPrerelease=true. Tag commit `2a6cde50ca568ac22fd6815cae752a464cabc60d` is on remote main; Latest remains v0.3.0. Asset ID 669305941, 187148 bytes: GitHub digest and a downloaded copy match the accepted SHA256 below. Fresh checks passed all 94 tests, six component interactions and 34 local document links. The package's bundled README reflects acceptance time; do not rebuild the package or move its tag. The market PR is merged but its catalog still points to 0.3.3. No market installation or production changes. See [release notes](releases/0.4.0.md).

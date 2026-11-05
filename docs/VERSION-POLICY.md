@@ -6,17 +6,17 @@
 
 | 项目 | 固定值 |
 |---|---|
-| 产品支持基线（用户选定） | `dsh-v0.2.1-rc.2`，commit `687f282e8625c6b8d11ff58211a90524be2e4317` |
-| 产品 peer 声明 | `@deepseek-ai/dsh@0.2.1-rc.2`、`@deepseek-ai/cordis@4.0.5`（精确） |
-| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，**已由用户经 Codex 升级到 `0.2.1-rc.2`**（2026-10-17；记录见 `E:/DSH-Desktop-Plugin-Dev/operations/production-upgrade-20261017/README.md`） |
-| 共用沙箱 | 同一基线 `0.2.1-rc.2`（用户 2026-10-17 批准，仅开发环境） |
-| RC 工具链 | `0.2.1-rc.2` 声明 `pnpm@11.28.5`（旧基线为 11.7.0） |
+| 产品支持基线（用户选定） | `dsh-v0.2.2-rc.1`，commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db` |
+| 产品 peer 声明 | `@deepseek-ai/dsh@0.2.2-rc.1`、`@deepseek-ai/cordis@4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.1`、`@deepseek-ai/dsh-tools@0.2.2-rc.1`（精确） |
+| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，**已升级到 `0.2.2-rc.1`**（2026-11-05；记录见 `E:/DSH-Desktop-Plugin-Dev/operations/production-upgrade-20261105/README.md`） |
+| 共用沙箱 | 同一基线 `0.2.2-rc.1`（用户 2026-11-05 与生产一起升级） |
+| RC 工具链 | `0.2.2-rc.1` 声明 `pnpm@11.28.5` |
 
 官方把 RC 也标为预发行版。这里“稳定基线”指用户已选定支持的 RC，不代表宣称其为官方最终正式版。
 
 ## 设计、打包和发布
 
-- 当前只维护 `0.2.1-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 已于 2026-10-17 升级到该基线，与本产品 peer 匹配；安装到生产仍需用户明确批准（不要擅自安装）。不要为兼容旧生产而放宽 peer。
+- 当前只维护 `0.2.2-rc.1`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 已于 2026-11-05 升级到该基线，与本产品 peer 匹配；安装到生产仍需用户明确批准（不要擅自安装）。不要为兼容旧生产而放宽 peer。
 - 设计中用到的工具、Remote、UI Slot、Agent 接续和持久化接口，必须在这个 RC 的源码与文档确认。最新网站、master 和 alpha 示例只能作参考，不能代替目标接口证据。
 - RC 缺少能力时调整方案、缩小首版范围或明确暂不支持。不能为完成首版要求用户升级 alpha，也不能复制 alpha 的私有实现绕过公共扩展机制。
 - 实现打包时按 RC 插件加载器实际采用的版本规则声明准确范围，并验证目标 RC 能加载、行为正常。不能只验证前端模拟或构建成功便宣称日用可用。
@@ -63,3 +63,19 @@
 - 沙箱安装 0.1.2（替换此前的 `0.1.3-adapt.1`），无兼容警告；启动后 guide 入口「资料筛选台」、tab chip「资料台」、placeholder body 复验通过。证据见 [SETUP-VERIFICATION.md](SETUP-VERIFICATION.md) 夜-3 段与 `logs/shots/peer-switch-0.1.2/`。
 - **后果（已知并接受）**：生产 Desktop 仍是 `0.2.0-rc.2`，精确 peer 为 `0.2.1-rc.2` 的 0.1.2 在生产升级前**不会加载**。不做多版本兼容；如需同时支持两个版本，另行讨论 `engines.dsh` 范围（0.2.1 兼容门优先读取它并替代 peer 检查）。
 - 沙箱中的适配测试包（`0.1.2-adapt.1`、`0.1.3-adapt.1`）保留在项目目录但被 Git 忽略，不再代表产品版本。
+
+## 2026-11-05：生产与沙箱升级到 0.2.2-rc.1，产品完成适配（用户指示）
+
+事实（实测）：
+
+- 官方 `dsh-v0.2.2-rc.1` 于 `2026-11-04T13:07:14Z` 发布，commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`；npm `next` 指向它，`latest` 仍为 `0.2.1-rc.5`。
+- 用户明确要求生产 Desktop 与共用开发沙箱一起升级；两者现均为 `0.2.2-rc.1`，`Get-SandboxStatus.ps1` 为 `matchesProduction=true`。生产升级、签名与启动见工作区 `operations/production-upgrade-20261105/README.md`，沙箱见 `sandbox/dsh-desktop/UPGRADE-20261105.md`。
+- 旧产品 0.4.0 的四个 DSH peer 精确 `0.2.1-rc.2`，在新基线被安装/启动兼容门拒绝。用户随后指示“资料台项目需要做适配”。
+
+执行结果：
+
+- 产品版本 `0.4.0 → 0.4.1`（开发分支 `feat/adapt-0.2.2-rc.1`）；peer 改为精确 `@deepseek-ai/dsh@0.2.2-rc.1`、`@deepseek-ai/cordis@4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.1`、`@deepseek-ai/dsh-tools@0.2.2-rc.1`；devDependencies 同步。
+- 0.2.2 删除 `tools.presentAs()`，工具呈现改为按 scope 挂载 executor 插件。研究 worker 改为在自身 scope 动态 import 并挂载官方 native executor；`restrict`/`guard` 与只读工具集不变。
+- 94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空数据与研究子智能体创建。研究轮次因沙箱无模型结束，未做真实模型质量验收。
+- 交付包 `dsh-source-deck-0.4.1.tgz`：188031 bytes、53 文件，SHA256 `45805676E8A0D9265E05DB2C1EEE79407EE69D1B2BF7F4DFF6E062D0227BE28A`；安装后 index.js/package.json 与包内一致，client.js 仅 CSS 映射键序存在已知重建差异。
+- **尚未发布 0.4.1 Release，未安装到生产**。已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。是否发布由用户另行明确选择；发布前不得宣称 0.4.1 已可下载，也不得把 0.4.0 说成兼容 0.2.2-rc.1。

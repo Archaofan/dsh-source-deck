@@ -47,15 +47,15 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.4.0 |
-| DeepSeek Harness Desktop | 0.2.1-rc.2 |
-| @deepseek-ai/cordis | 4.0.5 |
+| SourceDeck | 0.4.1 (development build, unreleased) |
+| DeepSeek Harness Desktop | 0.2.2-rc.1 |
+| @deepseek-ai/cordis | 4.1.0 |
 
-Only public APIs from `0.2.1-rc.2` are used. **Only this RC baseline is maintained; fast-moving alpha builds are not supported.** Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
+Only public APIs from `0.2.2-rc.1` are used. **0.4.1 is the development build adapted to the new baseline and is not released yet; the published 0.4.0 only supports `0.2.1-rc.2` and will not load on 0.2.2-rc.1.** Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Download `dsh-source-deck-0.4.0.tgz` from the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0), install it through the Desktop plugin manager, then restart when prompted. The list displays the bundled custom document icon and localized name. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+The published entry remains the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0): download `dsh-source-deck-0.4.0.tgz` there for environments still on `0.2.1-rc.2`. On `0.2.2-rc.1`, use the 0.4.1 development package built from this branch (see the [adaptation record](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)), install it through the Desktop plugin manager, then restart when prompted. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23; use the Release package above for 0.4.0. Catalog inclusion does not establish actual market-UI acceptance of this version. See [market status](docs/MARKETPLACE.en.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23 and likewise corresponds to the old baseline. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
 
 ## Start from chat
 

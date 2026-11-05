@@ -10,7 +10,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ..\sandbox\dsh-desktop\scrip
 powershell -NoProfile -ExecutionPolicy Bypass -File ..\sandbox\dsh-desktop\scripts\Start-Desktop.ps1 -Project dsh-source-deck
 ```
 
-沙箱当前为开发先行版官方 `dsh-v0.2.1-rc.2`（commit `687f282e8625c6b8d11ff58211a90524be2e4317`，用户 2026-10-17 批准，仅开发环境）；生产仍是 `0.2.0-rc.2`。工具链按新版 RC 自带声明使用本地 pnpm 11.28.5，执行 RC 的 `pnpm run build`（0.2.1 的构建脚本包含 9 个 gate，且需要 git commit：沙箱脚本通过官方非 Git 路径注入 `DSH_CLIENT_COMMIT_HASH`）。不要套用更早 alpha 的构建入口。具体准备与启动证据见 `SETUP-VERIFICATION.md` 及沙箱 status.json；维护范围见 VERSION-POLICY.md。
+沙箱当前为官方 `dsh-v0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`，用户 2026-11-05 与生产一起升级，仅开发环境），生产同为 `0.2.2-rc.1`。工具链按新版 RC 自带声明使用本地 pnpm 11.28.5，执行 RC 的 `pnpm run build`（0.2.2 的构建脚本包含 10 个 gate，且需要 git commit：沙箱脚本通过官方非 Git 路径注入 `DSH_CLIENT_COMMIT_HASH`）。不要套用更早 alpha 的构建入口。具体准备与启动证据见 `SETUP-VERIFICATION.md` 及沙箱 status.json；维护范围见 VERSION-POLICY.md。
 
 本机**有 git**：`C:\Users\Administrator\AppData\Local\hermes\git\cmd\git.exe`（Hermes 自带，git 2.54.0），只是未加入会话 PATH。仓库由另一账号创建，命令需带进程级 `safe.directory`（示例见 HANDOFF），不要改全局配置。
 
@@ -29,7 +29,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ..\sandbox\dsh-desktop\scrip
 
 **版本 bump 纪律**：pnpm 对相同 name@version 的 `file:` tgz 不替换已安装内容；每次迭代先 bump `package.json` 的 `version` 再 pack/install。
 
-**pnpm 11.28.5 的发布年龄例外**：官方 RC 包刚发布时会被 pnpm 的 minimumReleaseAge 策略挡住；安装 0.2.1-rc.2 后 pnpm 生成了 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`，精确列出本包需要的版本。该文件随仓库提交，保证后续安装可复现；升级基线时由 pnpm 重新生成或手工更新对应版本。
+**pnpm 11.28.5 的发布年龄例外**：官方 RC 包刚发布时会被 pnpm 的 minimumReleaseAge 策略挡住；安装 `0.2.2-rc.1` 后 pnpm 生成了 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`，精确列出本包需要的版本（含 Cordis `4.1.0`、cosmokit `1.9.0`）。该文件随仓库提交，保证后续安装可复现；升级基线时由 pnpm 重新生成或手工更新对应版本。
 
 **安装时的兼容门（0.2.1 起）**：安装前读包清单，按 `engines.dsh`（声明了就用它）或 dsh peer 判定；不兼容时 pnpm 可能显示 `Already up to date`，CLI 打印 `Plugin … is incompatible with dsh …` 并保留安装，但**profile 启动会拒绝装载该 bundle**。负向验证以启动后 guide/tab 是否出现为准，而不只看安装退出码。
 

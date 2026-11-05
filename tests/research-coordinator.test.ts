@@ -119,28 +119,38 @@ test('cancelling during activation admission disposes the eventual handle', asyn
 test('runtime creation hook scopes restrictions to assigned workers', async () => {
   const { createResearchRuntime } = await import('../src/research-runtime.ts')
   let listener: any; let guards = 0; let mask: string[] = []; let guard: any
+  const mounted: unknown[] = []
   const ctx = { effect: (f: any) => f(), on: (_name: string, f: any) => { listener = f; return () => {} } }
   const tools = { get: () => ({}), restrict: (f: any) => { mask = f.allow; return () => {} },
-    guard: (f: any) => { guards++; guard = f; return () => {} }, presentAs: () => () => {} }
-  createResearchRuntime(ctx as any, async id => id === 'worker' ? { parentSessionId: 'main', setId: 'set', roundId: 'r', workerSessionId: id, requestId: 'req' } : undefined)
-  await listener({ agent: { session: { id: 'main' }, ctx: { tools } } })
+    guard: (f: any) => { guards++; guard = f; return () => {} } }
+  const ownerCtx = { tools, plugin: (plugin: unknown) => { mounted.push(plugin) } }
+  createResearchRuntime(ctx as any, async id => id === 'worker' ? { parentSessionId: 'main', setId: 'set', roundId: 'r', workerSessionId: id, requestId: 'req' } : undefined,
+    { mountNative: agentCtx => { mounted.push(agentCtx) } })
+  await listener({ agent: { session: { id: 'main' }, ctx: ownerCtx } })
   assert.equal(guards, 0)
-  await listener({ agent: { session: { id: 'worker' }, ctx: { tools } } })
+  assert.equal(mounted.length, 0)
+  await listener({ agent: { session: { id: 'worker' }, ctx: ownerCtx } })
   assert.equal(guards, 1)
   assert.deepEqual(mask, ['web_search', 'web_fetch', 'deck_submit_sources'])
   assert.ok(guard({ name: 'write_file' }))
+  assert.equal(mounted.length, 1)
+  assert.equal(mounted[0], ownerCtx)
 })
 
 test('runtime looks up inherited preset tools through the worker scope', async () => {
   const { createResearchRuntime } = await import('../src/research-runtime.ts')
   let listener: any; let mask: string[] = []
+  const mounted: unknown[] = []
   const ctx = { effect: (f: any) => f(), on: (_name: string, f: any) => { listener = f; return () => {} } }
   const worker: any = { session: { id: 'worker' }, ctx: {} }
   worker.ctx.tools = {
     get: (name: string, scope: any) => name === 'deck_submit_sources' || scope === worker ? {} : undefined,
-    restrict: (filter: any) => { mask = filter.allow; return () => {} }, guard: () => () => {}, presentAs: () => () => {},
+    restrict: (filter: any) => { mask = filter.allow; return () => {} }, guard: () => () => {},
   }
-  createResearchRuntime(ctx as any, async () => ({ parentSessionId: 'main', setId: 'set', roundId: 'r', workerSessionId: 'worker', requestId: 'req' }))
+  worker.ctx.plugin = () => {}
+  createResearchRuntime(ctx as any, async () => ({ parentSessionId: 'main', setId: 'set', roundId: 'r', workerSessionId: 'worker', requestId: 'req' }),
+    { mountNative: agentCtx => { mounted.push(agentCtx) } })
   await listener({ agent: worker })
   assert.deepEqual(mask, ['web_search', 'web_fetch', 'deck_submit_sources'])
+  assert.equal(mounted.length, 1)
 })

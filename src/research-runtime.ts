@@ -13,9 +13,15 @@ interface ScopedTools {
   get(name: string, scope?: ResearchParent): unknown
   restrict(filter: { allow: readonly string[] }): () => void
   guard(check: typeof researchToolGuard): () => void
-  presentAs(mode: 'native'): () => void
 }
-interface RuntimeAgent extends ResearchParent { readonly ctx: { readonly tools: ScopedTools }; readonly session: Session }
+interface RuntimeAgentContext {
+  readonly tools: ScopedTools
+  plugin(plugin: unknown): unknown
+}
+interface RuntimeAgent extends ResearchParent {
+  readonly ctx: RuntimeAgentContext
+  readonly session: Session
+}
 interface RuntimeEvents {
   on(name: 'agent/created', listener: (payload: { agent: RuntimeAgent }) => Promise<void>): () => void
 }
@@ -24,16 +30,40 @@ interface Subagents {
   startActivation(spec: { provider: string; childId: string; label: string; request: { parent: ResearchParent; prompt: { type: 'text'; text: string }[] }; signal: AbortSignal; delivery: 'caller' }): Promise<ResearchActivation>
 }
 
-export function createResearchRuntime(ctx: Context, targetForWorker: (workerId: string) => Promise<ResearchTarget | undefined>): ResearchRuntime {
+/** Test seam for the worker-scope presentation mount. */
+export interface ResearchRuntimeHooks {
+  /**
+   * Mount native tool presentation in one research worker's own scope.
+   * Omitted, it imports the official executor plugin and mounts it there; the
+   * unit tests inject a probe so they need no host tool tree.
+   */
+  readonly mountNative?: (agentCtx: RuntimeAgentContext) => void | Promise<void>
+}
+
+/**
+ * Mount the official native executor in a worker's scope.
+ * @param agentCtx - the research worker's Agent context.
+ */
+async function mountNativeExecutor(agentCtx: RuntimeAgentContext): Promise<void> {
+  // 0.2.2 selects tool presentation with a per-scope executor plugin instead
+  // of `tools.presentAs()`. The worker's own scope is nearer than the preset
+  // scope it joined, so research always sees read tools directly even when the
+  // parent preset selects PTC; the restriction and guard still bound the set.
+  const executor = await import('@deepseek-ai/dsh-tool-executor-native')
+  agentCtx.plugin(executor)
+}
+
+export function createResearchRuntime(ctx: Context, targetForWorker: (workerId: string) => Promise<ResearchTarget | undefined>, hooks: ResearchRuntimeHooks = {}): ResearchRuntime {
+  const mountNative = hooks.mountNative ?? mountNativeExecutor
   const installed = new WeakSet<object>()
   ctx.effect(() => (ctx as unknown as RuntimeEvents).on('agent/created', async ({ agent }) => {
     if (!await targetForWorker(agent.session.id) || installed.has(agent)) return
     const tools = agent.ctx.tools
-    if (!tools?.restrict || !tools.guard || !tools.presentAs) throw new Error('RC research tool restrictions are unavailable')
+    if (!tools?.restrict || !tools.guard || typeof agent.ctx.plugin !== 'function') throw new Error('RC research tool restrictions are unavailable')
     // Preset tools are inherited scope entries. Omitted scope reads only globals.
     tools.restrict({ allow: READ_TOOLS.filter(name => tools.get(name, agent) !== undefined) })
     tools.guard(researchToolGuard)
-    tools.presentAs('native')
+    await mountNative(agent.ctx)
     for (const name of READ_TOOLS) if (!tools.get(name, agent)) throw new Error(`Research requires ${name}; enable the sandbox web tools first.`)
     installed.add(agent)
   }), 'dsh-source-deck: research tool scope')
