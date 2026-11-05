@@ -4,9 +4,9 @@
 
 ## 当前状态（2026-11-05）
 
-用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`，仍在开发分支 `feat/adapt-0.2.2-rc.1`，**尚未发布 Release、未安装到生产**。
+用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`，仍在开发分支 `feat/adapt-0.2.2-rc.1`。**发布材料已就绪（最终包、Release 说明、README、安装字节核对），GitHub Release 尚未创建；未安装到生产。**
 
-适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据。按用户指示，沙箱只复制生产 `DEEPSEEK_API_KEY` 后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留一项、插入引用并发送后，模型正确读取引用 JSON。**单样本通过不等于普遍研究质量保证；PTC 父预设分支未单独切换复验。** 详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 需用户明确指示；Release 前 README 下载入口仍指 0.4.0。
+适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据。按用户指示，沙箱只复制生产 `DEEPSEEK_API_KEY` 后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留一项、插入引用并发送后，模型正确读取引用 JSON。**单样本通过不等于普遍研究质量保证；PTC 父预设分支未单独切换复验。** 详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。是否发布 0.4.1 的下一步只需创建 GitHub Release；README 已切换为 0.4.1 入口，Release 说明在 `docs/releases/0.4.1.md`，发布后立即回读 tag/资产并补记。
 
 ## 历史交付（2026-10-23）
 
@@ -42,7 +42,7 @@
 
 生产 Desktop 现为 0.2.2-rc.1；先前的 0.4.0 包只声明 0.2.1-rc.2，在该环境不会加载。0.4.1 目前只在共用沙箱安装并验收，本 Agent 未操作生产。除用户本轮明确要求“沙箱凭据用和本处一样的 API”、因而只复制生产 `DEEPSEEK_API_KEY` 到沙箱隔离凭据外，不导入其他生产配置、账号 token 或密钥，不输出 bootstrap token/API key。
 
-开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用新版本号，经官方脚本安装后核对 lib 字节。当前开发包 `dsh-source-deck-0.4.1.tgz`，SHA256 `45805676E8A0D9265E05DB2C1EEE79407EE69D1B2BF7F4DFF6E062D0227BE28A`；已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。
+开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径，经官方脚本安装后核对 lib 字节。当前发布候选包 `dsh-source-deck-0.4.1.tgz`，SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`；已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。
 
 ## 验证与同步
 

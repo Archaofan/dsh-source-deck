@@ -2,7 +2,7 @@
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.0 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.1 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -21,7 +21,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 ## 界面预览
 
-0.4.0 真实 Host 截图（浅色中文 / 深色英文）。画面中的 QA 来源为合成验收材料，用于展示搜索、排序、对比名单和撤销。
+0.4.1 沿用 0.4.0 的界面，本轮没有 UI 变化。以下为 0.4.0 的真实 Host 截图（浅色中文 / 深色英文）；画面中的 QA 来源为合成验收材料，用于展示搜索、排序、对比名单和撤销。
 
 | 浅色 | 深色 |
 |---|---|
@@ -47,15 +47,15 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 | 项目 | 精确版本 |
 |---|---|
-| 本插件 | 0.4.1（开发版，未发布） |
+| 本插件 | 0.4.1 |
 | DeepSeek Harness Desktop | 0.2.2-rc.1 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-只使用 `0.2.2-rc.1` 的公共接口。**0.4.1 是适配新基线的开发版本，尚未发布 Release；已发布的 0.4.0 只支持 `0.2.1-rc.2`，在 0.2.2-rc.1 环境不会加载。** 目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
+只使用 `0.2.2-rc.1` 的公共接口。0.4.1 是适配该基线的当前预发行；已发布的 0.4.0 只支持 `0.2.1-rc.2`，在 0.2.2-rc.1 环境不会加载。目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
 
-已发布入口仍为 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)：从那里下载 `dsh-source-deck-0.4.0.tgz`，适用于仍停留在 `0.2.1-rc.2` 的环境。已升级到 `0.2.2-rc.1` 的环境请使用 0.4.1 开发包（当前分支构建，见[适配记录](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)），在 Desktop 插件管理页选择本地安装，按提示重启。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
+从 [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1) 下载 `dsh-source-deck-0.4.1.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。仍停留在 `0.2.1-rc.2` 的环境请使用 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
-市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已合并。2026-10-23 核对市场目录条目仍指向 0.3.3；该条目同样只对应旧基线。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
+市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已合并。2026-10-23 核对市场目录条目仍指向 0.3.3，只对应旧基线；安装 0.4.1 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
 
 ## 从聊天开始
 
@@ -77,7 +77,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 卡片显示保存状态；引用和直接摘要等待已有筛选写入，失败时保留草稿供重试。研究中约每 2 秒读取一次，静置结果约每 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。
 
-0.4.0 按预发行交付。6/24/200 项、深浅模式和四种面板宽度已在固定 RC Host 检查；原生缩放、真实 IME/附件组合、屏幕阅读器和真人观察仍有限制，未重跑完整性能矩阵。详见[本轮实施与验收](docs/implementation/2026-10-23-workflow-0.4.0.md)。
+0.4.1 适配 DSH 0.2.2-rc.1，接口层只把已删除的 `tools.presentAs()` 替换为研究 worker 自己的 native executor 挂载。94/94 自动测试、构建、官方安装和实际 Host 通过；按用户指示使用同一 API 完成了真实聊天、2 个真实 GitHub 来源的后台研究与引用闭环。单样本不代表普遍研究质量；原生缩放、真实 IME/附件组合、屏幕阅读器和真人观察仍有限制。详见[本轮适配与验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。0.4.0 为前一版本，仅支持 `0.2.1-rc.2`，历史验收见[0.4.0 记录](docs/implementation/2026-10-23-workflow-0.4.0.md)。
 
 1. 卡片展示仓库图 / Logo，失败时尝试 GitHub owner 头像，再显示字标。GitHub 的 stars、最近代码推送时间、查询时间与来源链接分别显示。未知数据明确显示未知，0 stars 保留为 0。
 2. `✓ 保留` / `✕ 排除`，再次点击同一选项恢复待处理；可展开填写原因。收藏、对比与筛选互相独立。
@@ -125,7 +125,7 @@ SourceDeck 还在早期，很多取舍可以一起讨论。欢迎 fork、提 iss
 ## 检索与索引
 
 - GitHub 仓库：<https://github.com/Archaofan/dsh-source-deck>（可搜索 `dsh-plugin`、`source-deck`、`DeepSeek Harness`）
-- 最新预发行：[0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- 最新预发行：[0.4.1](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP 文档索引：<https://gitmcp.io/Archaofan/dsh-source-deck>
 - 插件市场：[目录条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)（已收录；2026-10-23 指向 0.3.3）
 
@@ -138,10 +138,10 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-产物为 Host `lib/index.js`、Client lazy-CJS `lib/client.js`、types、图标及中英 locale。精确 peer 保持不变，无新增依赖。
+产物为 Host `lib/index.js`、Client lazy-CJS `lib/client.js`、types、图标及中英 locale。0.4.1 新增两个官方工具包 peer/dev 依赖，精确版本见上方「适配与安装」表。
 
 - [v3 设计](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [已批准实施计划](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [开发工作流调研](docs/research/2026-10-18-developer-workflow-review.md)
-- [本轮同类工具调研](docs/research/2026-10-23-next-iteration-review.md) · [0.4.0 实施与验收](docs/implementation/2026-10-23-workflow-0.4.0.md)
+- [本轮同类工具调研](docs/research/2026-10-23-next-iteration-review.md) · [0.4.0 实施与验收](docs/implementation/2026-10-23-workflow-0.4.0.md) · [0.4.1 适配与验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.1 发布说明](docs/releases/0.4.1.md)
 - [交接](docs/HANDOFF.md) · [版本策略](docs/VERSION-POLICY.md)

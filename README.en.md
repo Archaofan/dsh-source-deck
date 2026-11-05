@@ -2,7 +2,7 @@
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.0 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.1 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -21,7 +21,7 @@ Not for: replacing deep code audits or formal security/compliance review.
 
 ## Screenshots
 
-Actual 0.4.0 Host screenshots (light Chinese / dark English). QA sources are synthetic acceptance fixtures demonstrating search, sorting, comparison selection and undo.
+0.4.1 keeps the 0.4.0 interface; this round made no UI changes. These are actual 0.4.0 Host screenshots (light Chinese / dark English). QA sources are synthetic acceptance fixtures demonstrating search, sorting, comparison selection and undo.
 
 | Light | Dark |
 |---|---|
@@ -47,15 +47,15 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.4.1 (development build, unreleased) |
+| SourceDeck | 0.4.1 |
 | DeepSeek Harness Desktop | 0.2.2-rc.1 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-Only public APIs from `0.2.2-rc.1` are used. **0.4.1 is the development build adapted to the new baseline and is not released yet; the published 0.4.0 only supports `0.2.1-rc.2` and will not load on 0.2.2-rc.1.** Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
+Only public APIs from `0.2.2-rc.1` are used. 0.4.1 is the current prerelease adapted to that baseline; the published 0.4.0 only supports `0.2.1-rc.2` and will not load on 0.2.2-rc.1. Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-The published entry remains the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0): download `dsh-source-deck-0.4.0.tgz` there for environments still on `0.2.1-rc.2`. On `0.2.2-rc.1`, use the 0.4.1 development package built from this branch (see the [adaptation record](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)), install it through the Desktop plugin manager, then restart when prompted. During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+Download `dsh-source-deck-0.4.1.tgz` from the [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1), install it through the Desktop plugin manager, then restart when prompted. Environments still on `0.2.1-rc.2` should use the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0). During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23 and likewise corresponds to the old baseline. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23 and likewise corresponds to the old baseline; use the 0.4.1 Release package above. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
 
 ## Start from chat
 
@@ -77,7 +77,7 @@ Cards prioritize the existing Research judgment, with full notes and description
 
 Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Reads occur approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return.
 
-0.4.0 is a prerelease. Actual pinned-RC Host checks covered 6/24/200 items, both themes and four panel widths. Native zoom, real IME/attachment combinations, screen-reader speech and human observation remain limited; the full performance matrix was not rerun. See [this iteration's implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md).
+0.4.1 adapts SourceDeck to DSH 0.2.2-rc.1; the only interface-level change replaces the removed `tools.presentAs()` with a native executor mounted in each research worker's own scope. All 94 tests, the build, official installation and the actual Host passed. With the user's same-API instruction, real chat, a two-source background research round and the reference round-trip were verified. One sample does not prove general research quality; native zoom, real IME/attachment combinations, screen-reader speech and human observation remain limited. See [this adaptation and acceptance](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md). 0.4.0 is the previous version and only supports `0.2.1-rc.2`; see its [implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md).
 
 1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
 2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.
@@ -125,7 +125,7 @@ You do not need to finish a whole feature. A clear scenario, one test, or one pa
 ## Find the project
 
 - GitHub: <https://github.com/Archaofan/dsh-source-deck> (searchable via `dsh-plugin`, `source-deck`, `DeepSeek Harness`)
-- Latest prerelease: [0.4.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- Latest prerelease: [0.4.1](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP documentation index: <https://gitmcp.io/Archaofan/dsh-source-deck>
 - Plugin marketplace: [catalog entry](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml) (included; points to 0.3.3 as checked on 2026-10-23)
 
@@ -138,10 +138,10 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, icons, and Chinese/English locales. Exact peers stay unchanged; no dependencies were added.
+Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, icons, and Chinese/English locales. 0.4.1 adds two official tool packages as exact peer/dev dependencies; see the compatibility table above.
 
 - [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [Developer workflow research](docs/research/2026-10-18-developer-workflow-review.md)
-- [This iteration's comparable-tool review](docs/research/2026-10-23-next-iteration-review.en.md) · [0.4.0 implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md)
+- [This iteration's comparable-tool review](docs/research/2026-10-23-next-iteration-review.en.md) · [0.4.0 implementation and acceptance](docs/implementation/2026-10-23-workflow-0.4.0.en.md) · [0.4.1 adaptation and acceptance](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.1 release notes](docs/releases/0.4.1.md)
 - [Handoff](docs/HANDOFF.en.md) · [Version policy](docs/VERSION-POLICY.md)
