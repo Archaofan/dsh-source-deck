@@ -55,7 +55,7 @@ Only public APIs from `0.2.2-rc.1` are used. 0.4.1 is the current prerelease ada
 
 Download `dsh-source-deck-0.4.1.tgz` from the [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1), install it through the Desktop plugin manager, then restart when prompted. Environments still on `0.2.1-rc.2` should use the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0). During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. The catalog entry still points to 0.3.3 as checked on 2026-10-23 and likewise corresponds to the old baseline; use the 0.4.1 Release package above. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) is merged. Catalog update [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) is open: it points the entry at 0.4.1 and notes `DSH 0.2.2-rc.1` support in both descriptions. **Until it merges, the catalog still points to 0.3.3 (old baseline)**; use the 0.4.1 Release package above. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
 
 ## Start from chat
 

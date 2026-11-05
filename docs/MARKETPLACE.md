@@ -4,7 +4,15 @@
 
 > [English status](MARKETPLACE.en.md)
 
-## 2026-10-23 当前核对
+## 2026-11-05 当前核对：0.4.1 已发布，目录更新 PR 待合并
+
+SourceDeck **0.4.1** 已于 `2026-11-05T12:33:31Z` 发布为预发行，精确支持 **DSH Desktop 0.2.2-rc.1 / Cordis 4.1.0**。
+
+已提交 [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339)，只修改本插件条目：`tarball` 指向 `v0.4.1/dsh-source-deck-0.4.1.tgz`，并在中英描述中注明支持 `DSH 0.2.2-rc.1`。PR 当前 OPEN、`mergeable=MERGEABLE`、`mergeStateStatus=UNSTABLE`（CI 进行中），只改动 `data/plugins/Archaofan__dsh-source-deck.yml` 一个文件。
+
+**合并前，市场目录仍指向 `v0.3.3`（只支持旧基线）**，不能作为 0.2.2-rc.1 的安装入口；0.4.1 请使用[本仓库 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)。PR 合并并重新生成目录后，再核对市场条目实际指向 0.4.1，才算市场侧验收完成。
+
+## 2026-10-23 历史核对
 
 [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 **2026-10-18 20:22:40 UTC** 合并，merge commit `b51b8394b9a1155f64e18ba6269649be6adab27d`。通过 GitHub API 核对 merged=true，并从默认分支回读[市场条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)，当前 `tarball` 指向 `v0.3.3/dsh-source-deck-0.3.3.tgz`。
 
