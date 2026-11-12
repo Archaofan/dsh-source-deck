@@ -4,13 +4,17 @@
 
 > [English status](MARKETPLACE.en.md)
 
-## 2026-11-05 当前核对：0.4.1 已发布，目录更新 PR 待合并
+## 2026-11-12 当前核对：0.4.2 已发布，目录更新 PR 待合并
 
-SourceDeck **0.4.1** 已于 `2026-11-05T12:33:31Z` 发布为预发行，精确支持 **DSH Desktop 0.2.2-rc.1 / Cordis 4.1.0**。
+SourceDeck **0.4.2** 已适配 **DSH Desktop 0.2.2-rc.2 / Cordis 4.1.0**。此前 0.4.1 的目录更新已完成：
 
-已提交 [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339)，只修改本插件条目：`tarball` 指向 `v0.4.1/dsh-source-deck-0.4.1.tgz`，并在中英描述中注明支持 `DSH 0.2.2-rc.1`。PR 当前 OPEN、`mergeable=MERGEABLE`、`mergeStateStatus=UNSTABLE`（CI 进行中），只改动 `data/plugins/Archaofan__dsh-source-deck.yml` 一个文件。
+- [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 于 **2026-11-05T17:18:36Z 合并**（merged=true）。目录条目 `tarball` 指向 `v0.4.1/dsh-source-deck-0.4.1.tgz`，中英描述注明支持 `DSH 0.2.2-rc.1`。
+- 生成的目录快照 `awesome-dsh-plugin.com/plugins.json`（`updated=2026-11-11`）已包含该条目；市场页显示 0.4.1 与 rc.1 文案。
+- 因此 README 旧稿里“PR 待合并 / 目录仍指向 0.3.3”的说法自 2026-11-05 起已过期，已在本轮修正。
 
-**合并前，市场目录仍指向 `v0.3.3`（只支持旧基线）**，不能作为 0.2.2-rc.1 的安装入口；0.4.1 请使用[本仓库 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)。PR 合并并重新生成目录后，再核对市场条目实际指向 0.4.1，才算市场侧验收完成。
+**0.4.2 的目录更新 PR**：把 `tarball` 指向 `v0.4.2/dsh-source-deck-0.4.2.tgz`，描述改为支持 `DSH 0.2.2-rc.2`。合并前目录仍指向 0.4.1；0.4.2 请用本仓库 Release 包。目录收录不等同于已在实际市场界面安装验收。
+
+> 历史：2026-11-05 记录 0.4.1 已发布、PR #12339 当时 OPEN；2026-10-23 记录 PR #7739 合并、条目指向 0.3.3；2026-10-18 记录首次收录过程与 Submission gate 原文。
 
 ## 2026-10-23 历史核对
 

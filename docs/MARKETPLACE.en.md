@@ -2,13 +2,17 @@
 
 > [中文（默认）](MARKETPLACE.md) | English
 
-## Current verification: 2026-11-05 — 0.4.1 released, catalog PR pending
+## Current verification: 2026-11-12 — 0.4.2 released, catalog PR pending
 
-SourceDeck **0.4.1** was published as a prerelease at `2026-11-05T12:33:31Z` and exactly supports **DSH Desktop 0.2.2-rc.1 / Cordis 4.1.0**.
+SourceDeck **0.4.2** adapts the plugin to **DSH Desktop 0.2.2-rc.2 / Cordis 4.1.0**. The previous catalog update completed:
 
-[PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) updates only this plugin's entry: the `tarball` now points to `v0.4.1/dsh-source-deck-0.4.1.tgz`, and both descriptions note `DSH 0.2.2-rc.1` support. The PR is OPEN, `mergeable=MERGEABLE`, `mergeStateStatus=UNSTABLE` (CI running), and changes only `data/plugins/Archaofan__dsh-source-deck.yml`.
+- [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) merged at **2026-11-05T17:18:36Z**. The catalog entry's `tarball` points to `v0.4.1/dsh-source-deck-0.4.1.tgz`, and both descriptions note `DSH 0.2.2-rc.1` support.
+- The generated catalog snapshot `awesome-dsh-plugin.com/plugins.json` (`updated=2026-11-11`) already contains that entry; the market page shows 0.4.1 and the rc.1 wording.
+- The older README claim that the PR was open and the catalog still pointed to 0.3.3 has been false since 2026-11-05 and is corrected in this round.
 
-**Until that PR merges, the catalog still points to `v0.3.3` (old baseline)** and must not be used to install on 0.2.2-rc.1; use this repository's [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1). After merge and catalog regeneration, re-read the entry to confirm it points to 0.4.1 before treating market availability as verified.
+**The 0.4.2 catalog PR** points `tarball` at `v0.4.2/dsh-source-deck-0.4.2.tgz` and changes both descriptions to support `DSH 0.2.2-rc.2`. Until it merges the catalog still points to 0.4.1; use this repository's Release asset for 0.4.2. Catalog inclusion does not establish actual market-UI installation acceptance.
+
+> History: the 2026-11-05 entry recorded 0.4.1 as released with PR #12339 open; 2026-10-23 recorded PR #7739 merged with the entry on 0.3.3; 2026-10-18 recorded first inclusion and the Submission gate text.
 
 ## Historical verification: 2026-10-23
 

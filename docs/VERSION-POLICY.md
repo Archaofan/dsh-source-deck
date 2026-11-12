@@ -6,17 +6,17 @@
 
 | 项目 | 固定值 |
 |---|---|
-| 产品支持基线（用户选定） | `dsh-v0.2.2-rc.1`，commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db` |
-| 产品 peer 声明 | `@deepseek-ai/dsh@0.2.2-rc.1`、`@deepseek-ai/cordis@4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.1`、`@deepseek-ai/dsh-tools@0.2.2-rc.1`（精确） |
-| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，**已升级到 `0.2.2-rc.1`**（2026-11-05；记录见 `E:/DSH-Desktop-Plugin-Dev/operations/production-upgrade-20261105/README.md`） |
-| 共用沙箱 | 同一基线 `0.2.2-rc.1`（用户 2026-11-05 与生产一起升级） |
-| RC 工具链 | `0.2.2-rc.1` 声明 `pnpm@11.28.5` |
+| 产品支持基线（用户选定） | `dsh-v0.2.2-rc.2`，commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c` |
+| 产品 peer 声明 | `@deepseek-ai/dsh@0.2.2-rc.2`、`@deepseek-ai/cordis@4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.2`、`@deepseek-ai/dsh-tools@0.2.2-rc.2`（精确） |
+| 用户生产 Desktop | `E:/DSH-Desktop/DeepSeek/DeepSeek Harness.exe`，**仍为 `0.2.2-rc.1`**，装 0.4.1；生产升级需用户另行明确指示 |
+| 共用沙箱 | 已升级到 `0.2.2-rc.2`（2026-11-12，`sandboxRelation=ahead-of-production`，用户批准见 `upgradeApproval`） |
+| RC 工具链 | `0.2.2-rc.2` 仍声明 `pnpm@11.28.5` |
 
 官方把 RC 也标为预发行版。这里“稳定基线”指用户已选定支持的 RC，不代表宣称其为官方最终正式版。
 
 ## 设计、打包和发布
 
-- 当前只维护 `0.2.2-rc.1`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 已于 2026-11-05 升级到该基线，与本产品 peer 匹配；安装到生产仍需用户明确批准（不要擅自安装）。不要为兼容旧生产而放宽 peer。
+- 当前只维护 `0.2.2-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 仍为 `0.2.2-rc.1`，在用户批准生产升级窗口前，0.4.2 不会在生产加载；不要为兼容旧生产而放宽 peer，也不要擅自升级或安装生产。
 - 设计中用到的工具、Remote、UI Slot、Agent 接续和持久化接口，必须在这个 RC 的源码与文档确认。最新网站、master 和 alpha 示例只能作参考，不能代替目标接口证据。
 - RC 缺少能力时调整方案、缩小首版范围或明确暂不支持。不能为完成首版要求用户升级 alpha，也不能复制 alpha 的私有实现绕过公共扩展机制。
 - 实现打包时按 RC 插件加载器实际采用的版本规则声明准确范围，并验证目标 RC 能加载、行为正常。不能只验证前端模拟或构建成功便宣称日用可用。
@@ -79,3 +79,18 @@
 - 94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空数据。按用户指示只复制生产 `DEEPSEEK_API_KEY` 到沙箱后完成真实模型验收：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留 Ghostwriter、插入引用并发送后，模型正确读取引用 JSON。单样本通过不等于普遍研究质量；PTC 父预设分支未单独切换复验。
 - 交付包 `dsh-source-deck-0.4.1.tgz`：188322 bytes、53 文件，SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`；安装后 index.js、client.js、package.json 与中英 README 均与包内逐字节一致。
 - **`v0.4.1` 已于 2026-11-05T12:33:31Z 发布为预发行**，tag commit `820bf58244b4292d3c4eb26e13b63887ee27ec1f`，资产 188322 bytes / SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`，Latest 仍为 v0.3.0；未安装到生产。已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。发布后不重建/替换资产或移动 tag；生产安装需用户另行明确指示。
+
+## 2026-11-12：沙箱升级 0.2.2-rc.2，产品 0.4.2 适配（用户选择方案 B）
+
+事实（实测）：
+
+- 官方 `dsh-v0.2.2-rc.2` 于 `2026-11-11T11:33:06Z` 发布，commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`；npm `next` 指向它（`latest` 仍 `0.2.2-rc.1`），npm 发布时间 `2026-11-12T02:16:12Z`。
+- 用户 2026-11-12 选择“B（跟最新）”：沙箱先升级、产品适配并发 0.4.2、README 与市场同步，验收后再议生产。生产 Desktop 未动，仍 `0.2.2-rc.1` + 0.4.1。
+
+执行结果：
+
+- 共用沙箱升级到 `0.2.2-rc.2`；旧 rc.1 归档 `archives/rc-0.2.2-rc.1-20261112T135229Z/`（源码 tar + 隔离数据；不含 node_modules，回滚用 checkout + frozen install）。官方构建 10 gates 通过（195.86s / 371 artifacts），Electron 与 primary-runtime 准备通过。
+- 沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名；这是沙箱适配，不是上游改动。
+- 产品 `0.4.1 → 0.4.2`（分支 `feat/adapt-0.2.2-rc.2`）：六个 peer 与官方 Client 类型包精确 `0.2.2-rc.2`；`zod 4.4.3 → 4.6.6`（typert-protocol 0.2.2-rc.2 的硬要求）。`src/` 无代码改动：契约差异都是未使用的可选新增字段。
+- 94/94 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验了入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清除数据。真实模型研究未跑（需用户单独授权复用 API key）。
+- 交付包 `dsh-source-deck-0.4.2.tgz`：188723 bytes / 53 文件，SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`；发布为预发行 `v0.4.2`，市场条目 PR 待合并。

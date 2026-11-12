@@ -2,11 +2,13 @@
 
 同时遵守父目录 README.md、AGENTS.md。唯一项目目录为 `E:/DSH-Desktop-Plugin-Dev/dsh-source-deck`，远端 `https://github.com/Archaofan/dsh-source-deck.git`。
 
-## 当前状态（2026-11-05）
+## 当前状态（2026-11-12）
 
-用户告知共用沙箱已升级新版 DSH，要求资料台适配。生产 Desktop 与沙箱现均为 `0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`）；0.4.0 的精确 peer `0.2.1-rc.2` 在新基线安装/启动被拒，故本轮完成产品适配，版本 `0.4.1`。**`v0.4.1` 已于 2026-11-05T12:33:31Z 发布为预发行**（tag commit `820bf58244b4292d3c4eb26e13b63887ee27ec1f`，资产 188322 bytes / SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`，Latest 仍为 v0.3.0）；未安装到生产。
+用户选择方案 B（跟最新 RC）：共用沙箱升级到 `0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），产品适配并发布 `0.4.2`。生产 Desktop 仍为 `0.2.2-rc.1`、装 0.4.1，本轮未操作；0.4.2 的精确 peer 是 rc.2，**生产升级前不会加载**。**`v0.4.2` 已发布为预发行**（资产 188723 bytes / SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`，Latest 仍为 v0.3.0）；市场条目更新 PR 待合并，合并前目录仍是 0.4.1。
 
-适配内容：原有四个 DSH peer 与 devDependencies 精确升级到 `0.2.2-rc.1`，Cordis `4.1.0`；另新增 `@deepseek-ai/dsh-tool-executor-native` / `@deepseek-ai/dsh-tools` 两个工具包 peer/dev 依赖；研究 worker 改用 worker scope 挂载 native executor（0.2.2 删除了 `tools.presentAs()`）。94/94 测试、tsdown+tsc 构建通过；官方 `Install-Plugin.ps1` 安装退出 0；实际 Host 深色中文验证了资料台入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section 与清除数据。按用户指示，沙箱只复制生产 `DEEPSEEK_API_KEY` 后完成真实模型验收（验收后已从沙箱凭据移除并恢复原文件）：聊天回复 `OK`；后台研究约 30 秒返回 2 个真实 GitHub 来源并「已完成」；保留一项、插入引用并发送后，模型正确读取引用 JSON。**单样本通过不等于普遍研究质量保证；PTC 父预设分支未单独切换复验。** 详见[接口差异](docs/research/2026-11-05-0.2.2-rc.1-interface-delta.md)与[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。发布结果：tag `v0.4.1` 指向 `820bf58`，Release 资产 digest 与本地 SHA256 一致，下载回验通过；README 与 `docs/releases/0.4.1.md` 已是发布措辞。详见[实施验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md)。
+适配内容：六个 DSH peer 与官方 Client 类型包精确升级到 `0.2.2-rc.2`，Cordis `4.1.0`；`zod 4.4.3 → 4.6.6`（`dsh-typert-protocol@0.2.2-rc.2` 的硬要求）。`src/` 无代码改动：rc.2 契约差异都是未使用的可选新增字段（`insertQuote` 摘要、`consumeOlder`、`markdown.fence`、`enter.allowEmpty`）。沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名。94/94 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验证了资料台入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清除数据。**本轮未做真实模型研究**（复用生产 API key 需用户单独授权）；PTC 父预设分支、原生缩放/IME/附件/屏幕阅读器/真人观察未覆盖。详见[接口差异](docs/research/2026-11-12-0.2.2-rc.2-interface-delta.md)与[实施验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md)。
+
+历史（2026-11-05）：0.4.1 适配 `0.2.2-rc.1`，含真实模型验收；该结论已被本轮取代，记录保留在 VERSION-POLICY、`docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md` 与发布说明中。
 
 ## 历史交付（2026-10-23）
 
@@ -36,19 +38,19 @@
 
 ## 固定环境与权限
 
-产品 peer 精确 `@deepseek-ai/dsh@0.2.2-rc.1`、Cordis `4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.1`、`@deepseek-ai/dsh-tools@0.2.2-rc.1`；上游 commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`。不得升级基线、使用 alpha API 或改上游产品源码。
+产品 peer 精确 `@deepseek-ai/dsh@0.2.2-rc.2`、Cordis `4.1.0`、`@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.2`、`@deepseek-ai/dsh-tools@0.2.2-rc.2`，`zod@4.6.6`；沙箱上游 commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`。不得升级基线、使用 alpha API 或改上游产品源码。
 
 全部安装只用共享 `sandbox/dsh-desktop/scripts/Install-Plugin.ps1`，启动只用 Start-Desktop.ps1，隔离 DSH_HOME/userData/APPDATA/LOCALAPPDATA/缓存/临时目录。先检查 baseline/status/实时 lease，一次一个项目。测试材料限本项目 test-workspaces。停止进程前核对准确 PID、路径和隔离 userData，不按名称批量结束。
 
-生产 Desktop 现为 0.2.2-rc.1；先前的 0.4.0 包只声明 0.2.1-rc.2，在该环境不会加载。0.4.1 目前只在共用沙箱安装并验收，本 Agent 未操作生产。除用户本轮明确要求“沙箱凭据用和本处一样的 API”、因而只复制生产 `DEEPSEEK_API_KEY` 到沙箱隔离凭据（验收后已移除）外，不导入其他生产配置、账号 token 或密钥，不输出 bootstrap token/API key。
+生产 Desktop 现为 0.2.2-rc.1，装 0.4.1；0.4.1 的 peer 是 rc.1，仍在生产可用，但本轮没有动生产。0.4.2 的精确 peer 是 rc.2，**在生产 Desktop 升级到 rc.2 之前不会加载**，不得为了兼容 rc.1 放宽 peer。本轮未复制任何生产凭据；以后若要做真实模型验收，需用户单独授权复制 `DEEPSEEK_API_KEY` 到沙箱隔离凭据并在验收后移除。不导入其他生产配置、账号 token 或密钥，不输出 bootstrap token/API key。
 
-开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径，经官方脚本安装后核对 lib 字节。当前发布候选包 `dsh-source-deck-0.4.1.tgz`，SHA256 `BEF8D2989FD99CBCE817822F0BC22407B4B2AE4AB559B40E1DCB3A5CA3D13B73`；已发布的 0.4.0 包仍只支持 `0.2.1-rc.2`。
+开发同版本本地 tgz 会被包管理器缓存；沙箱验证使用内容哈希路径（本轮 `dsh-source-deck-0.4.2-990f36a4.tgz`），经官方脚本安装后核对 lib 字节。当前发布资产 `dsh-source-deck-0.4.2.tgz`：188723 bytes / 53 文件，SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`。
 
 ## 验证与同步
 
-- 真实 Host 已覆盖带参命令、自然语言、模型并行、停止隔离、仓库结果、引用发送、重启中断与深浅宽度矩阵。0.4.1 适配轮实际验证了入口/tab、手动添加、对话卡片、保留判定、引用 chip、设置 section、清空数据；使用同一 DeepSeek API 完成真实聊天与后台研究（2 个真实 GitHub 来源）、保留+引用及模型读取引用 JSON。仅一个研究样本，不宣称普遍质量。
+- 0.4.2 适配轮实际验证了入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清空数据（原生 confirm），Host 为 `0.2.2-rc.2-ddac967`；本轮**没有**跑真实模型研究，0.4.1 轮的真实模型结论仍只适用于 rc.1 基线。仅一个历史研究样本，不宣称普遍质量。
 - 当前控制端无法完成 Electron 原生 125% 缩放、OS 原生展开菜单截图及真实中文 IME/附件组合的完整验收；不能把 DOM/抽象草稿测试说成这些都已通过。
-- 0.4.1 新增 `@deepseek-ai/dsh-tool-executor-native` 与 `@deepseek-ai/dsh-tools` 两个官方依赖，lockfile 图已变化；未新增其他依赖。离线 frozen 校验缺少 registry metadata，明确记录，不能禁用供应链策略绕过。
-- [市场 PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于2026-10-18T20:22:40Z合并；2026-10-23默认分支条目仍指向0.3.3。目录收录已确认，不等同于0.4.0市场安装验收；本轮未修改外部条目，见 docs/MARKETPLACE.md。
+- 0.4.1 引入的 `@deepseek-ai/dsh-tool-executor-native` 与 `@deepseek-ai/dsh-tools` 依赖保留；0.4.2 只把 `zod` 升到 `4.6.6`，未新增其他依赖。离线 frozen 校验缺少 registry metadata 时明确记录，不能禁用供应链策略绕过。
+- 市场：[PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 于 2026-10-18 合并，[PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 于 2026-11-05T17:18:36Z 合并，目录条目 2026-11-11 指向 0.4.1；0.4.2 的条目更新 PR 待合并。目录收录不等同于市场界面安装验收，见 docs/MARKETPLACE.md。
 - 中文默认、英文同步。检查后提交并推送本项目交付分支，核对 HEAD 与 origin 一致；失败记 pending。
 - Git 使用进程级 safe.directory；不改全局配置或关闭 TLS。沙箱、node_modules、tgz、日志、缓存、凭据和个人记忆摘录不提交。
