@@ -491,3 +491,16 @@ English: SourceDeck 0.4.1 is the development adaptation to DSH `0.2.2-rc.1` / Co
 - 发布后不重建/替换资产、不移动 tag；生产未安装。市场目录仍指向 0.3.3，不等同于 0.4.1 市场安装验收。
 
 English: v0.4.1 was published as a prerelease at `2026-11-05T12:33:31Z`. The API read-back shows target commit 820bf58, draft=false, prerelease=true, asset ID 713353218 (188322 bytes) with SHA256 digest bef8d298…d13b73; the remote tag resolves to the same commit and Latest remains v0.3.0. A fresh download from the release matched the local package byte-for-byte. The process-level token and safe.directory were used only for this command; TLS and global Git trust were not changed. The asset/tag are now frozen; production was untouched.
+
+## 2026-11-12：沙箱 0.2.2-rc.2 与 v0.4.2 预发行
+
+用户选择方案 B：共用沙箱先升级到官方 `dsh-v0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`，Release `2026-11-11T11:33:06Z`），SourceDeck 适配并发布 0.4.2；生产 Desktop 保持 `0.2.2-rc.1`。
+
+- 沙箱：`git fetch --depth 1` 取 tag、detached checkout 后 `pnpm install --frozen-lockfile`（首次因缺少非交互确认挂起，`CI=true` 重跑 3m34s 退出 0）、`pnpm run build`（10 gates / 195.86s / 371 artifacts）、Electron 44.7.0 与 primary-runtime 准备通过。rc.2 的 `runDesktopCli` 改为单参数，`sandbox/scripts/desktop-cli.mjs` 跟进修好插件安装；未改上游源码。旧 rc.1 归档 `archives/rc-0.2.2-rc.1-20261112T135229Z/`（源码 tar，无 node_modules）。
+- 产品：`0.4.1 → 0.4.2`，六个 peer 精确 `0.2.2-rc.2`，Cordis `4.1.0`，`zod 4.4.3 → 4.6.6`（`dsh-typert-protocol@0.2.2-rc.2` 硬要求，否则 `remote-info.ts` 5 处 `TS2322`）。`src/` 无改动：rc.2 契约差异均为未使用的可选新增字段。94/94 测试、tsdown 与 tsc 通过。
+- 安装与 Host：`Install-Plugin.ps1` 退出 0（无兼容拒绝/豁免），Host `0.2.2-rc.2-ddac967` 实际验证入口/tab、旧卡片重放、手动添加、保留+撤销、引用 chip、设置 section、保存策略与原生 confirm 清空数据；截图 `test-workspaces/dsh-source-deck/rc2-deck.png`。两次实例均正常关闭（launcher exit 0、lease 释放）。
+- 发布：包 **188723 bytes / 53 文件**、SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`；`gh release create v0.4.2` 退出 0，API 回读 `prerelease=true`、target `e2f7b86fc4be58cca421b1d7df70ec090750657d`、asset digest 与本地一致，下载回验 SHA256 相同；`releases/latest` 仍 `v0.3.0`。
+- 市场：PR [#14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) OPEN、`mergeable=true`、仅改条目文件（+3/−3），指向 `v0.4.2` 与 rc.2；合并前目录仍是 0.4.1。
+- 未验证：真实模型研究（本轮未复制 API key）、PTC 父预设、原生缩放/IME/附件/屏幕阅读器/真人观察、完整矩阵。生产未安装、未升级。
+
+English: The shared sandbox was upgraded to DSH `0.2.2-rc.2` (commit ddac9676) and SourceDeck 0.4.2 was released as a prerelease at `2026-11-12T14:27:46Z`. The only product changes are exact peer bumps to rc.2 and `zod 4.6.6` (required by typert-protocol); no `src/` change. 94/94 tests, build, official install and byte checks passed, and the rc.2 Host exercised the deck entry/tab, manual add, keep/undo, reference chips, settings, policy save and native-confirm data clearing. The 188723-byte package's SHA256 matches the Release asset and a fresh download. Market PR #14728 is open; the catalog still points to 0.4.1. No real-model round ran this time, production was untouched, and native-input/accessibility limits remain.

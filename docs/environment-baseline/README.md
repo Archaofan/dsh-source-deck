@@ -1,6 +1,6 @@
 # 共用环境准备快照
 
-> **本目录是 2026-10-17 的历史准备快照，不是当前基线。** 2026-11-05 生产 Desktop 与共用沙箱已升级到官方 `dsh-v0.2.2-rc.1`（commit `66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db`），SourceDeck 0.4.1 已完成适配。当前事实以工作区根 `README.md` / `AGENTS.md`、`sandbox/dsh-desktop/baseline.json`、`status.json` 与 `UPGRADE-20261105.md` 为准；下文的 `baseline.json` 和脚本只保留当时状态，恢复前必须逐项比较，不能直接覆盖。
+> **本目录是 2026-10-17 的历史准备快照，不是当前基线。** 2026-11-12 共用沙箱已升级到官方 `dsh-v0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），SourceDeck 0.4.2 已适配并发布预发行；生产 Desktop 仍为 `0.2.2-rc.1`。当前事实以工作区根 `README.md` / `AGENTS.md`、`sandbox/dsh-desktop/baseline.json`、`status.json` 与 `UPGRADE-20261112.md` 为准；下文的 `baseline.json` 和脚本只保留当时状态，恢复前必须逐项比较，不能直接覆盖。
 
 此目录保存 2026-10-17 回退到生产 `0.2.0-rc.2` 后的跨项目说明、固定版本记录和操作脚本，随 SourceDeck 私有仓库版本化，便于后续接手与恢复。它不是第二份运行沙箱；初次 alpha 快照仅留在 Git 历史，不是当前支持目标。**2026-10-17 夜随用户批准的沙箱先行升级到 `0.2.1-rc.1` 更新过一次**（仅开发环境；生产与产品 peer 仍 `0.2.0-rc.2`），因此本快照的 `baseline.json` 与脚本反映升级后的状态。
 
