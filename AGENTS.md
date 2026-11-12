@@ -4,7 +4,7 @@
 
 ## 当前状态（2026-11-12）
 
-用户选择方案 B（跟最新 RC）：共用沙箱升级到 `0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），产品适配并发布 `0.4.2`。生产 Desktop 仍为 `0.2.2-rc.1`、装 0.4.1，本轮未操作；0.4.2 的精确 peer 是 rc.2，**生产升级前不会加载**。**`v0.4.2` 已发布为预发行**（资产 188723 bytes / SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`，Latest 仍为 v0.3.0）；市场条目更新 PR 待合并，合并前目录仍是 0.4.1。
+用户选择方案 B（跟最新 RC）：共用沙箱升级到 `0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），产品适配并发布 `0.4.2`。生产 Desktop 仍为 `0.2.2-rc.1`、装 0.4.1，本轮未操作；0.4.2 的精确 peer 是 rc.2，**生产升级前不会加载**。**`v0.4.2` 已于 2026-11-12T14:27:46Z 发布为预发行**（tag commit `e2f7b86fc4be58cca421b1d7df70ec090750657d`，资产 188723 bytes / SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`，Latest 仍为 v0.3.0）；市场条目更新 PR #14728 待合并，合并前目录仍是 0.4.1。
 
 适配内容：六个 DSH peer 与官方 Client 类型包精确升级到 `0.2.2-rc.2`，Cordis `4.1.0`；`zod 4.4.3 → 4.6.6`（`dsh-typert-protocol@0.2.2-rc.2` 的硬要求）。`src/` 无代码改动：rc.2 契约差异都是未使用的可选新增字段（`insertQuote` 摘要、`consumeOlder`、`markdown.fence`、`enter.allowEmpty`）。沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名。94/94 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验证了资料台入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清除数据。**本轮未做真实模型研究**（复用生产 API key 需用户单独授权）；PTC 父预设分支、原生缩放/IME/附件/屏幕阅读器/真人观察未覆盖。详见[接口差异](docs/research/2026-11-12-0.2.2-rc.2-interface-delta.md)与[实施验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md)。
 
@@ -51,6 +51,6 @@
 - 0.4.2 适配轮实际验证了入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清空数据（原生 confirm），Host 为 `0.2.2-rc.2-ddac967`；本轮**没有**跑真实模型研究，0.4.1 轮的真实模型结论仍只适用于 rc.1 基线。仅一个历史研究样本，不宣称普遍质量。
 - 当前控制端无法完成 Electron 原生 125% 缩放、OS 原生展开菜单截图及真实中文 IME/附件组合的完整验收；不能把 DOM/抽象草稿测试说成这些都已通过。
 - 0.4.1 引入的 `@deepseek-ai/dsh-tool-executor-native` 与 `@deepseek-ai/dsh-tools` 依赖保留；0.4.2 只把 `zod` 升到 `4.6.6`，未新增其他依赖。离线 frozen 校验缺少 registry metadata 时明确记录，不能禁用供应链策略绕过。
-- 市场：[PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 于 2026-10-18 合并，[PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 于 2026-11-05T17:18:36Z 合并，目录条目 2026-11-11 指向 0.4.1；0.4.2 的条目更新 PR 待合并。目录收录不等同于市场界面安装验收，见 docs/MARKETPLACE.md。
+- 市场：[PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 于 2026-10-18 合并，[PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 于 2026-11-05T17:18:36Z 合并，目录条目 2026-11-11 指向 0.4.1；0.4.2 的条目更新 [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) 已提交（OPEN、只改条目文件），合并前目录仍是 0.4.1。目录收录不等同于市场界面安装验收，见 docs/MARKETPLACE.md。
 - 中文默认、英文同步。检查后提交并推送本项目交付分支，核对 HEAD 与 origin 一致；失败记 pending。
 - Git 使用进程级 safe.directory；不改全局配置或关闭 TLS。沙箱、node_modules、tgz、日志、缓存、凭据和个人记忆摘录不提交。

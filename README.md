@@ -55,7 +55,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 从 [v0.4.2 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2) 下载 `dsh-source-deck-0.4.2.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。仍停留在 `0.2.2-rc.1` 的环境请使用 [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)，`0.2.1-rc.2` 环境使用 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
-市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 2026-10-18 合并；目录更新 PR [#12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 已于 2026-11-05 合并，目录条目当前指向 0.4.1 并注明支持 `DSH 0.2.2-rc.1`。0.4.2 的目录更新 PR 已提交，**合并前市场条目仍是 0.4.1（不适用于 rc.2）**，安装 0.4.2 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
+市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 2026-10-18 合并；目录更新 PR [#12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 已于 2026-11-05 合并，目录条目当前指向 0.4.1 并注明支持 `DSH 0.2.2-rc.1`。0.4.2 的目录更新 [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) 已提交（OPEN，只改条目文件），**合并前市场条目仍是 0.4.1（不适用于 rc.2）**，安装 0.4.2 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
 
 ## 从聊天开始
 

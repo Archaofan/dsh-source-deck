@@ -10,7 +10,7 @@ SourceDeck **0.4.2** adapts the plugin to **DSH Desktop 0.2.2-rc.2 / Cordis 4.1.
 - The generated catalog snapshot `awesome-dsh-plugin.com/plugins.json` (`updated=2026-11-11`) already contains that entry; the market page shows 0.4.1 and the rc.1 wording.
 - The older README claim that the PR was open and the catalog still pointed to 0.3.3 has been false since 2026-11-05 and is corrected in this round.
 
-**The 0.4.2 catalog PR** points `tarball` at `v0.4.2/dsh-source-deck-0.4.2.tgz` and changes both descriptions to support `DSH 0.2.2-rc.2`. Until it merges the catalog still points to 0.4.1; use this repository's Release asset for 0.4.2. Catalog inclusion does not establish actual market-UI installation acceptance.
+**The 0.4.2 catalog PR** is [#14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) (OPEN, `mergeable=true`, one file `data/plugins/Archaofan__dsh-source-deck.yml`, +3/−3): `tarball` points at `v0.4.2/dsh-source-deck-0.4.2.tgz` and both descriptions support `DSH 0.2.2-rc.2`. Until it merges the catalog still points to 0.4.1; use this repository's Release asset for 0.4.2. Catalog inclusion does not establish actual market-UI installation acceptance.
 
 > History: the 2026-11-05 entry recorded 0.4.1 as released with PR #12339 open; 2026-10-23 recorded PR #7739 merged with the entry on 0.3.3; 2026-10-18 recorded first inclusion and the Submission gate text.
 

@@ -12,7 +12,7 @@ SourceDeck **0.4.2** 已适配 **DSH Desktop 0.2.2-rc.2 / Cordis 4.1.0**。此�
 - 生成的目录快照 `awesome-dsh-plugin.com/plugins.json`（`updated=2026-11-11`）已包含该条目；市场页显示 0.4.1 与 rc.1 文案。
 - 因此 README 旧稿里“PR 待合并 / 目录仍指向 0.3.3”的说法自 2026-11-05 起已过期，已在本轮修正。
 
-**0.4.2 的目录更新 PR**：把 `tarball` 指向 `v0.4.2/dsh-source-deck-0.4.2.tgz`，描述改为支持 `DSH 0.2.2-rc.2`。合并前目录仍指向 0.4.1；0.4.2 请用本仓库 Release 包。目录收录不等同于已在实际市场界面安装验收。
+**0.4.2 的目录更新 PR**：[#14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728)，OPEN、`mergeable=true`，只改 `data/plugins/Archaofan__dsh-source-deck.yml`（+3/−3）：`tarball` 指向 `v0.4.2/dsh-source-deck-0.4.2.tgz`，描述改为支持 `DSH 0.2.2-rc.2`。合并前目录仍指向 0.4.1；0.4.2 请用本仓库 Release 包。目录收录不等同于已在实际市场界面安装验收。
 
 > 历史：2026-11-05 记录 0.4.1 已发布、PR #12339 当时 OPEN；2026-10-23 记录 PR #7739 合并、条目指向 0.3.3；2026-10-18 记录首次收录过程与 Submission gate 原文。
 
