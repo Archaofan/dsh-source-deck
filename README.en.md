@@ -2,7 +2,7 @@
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.2 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -21,7 +21,7 @@ Not for: replacing deep code audits or formal security/compliance review.
 
 ## Screenshots
 
-0.4.2 keeps the 0.4.0 interface (neither 0.4.1 nor 0.4.2 changed the UI). These are actual 0.4.0 Host screenshots (light Chinese / dark English). QA sources are synthetic acceptance fixtures demonstrating search, sorting, comparison selection and undo.
+0.4.3 keeps the 0.4.0 interface (neither 0.4.1 nor 0.4.3 changed the UI). These are actual 0.4.0 Host screenshots (light Chinese / dark English). QA sources are synthetic acceptance fixtures demonstrating search, sorting, comparison selection and undo.
 
 | Light | Dark |
 |---|---|
@@ -47,15 +47,15 @@ The left side keeps the conversation going while the right-side deck stays in sy
 
 | Item | Exact version |
 |---|---|
-| SourceDeck | 0.4.2 |
+| SourceDeck | 0.4.3 |
 | DeepSeek Harness Desktop | 0.2.2-rc.2 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-Only public APIs from `0.2.2-rc.2` are used. 0.4.2 is the current prerelease adapted to that baseline; 0.4.1 only supports `0.2.2-rc.1`, and the published 0.4.0 only supports `0.2.1-rc.2`. Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
+Only public APIs from `0.2.2-rc.2` are used. 0.4.3 is the current prerelease adapted to that baseline; 0.4.1 only supports `0.2.2-rc.1`, and the published 0.4.0 only supports `0.2.1-rc.2`. Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
-Download `dsh-source-deck-0.4.2.tgz` from the [v0.4.2 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2), install it through the Desktop plugin manager, then restart when prompted. Environments still on `0.2.2-rc.1` should use the [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1), and `0.2.1-rc.2` environments the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0). During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
+Download `dsh-source-deck-0.4.3.tgz` from the [v0.4.3 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3), install it through the Desktop plugin manager, then restart when prompted. **Do not use 0.4.2**: its research round fails immediately on rc.2 (`Cannot read properties of undefined (reading 'id')`). Environments still on `0.2.2-rc.1` should use the [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1), and `0.2.1-rc.2` environments the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0). During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
-Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) merged on 2026-10-18; catalog update [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) merged on 2026-11-05, so the catalog entry points at 0.4.1 and notes `DSH 0.2.2-rc.1` support. A catalog update for 0.4.2 is open as [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) (entry file only); **until it merges the market entry is still 0.4.1 (not valid for rc.2)**, so install 0.4.2 from the Release above. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
+Market submission [PR #7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) merged on 2026-10-18; catalog update [PR #12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) merged on 2026-11-05, so the catalog entry points at 0.4.1 and notes `DSH 0.2.2-rc.1` support. A catalog update for 0.4.3 is open as [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) (entry file only); **until it merges the market entry is still 0.4.1 (not valid for rc.2)**, so install 0.4.3 from the Release above. Catalog inclusion does not establish actual market-UI acceptance of any version. See [market status](docs/MARKETPLACE.en.md).
 
 ## Start from chat
 
@@ -77,7 +77,7 @@ Cards prioritize the existing Research judgment, with full notes and description
 
 Cards show saving status. References and direct summaries wait for pending screening writes; failed saves preserve drafts for retry. Reads occur approximately every two seconds during research and every thirty seconds for idle results. Periodic full reads pause in favorites or hidden panes and refresh on return.
 
-0.4.2 adapts SourceDeck to DSH 0.2.2-rc.2 without code changes: every contract difference is an additive optional field (`insertQuote` summary, `consumeOlder`, `conversation.chat.markdown.fence`), none of which SourceDeck uses; the only required follow-up is `zod@4.6.6`, which `@deepseek-ai/dsh-typert-protocol@0.2.2-rc.2` demands. All 94 tests, the build, official installation and the actual Host (`0.2.2-rc.2-ddac967`) passed, exercising the deck entry/tab, manual add, keep/undo, reference chips, settings section, policy save and data clearing. No real-model research round ran this time (it needs separate user authorization to copy an API key); native zoom, real IME/attachment combinations, screen-reader speech and human observation remain limited. See [this adaptation and acceptance](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md). 0.4.1 only supports `0.2.2-rc.1`; 0.4.0 only supports `0.2.1-rc.2`.
+0.4.3 adapts SourceDeck to DSH 0.2.2-rc.2. rc.2 flattens `startActivation` from `request: { parent, prompt }` to top-level `parent`/`prompt` fields — the one real interface break, and why 0.4.2 failed to start any research round; 0.4.3 passes the flat spec and adds a regression test. Every other contract difference is an unused optional field (`insertQuote` summary, `consumeOlder`, `markdown.fence`), plus the required `zod@4.6.6` for `typert-protocol` rc.2. All 95 tests, the build, official installation and installed-byte checks passed; the actual Host (`0.2.2-rc.2-ddac967`) exercised the deck entry/tab, manual add, keep/undo, reference chips, settings and data clearing, and with the user's authorization to reuse the production `DEEPSEEK_API_KEY` (removed and restored afterwards) the real model round completed: ~40-second background research returned two real GitHub sources, and a kept MDEZ++ reference that the model read correctly and answered from alone. Native zoom, real IME/attachment combinations, screen-reader speech and human observation remain limited. See [this adaptation and acceptance](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md). 0.4.1 only supports `0.2.2-rc.1`; 0.4.0 only supports `0.2.1-rc.2`.
 
 1. Cards show a project image/Logo, then try the GitHub owner avatar, then a monogram. GitHub stars, last code push, lookup time, and evidence link are separate. Unknown facts stay unknown; zero stars stay zero.
 2. Keep or exclude; click the active verdict again to return to pending. Expand the optional reason. Favorites and comparison do not change verdicts.
@@ -125,9 +125,9 @@ You do not need to finish a whole feature. A clear scenario, one test, or one pa
 ## Find the project
 
 - GitHub: <https://github.com/Archaofan/dsh-source-deck> (searchable via `dsh-plugin`, `source-deck`, `DeepSeek Harness`)
-- Latest prerelease: [0.4.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- Latest prerelease: [0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP documentation index: <https://gitmcp.io/Archaofan/dsh-source-deck>
-- Plugin marketplace: [catalog entry](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml) (included; points to 0.4.1 as checked on 2026-11-11, with the 0.4.2 update PR pending)
+- Plugin marketplace: [catalog entry](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml) (included; points to 0.4.1 as checked on 2026-11-11, with the 0.4.3 update PR pending)
 
 ## Development
 
@@ -138,10 +138,10 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, icons, and Chinese/English locales. 0.4.2 keeps the two official tool packages added in 0.4.1 (`@deepseek-ai/dsh-tool-executor-native`, `@deepseek-ai/dsh-tools`; exact versions in the compatibility table above) and raises `zod` to `4.6.6` to match the `typert-protocol` 0.2.2-rc.2 types.
+Artifacts are the Host `lib/index.js`, Client lazy-CJS `lib/client.js`, types, icons, and Chinese/English locales. 0.4.3 keeps the two official tool packages added in 0.4.1 (`@deepseek-ai/dsh-tool-executor-native`, `@deepseek-ai/dsh-tools`; exact versions in the compatibility table above) and raises `zod` to `4.6.6` to match the `typert-protocol` 0.2.2-rc.2 types.
 
 - [v3 design](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [Approved implementation plan](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [Developer workflow research](docs/research/2026-10-18-developer-workflow-review.md)
-- [This iteration's comparable-tool review](docs/research/2026-10-23-next-iteration-review.en.md) · [0.4.1 adaptation and acceptance](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.2 adaptation and acceptance](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md) · [0.4.2 release notes](docs/releases/0.4.2.md)
+- [This iteration's comparable-tool review](docs/research/2026-10-23-next-iteration-review.en.md) · [0.4.1 adaptation and acceptance](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.3 adaptation and acceptance](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md) · [0.4.3 release notes](docs/releases/0.4.3.md)
 - [Handoff](docs/HANDOFF.en.md) · [Version policy](docs/VERSION-POLICY.md)

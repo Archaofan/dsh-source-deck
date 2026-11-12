@@ -504,3 +504,14 @@ English: v0.4.1 was published as a prerelease at `2026-11-05T12:33:31Z`. The API
 - 未验证：真实模型研究（本轮未复制 API key）、PTC 父预设、原生缩放/IME/附件/屏幕阅读器/真人观察、完整矩阵。生产未安装、未升级。
 
 English: The shared sandbox was upgraded to DSH `0.2.2-rc.2` (commit ddac9676) and SourceDeck 0.4.2 was released as a prerelease at `2026-11-12T14:27:46Z`. The only product changes are exact peer bumps to rc.2 and `zod 4.6.6` (required by typert-protocol); no `src/` change. 94/94 tests, build, official install and byte checks passed, and the rc.2 Host exercised the deck entry/tab, manual add, keep/undo, reference chips, settings, policy save and native-confirm data clearing. The 188723-byte package's SHA256 matches the Release asset and a fresh download. Market PR #14728 is open; the catalog still points to 0.4.1. No real-model round ran this time, production was untouched, and native-input/accessibility limits remain.
+
+## 2026-11-12（续）：0.4.2 研究链路失败，0.4.3 修复并完成真实模型验收
+
+真实模型授权到位后，0.4.2 在 rc.2 上第一次研究回合就失败：round 记录 `status=failed`、`diagnostic=Cannot read properties of undefined (reading 'id')`、`createdAt` 到 `endedAt` 仅 8 ms。根因是 rc.2 把 `subagents.startActivation` 的 `request: { parent, prompt }` 拍平为顶层字段，0.4.2 未跟进。
+
+- 先写失败测试 `tests/research-runtime.test.ts`（断言 `parent` 在顶层且 `request` 不存在），红；把 `src/research-runtime.ts` 改为扁平传参，绿；全套 95/95 通过。
+- 版本 `0.4.2 → 0.4.3`，重新构建、打包（`189287 bytes / 53 文件`、SHA256 `2B4D7FF20A8631A2C93B83D782E80D2CBAAF2A524286572227D2B2468FB536BC`），内容哈希路径 `dsh-source-deck-0.4.3-2b4d7ff2.tgz` 经官方脚本安装，包内与安装后 `lib/index.js`、`lib/client.js`、`package.json`、中英 README 逐字节一致。
+- 真实模型验收（授权后仅把生产 `DEEPSEEK_API_KEY` 写入沙箱隔离 `.credentials.yaml`，验收后移除并恢复 161 bytes 原文件）：聊天「只回复 OK」2 秒回复 `OK`（16.4K tok）；资料台后台研究约 40 秒返回 2 个真实 GitHub 来源（`tyleruploads/mdez`、`retext-project/retext`）并「已完成」；保留 MDEZ++、插入引用并发送后，模型只依据引用 JSON 回答并指出 `sources` 长度为 1。
+- 0.4.2 的 Release 与 tag 保留，不删除、不移动，正文与 README 标注 superseded，提示改用 0.4.3。
+
+English: 0.4.2 failed every research round on rc.2 within 8 ms because it kept the rc.1 nested `request: { parent, prompt }` shape after rc.2 flattened it. A failing test was added first, `src/research-runtime.ts` was changed to the flat spec, and the suite reached 95/95. 0.4.3 was rebuilt, packed (189287 bytes, SHA256 2B4D7FF2…536BC), installed through the official script, and byte-checked. With the user's authorization to reuse the production `DEEPSEEK_API_KEY` (isolated sandbox credential only, restored afterwards), real model calls passed: chat `OK`, a ~40-second research round returning two real GitHub sources, and a kept MDEZ++ reference the model answered from correctly. 0.4.2's release and tag stay in place, marked superseded.

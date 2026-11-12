@@ -2,7 +2,7 @@
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.2 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -21,7 +21,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 ## 界面预览
 
-0.4.2 沿用 0.4.0 的界面（0.4.1 与 0.4.2 都没有 UI 变化）。以下为 0.4.0 的真实 Host 截图（浅色中文 / 深色英文）；画面中的 QA 来源为合成验收材料，用于展示搜索、排序、对比名单和撤销。
+0.4.3 沿用 0.4.0 的界面（0.4.1 与 0.4.3 都没有 UI 变化）。以下为 0.4.0 的真实 Host 截图（浅色中文 / 深色英文）；画面中的 QA 来源为合成验收材料，用于展示搜索、排序、对比名单和撤销。
 
 | 浅色 | 深色 |
 |---|---|
@@ -47,15 +47,15 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 | 项目 | 精确版本 |
 |---|---|
-| 本插件 | 0.4.2 |
+| 本插件 | 0.4.3 |
 | DeepSeek Harness Desktop | 0.2.2-rc.2 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-只使用 `0.2.2-rc.2` 的公共接口。0.4.2 是适配该基线的当前预发行；0.4.1 只支持 `0.2.2-rc.1`，0.4.0 只支持 `0.2.1-rc.2`。目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
+只使用 `0.2.2-rc.2` 的公共接口。0.4.3 是适配该基线的当前预发行；0.4.1 只支持 `0.2.2-rc.1`，0.4.0 只支持 `0.2.1-rc.2`。目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
 
-从 [v0.4.2 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2) 下载 `dsh-source-deck-0.4.2.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。仍停留在 `0.2.2-rc.1` 的环境请使用 [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)，`0.2.1-rc.2` 环境使用 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
+从 [v0.4.3 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) 下载 `dsh-source-deck-0.4.3.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。**不要使用 0.4.2**：它在 rc.2 上启动研究回合会立刻失败（`Cannot read properties of undefined (reading 'id')`）。仍停留在 `0.2.2-rc.1` 的环境请使用 [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)，`0.2.1-rc.2` 环境使用 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
-市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 2026-10-18 合并；目录更新 PR [#12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 已于 2026-11-05 合并，目录条目当前指向 0.4.1 并注明支持 `DSH 0.2.2-rc.1`。0.4.2 的目录更新 [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) 已提交（OPEN，只改条目文件），**合并前市场条目仍是 0.4.1（不适用于 rc.2）**，安装 0.4.2 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
+市场收录 PR [#7739](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7739) 已于 2026-10-18 合并；目录更新 PR [#12339](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/12339) 已于 2026-11-05 合并，目录条目当前指向 0.4.1 并注明支持 `DSH 0.2.2-rc.1`。0.4.3 的目录更新 [PR #14728](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/14728) 已提交（OPEN，只改条目文件），**合并前市场条目仍是 0.4.1（不适用于 rc.2）**，安装 0.4.3 请使用上述 Release 包。目录收录不等同于已在实际市场界面验收某个版本，详见[市场记录](docs/MARKETPLACE.md)。
 
 ## 从聊天开始
 
@@ -77,7 +77,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 
 卡片显示保存状态；引用和直接摘要等待已有筛选写入，失败时保留草稿供重试。研究中约每 2 秒读取一次，静置结果约每 30 秒一次；收藏页或面板隐藏时暂停定期完整读取，返回时刷新。
 
-0.4.2 适配 DSH 0.2.2-rc.2，不改插件代码：契约差异只有新增的可选字段（`insertQuote` 的摘要参数、`consumeOlder`、`conversation.chat.markdown.fence`），SourceDeck 都未使用；唯一必须跟进的是 `@deepseek-ai/dsh-typert-protocol@0.2.2-rc.2` 要求 `zod@4.6.6`。94/94 自动测试、构建、官方安装和实际 Host（`0.2.2-rc.2-ddac967`）通过，覆盖资料台入口/tab、手动添加、保留与撤销、引用 chip、设置 section、保存策略与清空数据。本轮未做真实模型研究（需用户单独授权复制 API key）；原生缩放、真实 IME/附件组合、屏幕阅读器和真人观察仍有限制。详见[本轮适配与验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md)。0.4.1 仅支持 `0.2.2-rc.1`，0.4.0 仅支持 `0.2.1-rc.2`。
+0.4.3 适配 DSH 0.2.2-rc.2。rc.2 把 `startActivation` 的参数从 `request: { parent, prompt }` 拍平为 `parent`/`prompt` 顶层字段——这是本轮唯一真正的接口破坏，也是 0.4.2 研究回合启动即失败的原因；0.4.3 改为扁平传参并新增回归测试。其余契约差异只是未使用的可选字段（`insertQuote` 摘要、`consumeOlder`、`markdown.fence`），另需 `zod@4.6.6`（typert-protocol rc.2 的要求）。95/95 自动测试、构建、官方安装与安装字节核对通过；实际 Host（`0.2.2-rc.2-ddac967`）验证了入口/tab、手动添加、保留与撤销、引用 chip、设置与清空数据；经用户授权复用生产 `DEEPSEEK_API_KEY`（验收后已移除并恢复）完成真实模型链路：后台研究约 40 秒返回 2 个真实 GitHub 来源并「已完成」，保留 MDEZ++ 后插入引用并发送，模型只依据引用 JSON 正确报出来源名称。原生缩放、真实 IME/附件组合、屏幕阅读器和真人观察仍有限制。详见[本轮适配与验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md)。0.4.1 仅支持 `0.2.2-rc.1`，0.4.0 仅支持 `0.2.1-rc.2`。
 
 1. 卡片展示仓库图 / Logo，失败时尝试 GitHub owner 头像，再显示字标。GitHub 的 stars、最近代码推送时间、查询时间与来源链接分别显示。未知数据明确显示未知，0 stars 保留为 0。
 2. `✓ 保留` / `✕ 排除`，再次点击同一选项恢复待处理；可展开填写原因。收藏、对比与筛选互相独立。
@@ -125,9 +125,9 @@ SourceDeck 还在早期，很多取舍可以一起讨论。欢迎 fork、提 iss
 ## 检索与索引
 
 - GitHub 仓库：<https://github.com/Archaofan/dsh-source-deck>（可搜索 `dsh-plugin`、`source-deck`、`DeepSeek Harness`）
-- 最新预发行：[0.4.2](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.2)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- 最新预发行：[0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP 文档索引：<https://gitmcp.io/Archaofan/dsh-source-deck>
-- 插件市场：[目录条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)（已收录；2026-11-11 指向 0.4.1，0.4.2 的条目更新 PR 待合并）
+- 插件市场：[目录条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)（已收录；2026-11-11 指向 0.4.1，0.4.3 的条目更新 PR 待合并）
 
 ## 开发
 
@@ -138,10 +138,10 @@ node --test tests/*.test.ts
 npm pack
 ```
 
-产物为 Host `lib/index.js`、Client lazy-CJS `lib/client.js`、types、图标及中英 locale。0.4.2 沿用 0.4.1 的两个官方工具包依赖（`@deepseek-ai/dsh-tool-executor-native`、`@deepseek-ai/dsh-tools`，精确版本见上方「适配与安装」表），并把 `zod` 升到 `4.6.6` 以匹配 `typert-protocol` 0.2.2-rc.2 的类型要求。
+产物为 Host `lib/index.js`、Client lazy-CJS `lib/client.js`、types、图标及中英 locale。0.4.3 沿用 0.4.1 的两个官方工具包依赖（`@deepseek-ai/dsh-tool-executor-native`、`@deepseek-ai/dsh-tools`，精确版本见上方「适配与安装」表），并把 `zod` 升到 `4.6.6` 以匹配 `typert-protocol` 0.2.2-rc.2 的类型要求。
 
 - [v3 设计](docs/superpowers/specs/2026-10-18-sourcedeck-v3-design.md)
 - [已批准实施计划](docs/superpowers/plans/2026-10-18-sourcedeck-v3.md)
 - [开发工作流调研](docs/research/2026-10-18-developer-workflow-review.md)
-- [本轮同类工具调研](docs/research/2026-10-23-next-iteration-review.md) · [0.4.1 适配与验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.2 适配与验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md) · [0.4.2 发布说明](docs/releases/0.4.2.md)
+- [本轮同类工具调研](docs/research/2026-10-23-next-iteration-review.md) · [0.4.1 适配与验收](docs/implementation/2026-11-05-0.2.2-rc.1-adaptation.md) · [0.4.3 适配与验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md) · [0.4.3 发布说明](docs/releases/0.4.3.md)
 - [交接](docs/HANDOFF.md) · [版本策略](docs/VERSION-POLICY.md)

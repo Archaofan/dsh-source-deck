@@ -16,7 +16,7 @@
 
 ## 设计、打包和发布
 
-- 当前只维护 `0.2.2-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 仍为 `0.2.2-rc.1`，在用户批准生产升级窗口前，0.4.2 不会在生产加载；不要为兼容旧生产而放宽 peer，也不要擅自升级或安装生产。
+- 当前只维护 `0.2.2-rc.2`。不实现 alpha 专属分支、不承担 alpha 兼容，也不宣称支持未验收的历史或未来版本。生产 Desktop 仍为 `0.2.2-rc.1`，在用户批准生产升级窗口前，0.4.3 不会在生产加载；不要为兼容旧生产而放宽 peer，也不要擅自升级或安装生产。
 - 设计中用到的工具、Remote、UI Slot、Agent 接续和持久化接口，必须在这个 RC 的源码与文档确认。最新网站、master 和 alpha 示例只能作参考，不能代替目标接口证据。
 - RC 缺少能力时调整方案、缩小首版范围或明确暂不支持。不能为完成首版要求用户升级 alpha，也不能复制 alpha 的私有实现绕过公共扩展机制。
 - 实现打包时按 RC 插件加载器实际采用的版本规则声明准确范围，并验证目标 RC 能加载、行为正常。不能只验证前端模拟或构建成功便宣称日用可用。
@@ -91,6 +91,6 @@
 
 - 共用沙箱升级到 `0.2.2-rc.2`；旧 rc.1 归档 `archives/rc-0.2.2-rc.1-20261112T135229Z/`（源码 tar + 隔离数据；不含 node_modules，回滚用 checkout + frozen install）。官方构建 10 gates 通过（195.86s / 371 artifacts），Electron 与 primary-runtime 准备通过。
 - 沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名；这是沙箱适配，不是上游改动。
-- 产品 `0.4.1 → 0.4.2`（分支 `feat/adapt-0.2.2-rc.2`）：六个 peer 与官方 Client 类型包精确 `0.2.2-rc.2`；`zod 4.4.3 → 4.6.6`（typert-protocol 0.2.2-rc.2 的硬要求）。`src/` 无代码改动：契约差异都是未使用的可选新增字段。
-- 94/94 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验了入口/tab、手动添加、保留+撤销、引用 chip、设置 section、保存策略与清除数据。真实模型研究未跑（需用户单独授权复用 API key）。
-- 交付包 `dsh-source-deck-0.4.2.tgz`：188723 bytes / 53 文件，SHA256 `990F36A401FC98BDAE0BAC858C97185284A4B96395B32D50539BC4165D44BDEA`；发布为预发行 `v0.4.2`，市场条目 PR 待合并。
+- 产品 `0.4.1 → 0.4.3`（分支 `feat/adapt-0.2.2-rc.2`）：六个 peer 与官方 Client 类型包精确 `0.2.2-rc.2`；`zod 4.4.3 → 4.6.6`（typert-protocol 0.2.2-rc.2 的硬要求）。**唯一代码改动**：rc.2 把 `subagents.startActivation` 的 `request: { parent, prompt }` 拍平为顶层字段，`src/research-runtime.ts` 改为扁平传参并新增回归测试。同日先发的 0.4.2 未跟进该破坏，研究回合 8 ms 失败，已标注 superseded。
+- 95/95 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验了入口/tab、手动添加、保留+撤销、引用 chip、设置、保存策略与清除数据。经用户单独授权复用生产 `DEEPSEEK_API_KEY`（仅沙箱隔离凭据，验收后移除并恢复）跑通真实模型：聊天 OK、约 40 秒研究返回 2 个真实 GitHub 来源、保留 MDEZ++ 后引用发送且模型正确读取引用 JSON。
+- 交付包 `dsh-source-deck-0.4.3.tgz`：189287 bytes / 53 文件，SHA256 `2B4D7FF20A8631A2C93B83D782E80D2CBAAF2A524286572227D2B2468FB536BC`；发布为预发行 `v0.4.3`，市场条目 PR #14728 待合并。
