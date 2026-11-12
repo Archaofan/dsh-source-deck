@@ -1,4 +1,4 @@
-# 版本维护策略
+﻿# 版本维护策略
 
 2026-10-17 用户明确要求：插件会在自己的生产 Desktop 中使用，不升级不稳定的 alpha。维护目标由用户实际使用的版本决定，不由官方“最新发布”决定。
 
@@ -93,4 +93,4 @@
 - 沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名；这是沙箱适配，不是上游改动。
 - 产品 `0.4.1 → 0.4.3`（分支 `feat/adapt-0.2.2-rc.2`）：六个 peer 与官方 Client 类型包精确 `0.2.2-rc.2`；`zod 4.4.3 → 4.6.6`（typert-protocol 0.2.2-rc.2 的硬要求）。**唯一代码改动**：rc.2 把 `subagents.startActivation` 的 `request: { parent, prompt }` 拍平为顶层字段，`src/research-runtime.ts` 改为扁平传参并新增回归测试。同日先发的 0.4.2 未跟进该破坏，研究回合 8 ms 失败，已标注 superseded。
 - 95/95 测试、tsdown+tsc、官方 `Install-Plugin.ps1`（退出 0，无兼容拒绝/豁免）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验了入口/tab、手动添加、保留+撤销、引用 chip、设置、保存策略与清除数据。经用户单独授权复用生产 `DEEPSEEK_API_KEY`（仅沙箱隔离凭据，验收后移除并恢复）跑通真实模型：聊天 OK、约 40 秒研究返回 2 个真实 GitHub 来源、保留 MDEZ++ 后引用发送且模型正确读取引用 JSON。
-- 交付包 `dsh-source-deck-0.4.3.tgz`：189287 bytes / 53 文件，SHA256 `2B4D7FF20A8631A2C93B83D782E80D2CBAAF2A524286572227D2B2468FB536BC`；发布为预发行 `v0.4.3`，市场条目 PR #14728 待合并。
+- 交付包 `dsh-source-deck-0.4.3.tgz`：189287 bytes / 53 文件，SHA256 `2B4D7FF20A8631A2C93B83D782E80D2CBAAF2A524286572227D2B2468FB536BC`；已正式发布（非预发行，Latest 指向 `v0.4.3`），市场条目 PR #14728 待合并。

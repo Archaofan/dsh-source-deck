@@ -4,7 +4,7 @@
 
 ## 当前状态（2026-11-12）
 
-用户选择方案 B（跟最新 RC）：共用沙箱升级到 `0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），产品适配并发布 `0.4.3`。生产 Desktop 仍为 `0.2.2-rc.1`、装 0.3.0（不兼容、未生效），本轮未操作；0.4.3 的精确 peer 是 rc.2，**生产升级前不会加载**。**`v0.4.3` 已发布为预发行**（Latest 仍 v0.3.0）；0.4.2 是同日失败版本，保留 Release 但标注 superseded；市场条目更新 PR #14728 待合并，合并前目录仍是 0.4.1。
+用户选择方案 B（跟最新 RC）：共用沙箱升级到 `0.2.2-rc.2`（commit `ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`），产品适配并发布 `0.4.3`。生产 Desktop 仍为 `0.2.2-rc.1`、装 0.3.0（不兼容、未生效），本轮未操作；0.4.3 的精确 peer 是 rc.2，**生产升级前不会加载**。**`v0.4.3` 已正式发布（非预发行，Latest 指向 v0.4.3）**；0.4.2 是同日失败版本，保留 Release 但标注 superseded；市场条目更新 PR #14728 待合并，合并前目录仍是 0.4.1。
 
 适配内容：六个 DSH peer 与官方 Client 类型包精确升级到 `0.2.2-rc.2`，Cordis `4.1.0`；`zod 4.4.3 → 4.6.6`（`dsh-typert-protocol@0.2.2-rc.2` 的硬要求）。**唯一代码改动**：rc.2 把 `subagents.startActivation` 的 `request: { parent, prompt }` 拍平为顶层字段，`src/research-runtime.ts` 改为扁平传参，并用 `tests/research-runtime.test.ts` 锁定（0.4.2 因未改而研究回合 8 ms 失败）。沙箱脚本 `desktop-cli.mjs` 跟进 rc.2 的 `runDesktopCli(supportDir)` 单参数签名。95/95 测试、tsdown+tsc、官方安装（退出 0）与安装字节核对通过；实际 Host `0.2.2-rc.2-ddac967` 验证了入口/tab、手动添加、保留+撤销、引用 chip、设置与清除数据，并经用户授权复用生产 `DEEPSEEK_API_KEY`（验收后移除并恢复）跑通真实模型：聊天 OK、约 40 秒后台研究返回 2 个真实 GitHub 来源、保留 MDEZ++ 后引用发送且模型只依据引用 JSON 正确报出来源。PTC 父预设分支、原生缩放/IME/附件/屏幕阅读器/真人观察未覆盖。详见[接口差异](docs/research/2026-11-12-0.2.2-rc.2-interface-delta.md)与[实施验收](docs/implementation/2026-11-12-0.2.2-rc.2-adaptation.md)。
 

@@ -1,8 +1,8 @@
-# SourceDeck
+﻿# SourceDeck
 
 > [中文（默认）](README.md) | English
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 prerelease](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 latest](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [Stable 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [Marketplace catalog](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck is an open-source research workbench for DeepSeek Harness Desktop. It brings “let me see how others did it” out of a dozen browser tabs, scattered bookmarks, and chat history into one sidebar: background research, card-based screening, side-by-side comparison, and selected repositories referenced back into the current conversation.
 
@@ -51,7 +51,7 @@ The left side keeps the conversation going while the right-side deck stays in sy
 | DeepSeek Harness Desktop | 0.2.2-rc.2 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-Only public APIs from `0.2.2-rc.2` are used. 0.4.3 is the current prerelease adapted to that baseline; 0.4.1 only supports `0.2.2-rc.1`, and the published 0.4.0 only supports `0.2.1-rc.2`. Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
+Only public APIs from `0.2.2-rc.2` are used. 0.4.3 is the current release (Latest) adapted to that baseline; 0.4.1 only supports `0.2.2-rc.1`, and the published 0.4.0 only supports `0.2.1-rc.2`. Only this RC baseline is maintained; fast-moving alpha builds are not supported. Moving to a newer RC or a stable release requires a separate evaluation and acceptance pass.
 
 Download `dsh-source-deck-0.4.3.tgz` from the [v0.4.3 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3), install it through the Desktop plugin manager, then restart when prompted. **Do not use 0.4.2**: its research round fails immediately on rc.2 (`Cannot read properties of undefined (reading 'id')`). Environments still on `0.2.2-rc.1` should use the [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1), and `0.2.1-rc.2` environments the [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0). During development, use a new version or a content-hashed tgz path: the package manager may cache the same version at the same path.
 
@@ -125,7 +125,7 @@ You do not need to finish a whole feature. A clear scenario, one test, or one pa
 ## Find the project
 
 - GitHub: <https://github.com/Archaofan/dsh-source-deck> (searchable via `dsh-plugin`, `source-deck`, `DeepSeek Harness`)
-- Latest prerelease: [0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- Latest: [0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3); stable: [0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP documentation index: <https://gitmcp.io/Archaofan/dsh-source-deck>
 - Plugin marketplace: [catalog entry](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml) (included; points to 0.4.1 as checked on 2026-11-11, with the 0.4.3 update PR pending)
 

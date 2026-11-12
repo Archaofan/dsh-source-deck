@@ -1,8 +1,8 @@
-# SourceDeck / 资料台
+﻿# SourceDeck / 资料台
 
 > 中文（默认） | [English](README.en.md)
 
-[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 预发行](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
+[GitHub](https://github.com/Archaofan/dsh-source-deck) · [0.4.3 最新发布](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) · [稳定版 0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0) · [GitMCP](https://gitmcp.io/Archaofan/dsh-source-deck) · [插件市场目录](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)
 
 SourceDeck 是给 DeepSeek Harness Desktop 用的开源资料工作台。它把“先看看别人怎么做的”从十几个浏览器标签页、零散书签和聊天记录里收进一个侧栏：后台研究、卡片筛选、并排对比，再把选中的仓库引用回当前对话。
 
@@ -51,7 +51,7 @@ SourceDeck 就是为这个中间过程做的。它把一次调研变成一条可
 | DeepSeek Harness Desktop | 0.2.2-rc.2 |
 | @deepseek-ai/cordis | 4.1.0 |
 
-只使用 `0.2.2-rc.2` 的公共接口。0.4.3 是适配该基线的当前预发行；0.4.1 只支持 `0.2.2-rc.1`，0.4.0 只支持 `0.2.1-rc.2`。目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
+只使用 `0.2.2-rc.2` 的公共接口。0.4.3 是适配该基线的当前正式发布（Latest）；0.4.1 只支持 `0.2.2-rc.1`，0.4.0 只支持 `0.2.1-rc.2`。目前只维护这个 RC 基线；更新迭代快的 alpha 版本暂不提供支持。升级到新的 RC 或正式版需要单独评估和验收。
 
 从 [v0.4.3 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3) 下载 `dsh-source-deck-0.4.3.tgz`，在 Desktop 插件管理页选择本地安装，按提示重启。**不要使用 0.4.2**：它在 rc.2 上启动研究回合会立刻失败（`Cannot read properties of undefined (reading 'id')`）。仍停留在 `0.2.2-rc.1` 的环境请使用 [v0.4.1 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.1)，`0.2.1-rc.2` 环境使用 [v0.4.0 Release](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.0)。重复开发安装应使用新版本或带内容哈希的新 tgz 路径；同路径同版本可能被包管理器缓存。
 
@@ -125,7 +125,7 @@ SourceDeck 还在早期，很多取舍可以一起讨论。欢迎 fork、提 iss
 ## 检索与索引
 
 - GitHub 仓库：<https://github.com/Archaofan/dsh-source-deck>（可搜索 `dsh-plugin`、`source-deck`、`DeepSeek Harness`）
-- 最新预发行：[0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
+- 最新发布：[0.4.3](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.4.3)；稳定版：[0.3.0](https://github.com/Archaofan/dsh-source-deck/releases/tag/v0.3.0)
 - GitMCP 文档索引：<https://gitmcp.io/Archaofan/dsh-source-deck>
 - 插件市场：[目录条目](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/data/plugins/Archaofan__dsh-source-deck.yml)（已收录；2026-11-11 指向 0.4.1，0.4.3 的条目更新 PR 待合并）
 
